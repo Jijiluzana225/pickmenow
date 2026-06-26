@@ -108,6 +108,8 @@ def create_booking(request):
 
 📝 <b>Instructions:</b> {booking.instructions or "None"}
 
+https://www.pickmenow.online/dashboard/
+
 
 """
 
