@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app',
+                      'https://www.pickmenow.online',                      
+                      'https://pickmenow.online']
+
 
 # Application definition
 
