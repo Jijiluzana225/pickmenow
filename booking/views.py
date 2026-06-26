@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -362,12 +363,13 @@ def driver_register(request):
             is_approved=False
         )
 
-        return HttpResponse("""
-        <script>
+        return HttpResponse(f"""
+            <script>
             alert("Registration successful!\\n\\nWait for the call of the Admin to activate your account.");
-            window.location.href = "customer/login/";
-        </script>
-        """)
+            window.location.href = "{reverse('customer_login')}";
+            </script>
+            """)
+
 
     return render(request, "booking/driver_register.html")
 
