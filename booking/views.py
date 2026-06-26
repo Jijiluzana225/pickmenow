@@ -4,13 +4,21 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 
-@login_required
-def index(request):
-    customer = request.user.customer_profile
 
-    return render(request, "booking/index.html", {
-        "customer": customer
-    })
+@login_required(login_url="customer_login")
+def index(request):
+
+    if hasattr(request.user, "customer_profile"):
+        customer = request.user.customer_profile
+
+        return render(request, "booking/index.html", {
+            "customer": customer
+        })
+
+    if hasattr(request.user, "driver_profile"):
+        return redirect("dashboard")
+
+    return redirect("customer_login")
 
 
 from django.contrib.auth.decorators import login_required
