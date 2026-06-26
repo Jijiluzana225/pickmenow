@@ -275,7 +275,6 @@ def customer_dashboard(request):
         "bookings": bookings
     })
 
-
 @login_required
 def update_booking_tip(request, booking_id):
     customer = request.user.customer_profile
@@ -287,9 +286,41 @@ def update_booking_tip(request, booking_id):
     )
 
     if request.method == "POST":
-        tip = request.POST.get("tip") or 0
-        booking.tip = Decimal(tip)
+
+        # Save the old tip first
+        old_tip = booking.tip
+
+        # Get the new tip
+        new_tip = Decimal(request.POST.get("tip") or 0)
+        tip_added = new_tip - old_tip
+
+        booking.tip = new_tip
         booking.save()
+        
+
+        message = f"""
+⭐ <b>TIP Update Alert</b>
+
+👤 <b>Customer:</b> {booking.customer_name}
+📞 <b>Contact:</b> {booking.contact_number}
+
+📍 <b>Pickup:</b> {booking.origin}
+🏁 <b>Destination:</b> {booking.destination}
+
+📏 <b>Distance:</b> {booking.distance_km} KM
+💰 <b>Fare:</b> ₱{booking.fare}
+
+☕ <b>Previous Tip:</b> ₱{old_tip}
+➕ <b>Added Tip:</b> ₱{tip_added}
+
+🎁 <b>New Tip:</b> ₱{new_tip}
+
+💵 <b>Total:</b> ₱{booking.total_amount}
+
+https://www.pickmenow.online/dashboard/
+"""
+
+        send_telegram_message(message)
 
     return redirect("customer_dashboard")
 
