@@ -365,7 +365,7 @@ def driver_register(request):
         return HttpResponse("""
         <script>
             alert("Registration successful!\\n\\nWait for the call of the Admin to activate your account.");
-            window.location.href = "/customer-login/";
+            window.location.href = "customer/login/";
         </script>
         """)
 
