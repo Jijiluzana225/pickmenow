@@ -11,15 +11,15 @@
         body {
             min-height: 100vh;
             background:
-                radial-gradient(circle at top left, rgba(250, 204, 21, .25), transparent 30%),
-                radial-gradient(circle at bottom right, rgba(37, 99, 235, .18), transparent 30%),
+                radial-gradient(circle at top left, rgba(250, 204, 21, .22), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, .16), transparent 32%),
                 linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: #1f2937;
         }
 
-        .booking-wrapper {
-            max-width: 820px;
+        .dashboard-wrapper {
+            max-width: 950px;
             margin: auto;
             padding: 14px;
         }
@@ -31,23 +31,23 @@
             padding: 22px;
             margin-bottom: 16px;
             box-shadow: 0 18px 45px rgba(15, 23, 42, .22);
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
 
         .hero-card::after {
             content: "🛵";
             position: absolute;
             right: 18px;
-            bottom: -8px;
-            font-size: 82px;
-            opacity: .13;
+            bottom: -12px;
+            font-size: 88px;
+            opacity: .12;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             background: rgba(250, 204, 21, .16);
             color: #facc15;
             border: 1px solid rgba(250, 204, 21, .28);
@@ -59,7 +59,7 @@
         }
 
         .hero-card h2 {
-            font-size: 26px;
+            font-size: 27px;
             font-weight: 950;
             letter-spacing: -.5px;
             margin-bottom: 6px;
@@ -69,50 +69,78 @@
             color: #cbd5e1;
             font-size: 14px;
             margin-bottom: 0;
-            max-width: 520px;
+            max-width: 560px;
         }
 
         .booking-card {
+            background: rgba(255,255,255,.96);
+            border: 1px solid rgba(226,232,240,.9);
             border-radius: 26px;
-            border: 1px solid rgba(226, 232, 240, .9);
-            background: rgba(255, 255, 255, .96);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, .10);
+            box-shadow: 0 16px 42px rgba(15, 23, 42, .09);
+            margin-bottom: 16px;
             overflow: hidden;
         }
 
-        .card-inner {
+        .booking-card-body {
             padding: 18px;
         }
 
         .section-title {
             display: flex;
             align-items: center;
-            gap: 9px;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: #64748b;
-            font-weight: 900;
-            margin-bottom: 14px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        .section-title span {
-            width: 30px;
-            height: 30px;
-            display: inline-flex;
+        .section-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            display: flex;
             align-items: center;
             justify-content: center;
-            background: #eff6ff;
-            color: #2563eb;
-            border-radius: 10px;
-            font-size: 16px;
+            font-size: 22px;
+            box-shadow: 0 12px 26px rgba(249, 115, 22, .20);
+            flex: 0 0 auto;
+        }
+
+        .section-title h5 {
+            margin: 0;
+            font-weight: 950;
+            color: #111827;
+        }
+
+        .section-title small {
+            color: #6b7280;
+            font-size: 13px;
         }
 
         .form-label {
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 900;
             color: #374151;
             margin-bottom: 6px;
+        }
+
+        .form-control,
+        .tip-input {
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+            background: #ffffff;
+        }
+
+        .form-control:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .16);
+        }
+
+        .form-control[readonly] {
+            background: #f8fafc;
+            color: #4b5563;
+            font-weight: 700;
         }
 
         .input-icon-wrap {
@@ -133,27 +161,40 @@
         }
 
         textarea.form-control {
-            padding-left: 15px;
+            padding-left: 14px;
         }
 
-        .form-control {
-            border-radius: 16px;
-            padding: 13px 15px;
-            border: 1px solid #d1d5db;
-            font-size: 15px;
-            background: #ffffff;
-        }
-
-        .form-control:focus {
-            border-color: #f97316;
-            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .16);
-        }
-
-        .form-control[readonly] {
+        .route-box {
             background: #f8fafc;
-            color: #4b5563;
-            font-weight: 700;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
+
+        .route-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .route-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .route-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            font-size: 15px;
+        }
+
+        .pickup-icon { background: #dcfce7; color: #166534; }
+        .destination-icon { background: #fee2e2; color: #991b1b; }
 
         .map-card {
             margin: 16px 0;
@@ -184,7 +225,7 @@
         }
 
         .map-header h5 {
-            font-weight: 900;
+            font-weight: 950;
             margin-bottom: 2px;
         }
 
@@ -223,35 +264,11 @@
             overflow: hidden !important;
         }
 
-        .btn {
-            border-radius: 16px;
-            padding: 13px 16px;
-            font-weight: 900;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            border: none;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            border: none;
-            box-shadow: 0 12px 24px rgba(22, 163, 74, .22);
-        }
-
-        .btn:disabled {
-            cursor: not-allowed;
-            opacity: .55;
-            box-shadow: none;
-        }
-
         .result-box {
             background: linear-gradient(135deg, #f8fafc, #ffffff);
             border: 1px solid #e5e7eb;
             border-radius: 20px;
-            padding: 16px;
+            padding: 14px;
             margin-top: 16px;
             margin-bottom: 16px;
         }
@@ -270,12 +287,19 @@
             margin-bottom: 6px;
         }
 
-        .result-label {
+        .label {
+            font-size: 11px;
+            font-weight: 950;
             color: #64748b;
-            font-size: 13px;
-            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: .06em;
+            letter-spacing: .07em;
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-size: 14px;
+            color: #1f2937;
+            line-height: 1.35;
         }
 
         .result-value {
@@ -301,7 +325,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: 900;
+            font-weight: 950;
             color: #9a3412;
             margin-bottom: 8px;
         }
@@ -312,8 +336,49 @@
             margin-top: 6px;
         }
 
+        .route-locked-note {
+            display: none;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .btn {
+            border-radius: 16px;
+            font-weight: 900;
+            padding: 12px 14px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+            box-shadow: 0 12px 24px rgba(22, 163, 74, .22);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
+        }
+
+        .btn-outline-secondary {
+            border-width: 2px;
+            background: #ffffff;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+            box-shadow: none;
+        }
+
         @media (min-width: 768px) {
-            .booking-wrapper {
+            .dashboard-wrapper {
                 padding: 28px;
             }
 
@@ -325,12 +390,18 @@
                 font-size: 34px;
             }
 
-            .card-inner {
-                padding: 24px;
+            .booking-card-body {
+                padding: 22px;
             }
 
             #map {
                 height: 430px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .hero-card h2 {
+                font-size: 24px;
             }
         }
     </style>
@@ -340,7 +411,7 @@
 
 {% include "includes/navbar.html" %}
 
-<div class="booking-wrapper">
+<div class="dashboard-wrapper">
 
     <div class="hero-card">
         <div class="hero-badge">
@@ -356,12 +427,15 @@
         </p>
     </div>
 
-    <div class="card booking-card">
-        <div class="card-inner">
+    <div class="booking-card">
+        <div class="booking-card-body">
 
             <div class="section-title">
-                <span>🛵</span>
-                Ride Details
+                <div class="section-icon">🛵</div>
+                <div>
+                    <h5>Ride Details</h5>
+                    <small>Choose your pickup and destination from Google Maps.</small>
+                </div>
             </div>
 
             <form method="POST" action="/create-booking/">
@@ -394,40 +468,45 @@
                         placeholder="Landmark, gate number, pickup notes, etc."></textarea>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">📍 Pickup Location</label>
-                    <div class="input-icon-wrap">
-                        <span class="input-icon">🟢</span>
-                        <input
-                            type="text"
-                            id="origin"
-                            name="origin"
-                            class="form-control"
-                            placeholder="Getting your current GPS location..."
-                            required>
+                <div class="route-box">
+                    <div class="route-item">
+                        <div class="route-icon pickup-icon">📍</div>
+                        <div class="w-100">
+                            <div class="label">Pickup Location</div>
+                            <div class="input-icon-wrap">
+                                <span class="input-icon">🟢</span>
+                                <input
+                                    type="text"
+                                    id="origin"
+                                    name="origin"
+                                    class="form-control"
+                                    placeholder="Getting your current GPS location..."
+                                    required>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label class="form-label">🏁 Destination</label>
-                    <div class="input-icon-wrap">
-                        <span class="input-icon">🔴</span>
-                        <input
-                            type="text"
-                            id="destination"
-                            name="destination"
-                            class="form-control"
-                            placeholder="Search destination, drag pin if needed"
-                            required>
+                    <div class="route-item">
+                        <div class="route-icon destination-icon">🏁</div>
+                        <div class="w-100">
+                            <div class="label">Destination</div>
+                            <div class="input-icon-wrap">
+                                <span class="input-icon">🔴</span>
+                                <input
+                                    type="text"
+                                    id="destination"
+                                    name="destination"
+                                    class="form-control"
+                                    placeholder="Search Destination, Drag Pin if needed"
+                                    required>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="map-card">
                     <div class="map-header">
-                        <div class="map-icon">
-                            🗺️
-                        </div>
-
+                        <div class="map-icon">🗺️</div>
                         <div>
                             <h5>Route Map</h5>
                             <small>
@@ -448,17 +527,30 @@
                 <input type="hidden" id="distance_km" name="distance_km">
 
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary" onclick="calculateRoute()">
+                    <button
+                        type="button"
+                        id="calculateRouteBtn"
+                        class="btn btn-primary"
+                        onclick="calculateRoute()">
                         🧭 Calculate Route and Fare
                     </button>
+
+                    <button
+                        type="button"
+                        id="changeRouteBtn"
+                        class="btn btn-outline-secondary"
+                        onclick="window.location.reload();"
+                        style="display:none;">
+                        🔄 Change Pickup or Destination
+                    </button>
                 </div>
+             
 
                 <div class="result-box">
                     <div class="result-row">
                         <div>
-                            <div class="result-label">Distance</div>
+                            <div class="label">Distance</div>
                         </div>
-
                         <div id="distance_text" class="result-value">
                             —
                         </div>
@@ -466,9 +558,8 @@
 
                     <div class="result-row">
                         <div>
-                            <div class="result-label">Estimated Fare</div>
+                            <div class="label">Estimated Fare</div>
                         </div>
-
                         <div id="fare_text" class="result-value fare">
                             —
                         </div>
@@ -483,7 +574,7 @@
                     <input
                         type="number"
                         name="tip"
-                        class="form-control"
+                        class="form-control tip-input"
                         placeholder="Enter tip amount, ₱"
                         min="0"
                         step="1">
@@ -498,16 +589,13 @@
                         ✅ Book Ride Now
                     </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 
 </div>
 
 <script>
-
 let map;
 let directionsService;
 let directionsRenderer;
@@ -519,7 +607,6 @@ let pickupInfoWindow;
 let destinationInfoWindow;
 
 function initMap() {
-
     const defaultLocation = { lat: 6.9214, lng: 122.0790 };
 
     map = new google.maps.Map(document.getElementById("map"), {
@@ -550,9 +637,12 @@ function initMap() {
     const originAuto = new google.maps.places.Autocomplete(originInput);
 
     originAuto.addListener("place_changed", function() {
-
         const place = originAuto.getPlace();
-        if (!place.geometry) return;
+
+        if (!place.geometry) {
+            clearInvalidAddress("origin", "origin_lat", "origin_lng", "Pickup location");
+            return;
+        }
 
         const loc = {
             lat: place.geometry.location.lat(),
@@ -571,9 +661,12 @@ function initMap() {
     const destAuto = new google.maps.places.Autocomplete(destinationInput);
 
     destAuto.addListener("place_changed", function() {
-
         const place = destAuto.getPlace();
-        if (!place.geometry) return;
+
+        if (!place.geometry) {
+            clearInvalidAddress("destination", "destination_lat", "destination_lng", "Destination");
+            return;
+        }
 
         const loc = {
             lat: place.geometry.location.lat(),
@@ -590,7 +683,6 @@ function initMap() {
 }
 
 function autoPinCurrentLocation() {
-
     if (!navigator.geolocation) {
         alert("Your browser does not support GPS location. Please manually pin your pickup location.");
         document.getElementById("origin").placeholder = "Search Pickup, Drag Pin if needed";
@@ -598,9 +690,7 @@ function autoPinCurrentLocation() {
     }
 
     navigator.geolocation.getCurrentPosition(
-
         function(position) {
-
             const userLocation = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
@@ -615,16 +705,11 @@ function autoPinCurrentLocation() {
 
             resetBookingButton();
         },
-
         function(error) {
-
             document.getElementById("origin").placeholder = "Search Pickup, Drag Pin if needed";
-
             alert("Unable to access your current location. Please enable GPS/location permission or manually pin your pickup location.");
-
             console.log(error);
         },
-
         {
             enableHighAccuracy: true,
             timeout: 10000,
@@ -640,21 +725,89 @@ function resetBookingButton() {
     document.getElementById("distance_km").value = "";
 }
 
+function lockRouteInputs() {
+    document.getElementById("origin").readOnly = true;
+    document.getElementById("destination").readOnly = true;
+
+    document.getElementById("calculateRouteBtn").style.display = "none";
+    document.getElementById("changeRouteBtn").style.display = "block";
+    document.getElementById("routeLockedNote").style.display = "block";
+
+    if (originMarker) {
+        originMarker.setDraggable(false);
+    }
+
+    if (destinationMarker) {
+        destinationMarker.setDraggable(false);
+    }
+}
+
 function watchLocationInputChanges() {
     const originInput = document.getElementById("origin");
     const destinationInput = document.getElementById("destination");
 
     originInput.addEventListener("input", function () {
+        if (originInput.readOnly) return;
+
+        document.getElementById("origin_lat").value = "";
+        document.getElementById("origin_lng").value = "";
         resetBookingButton();
     });
 
     destinationInput.addEventListener("input", function () {
+        if (destinationInput.readOnly) return;
+
+        document.getElementById("destination_lat").value = "";
+        document.getElementById("destination_lng").value = "";
         resetBookingButton();
+    });
+
+    originInput.addEventListener("blur", function () {
+        validateAddressInput("origin", "origin_lat", "origin_lng", "Pickup location");
+    });
+
+    destinationInput.addEventListener("blur", function () {
+        validateAddressInput("destination", "destination_lat", "destination_lng", "Destination");
     });
 }
 
-function setOriginMarker(loc) {
+function validateAddressInput(inputId, latId, lngId, fieldName) {
+    const input = document.getElementById(inputId);
+    const lat = document.getElementById(latId);
+    const lng = document.getElementById(lngId);
 
+    if (input.readOnly) {
+        return true;
+    }
+
+    if (input.value.trim() !== "" && (lat.value === "" || lng.value === "")) {
+        alert(fieldName + " is not a valid Google Maps address. Please select from the Google suggestions or drag the pin on the map.");
+
+        input.value = "";
+        lat.value = "";
+        lng.value = "";
+
+        resetBookingButton();
+        input.focus();
+
+        return false;
+    }
+
+    return true;
+}
+
+function clearInvalidAddress(inputId, latId, lngId, fieldName) {
+    alert(fieldName + " is not valid. Please select from the Google suggestions.");
+
+    document.getElementById(inputId).value = "";
+    document.getElementById(latId).value = "";
+    document.getElementById(lngId).value = "";
+
+    resetBookingButton();
+    document.getElementById(inputId).focus();
+}
+
+function setOriginMarker(loc) {
     if (originMarker) {
         originMarker.setMap(null);
     }
@@ -697,7 +850,6 @@ function setOriginMarker(loc) {
     });
 
     originMarker.addListener("dragend", function(e) {
-
         const updated = {
             lat: e.latLng.lat(),
             lng: e.latLng.lng()
@@ -718,7 +870,6 @@ function setOriginMarker(loc) {
 }
 
 function setDestinationMarker(loc) {
-
     if (destinationMarker) {
         destinationMarker.setMap(null);
     }
@@ -761,7 +912,6 @@ function setDestinationMarker(loc) {
     });
 
     destinationMarker.addListener("dragend", function(e) {
-
         const updated = {
             lat: e.latLng.lat(),
             lng: e.latLng.lng()
@@ -792,13 +942,10 @@ function updateDestination(loc) {
 }
 
 function reverseGeocode(loc, type) {
-
     const geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({ location: loc }, function(results, status) {
-
         if (status === "OK" && results[0]) {
-
             if (type === "origin") {
                 document.getElementById("origin").value = results[0].formatted_address;
             }
@@ -811,6 +958,13 @@ function reverseGeocode(loc, type) {
 }
 
 function calculateRoute() {
+    if (!validateAddressInput("origin", "origin_lat", "origin_lng", "Pickup location")) {
+        return;
+    }
+
+    if (!validateAddressInput("destination", "destination_lat", "destination_lng", "Destination")) {
+        return;
+    }
 
     const origin = document.getElementById("origin").value.trim();
     const destination = document.getElementById("destination").value.trim();
@@ -822,35 +976,29 @@ function calculateRoute() {
     const destinationLng = document.getElementById("destination_lng").value;
 
     if (origin === "" || originLat === "" || originLng === "") {
-        alert("Please Pin Origin.");
+        alert("Please pin or select a valid pickup location.");
         document.getElementById("origin").focus();
         return;
     }
 
     if (destination === "" || destinationLat === "" || destinationLng === "") {
-        alert("Please Pin Destination.");
+        alert("Please pin or select a valid destination.");
         document.getElementById("destination").focus();
         return;
     }
 
     directionsService.route({
-
         origin: {
             lat: parseFloat(originLat),
             lng: parseFloat(originLng)
         },
-
         destination: {
             lat: parseFloat(destinationLat),
             lng: parseFloat(destinationLng)
         },
-
         travelMode: google.maps.TravelMode.DRIVING
-
     }, function(response, status) {
-
         if (status === "OK") {
-
             directionsRenderer.setDirections(response);
 
             const leg = response.routes[0].legs[0];
@@ -860,27 +1008,20 @@ function calculateRoute() {
 
             const fare = Math.ceil(25 + (km * 8));
 
-            document.getElementById("distance_text").innerHTML =
-                leg.distance.text;
-
-            document.getElementById("fare_text").innerHTML =
-                "₱" + fare;
+            document.getElementById("distance_text").innerHTML = leg.distance.text;
+            document.getElementById("fare_text").innerHTML = "₱" + fare;
 
             document.getElementById("bookRideBtn").disabled = false;
-
+            lockRouteInputs();
         } else if (status === "ZERO_RESULTS") {
-
             alert("No route could be found between the selected locations.");
             document.getElementById("bookRideBtn").disabled = true;
-
         } else {
-
             alert("Unable to calculate route. Please check your pinned locations.");
             document.getElementById("bookRideBtn").disabled = true;
         }
     });
 }
-
 </script>
 
 <script async defer
