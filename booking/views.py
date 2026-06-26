@@ -216,7 +216,7 @@ from .models import CustomerProfile
 def customer_login(request):
 
     if request.user.is_authenticated:
-        return redirect("booking")
+        return redirect("index")
 
     if request.method == "POST":
 
