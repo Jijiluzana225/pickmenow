@@ -294,8 +294,9 @@ def update_booking_tip(request, booking_id):
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import login
 from .models import DriverProfile
+from django.http import HttpResponse
+
 
 def driver_register(request):
 
@@ -361,8 +362,12 @@ def driver_register(request):
             is_approved=False
         )
 
-        login(request, user)
-        return redirect("dashboard")
+        return HttpResponse("""
+        <script>
+            alert("Registration successful!\\n\\nWait for the call of the Admin to activate your account.");
+            window.location.href = "/customer-login/";
+        </script>
+        """)
 
     return render(request, "booking/driver_register.html")
 
