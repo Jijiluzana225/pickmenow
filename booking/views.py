@@ -314,15 +314,16 @@ def driver_register(request):
 
         profile_picture = request.FILES.get("profile_picture")
 
+       
         if not profile_picture:
             return render(request, "booking/driver_register.html", {
-                "error": "Profile picture is required.",
-                "full_name": full_name,
-                "contact_number": contact_number,
-                "motorcycle_model": motorcycle_model,
-                "plate_number": plate_number,
-                "license_number": license_number,
-            })
+        "error": "Please upload your profile picture.",
+        "full_name": full_name,
+        "contact_number": contact_number,
+        "motorcycle_model": motorcycle_model,
+        "plate_number": plate_number,
+        "license_number": license_number,
+    })
 
         if password != confirm_password:
             return render(request, "booking/driver_register.html", {
