@@ -377,6 +377,24 @@
             box-shadow: none;
         }
 
+
+        .pac-container {
+            z-index: 999999 !important;
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, .25);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .pac-item {
+            padding: 12px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .pac-item-query {
+            font-size: 14px;
+        }
+
         @media (min-width: 768px) {
             .dashboard-wrapper {
                 padding: 28px;
@@ -544,6 +562,7 @@
                         🔄 Change Pickup or Destination
                     </button>
                 </div>
+
              
 
                 <div class="result-box">
@@ -606,6 +625,11 @@ let destinationMarker;
 let pickupInfoWindow;
 let destinationInfoWindow;
 
+let originPlaceSelected = false;
+let destinationPlaceSelected = false;
+let suppressOriginInput = false;
+let suppressDestinationInput = false;
+
 function initMap() {
     const defaultLocation = { lat: 6.9214, lng: 122.0790 };
 
@@ -630,24 +654,31 @@ function initMap() {
 
     directionsRenderer.setMap(map);
 
-    autoPinCurrentLocation();
-    watchLocationInputChanges();
-
     const originInput = document.getElementById("origin");
-    const originAuto = new google.maps.places.Autocomplete(originInput);
+    const destinationInput = document.getElementById("destination");
+
+    const originAuto = new google.maps.places.Autocomplete(originInput, {
+        fields: ["geometry", "formatted_address", "name"]
+    });
 
     originAuto.addListener("place_changed", function() {
         const place = originAuto.getPlace();
 
         if (!place.geometry) {
-            clearInvalidAddress("origin", "origin_lat", "origin_lng", "Pickup location");
+            clearLocationInput("origin");
+            alert("Pickup location is not a valid Google Maps address. Please select from the Google suggestions or drag the pin on the map.");
             return;
         }
+
+        suppressOriginInput = true;
+        originPlaceSelected = true;
 
         const loc = {
             lat: place.geometry.location.lat(),
             lng: place.geometry.location.lng()
         };
+
+        originInput.value = place.formatted_address || place.name;
 
         map.setCenter(loc);
         map.setZoom(17);
@@ -655,23 +686,34 @@ function initMap() {
         setOriginMarker(loc);
         updateOrigin(loc);
         resetBookingButton();
+
+        setTimeout(function() {
+            suppressOriginInput = false;
+        }, 800);
     });
 
-    const destinationInput = document.getElementById("destination");
-    const destAuto = new google.maps.places.Autocomplete(destinationInput);
+    const destAuto = new google.maps.places.Autocomplete(destinationInput, {
+        fields: ["geometry", "formatted_address", "name"]
+    });
 
     destAuto.addListener("place_changed", function() {
         const place = destAuto.getPlace();
 
         if (!place.geometry) {
-            clearInvalidAddress("destination", "destination_lat", "destination_lng", "Destination");
+            clearLocationInput("destination");
+            alert("Destination is not a valid Google Maps address. Please select from the Google suggestions or drag the pin on the map.");
             return;
         }
+
+        suppressDestinationInput = true;
+        destinationPlaceSelected = true;
 
         const loc = {
             lat: place.geometry.location.lat(),
             lng: place.geometry.location.lng()
         };
+
+        destinationInput.value = place.formatted_address || place.name;
 
         map.setCenter(loc);
         map.setZoom(17);
@@ -679,7 +721,14 @@ function initMap() {
         setDestinationMarker(loc);
         updateDestination(loc);
         resetBookingButton();
+
+        setTimeout(function() {
+            suppressDestinationInput = false;
+        }, 800);
     });
+
+    watchLocationInputChanges();
+    autoPinCurrentLocation();
 }
 
 function autoPinCurrentLocation() {
@@ -742,32 +791,68 @@ function lockRouteInputs() {
     }
 }
 
+function clearLocationInput(type) {
+    if (type === "origin") {
+        document.getElementById("origin").value = "";
+        document.getElementById("origin_lat").value = "";
+        document.getElementById("origin_lng").value = "";
+        originPlaceSelected = false;
+        suppressOriginInput = false;
+
+        if (originMarker) {
+            originMarker.setMap(null);
+            originMarker = null;
+        }
+    }
+
+    if (type === "destination") {
+        document.getElementById("destination").value = "";
+        document.getElementById("destination_lat").value = "";
+        document.getElementById("destination_lng").value = "";
+        destinationPlaceSelected = false;
+        suppressDestinationInput = false;
+
+        if (destinationMarker) {
+            destinationMarker.setMap(null);
+            destinationMarker = null;
+        }
+    }
+
+    resetBookingButton();
+}
+
 function watchLocationInputChanges() {
     const originInput = document.getElementById("origin");
     const destinationInput = document.getElementById("destination");
 
     originInput.addEventListener("input", function () {
-        if (originInput.readOnly) return;
+        if (originInput.readOnly || suppressOriginInput) return;
 
+        originPlaceSelected = false;
         document.getElementById("origin_lat").value = "";
         document.getElementById("origin_lng").value = "";
         resetBookingButton();
     });
 
     destinationInput.addEventListener("input", function () {
-        if (destinationInput.readOnly) return;
+        if (destinationInput.readOnly || suppressDestinationInput) return;
 
+        destinationPlaceSelected = false;
         document.getElementById("destination_lat").value = "";
         document.getElementById("destination_lng").value = "";
         resetBookingButton();
     });
 
     originInput.addEventListener("blur", function () {
-        validateAddressInput("origin", "origin_lat", "origin_lng", "Pickup location");
+        setTimeout(function () {
+            validateAddressInput("origin", "origin_lat", "origin_lng", "Pickup location");
+        }, 700);
     });
 
     destinationInput.addEventListener("blur", function () {
-        validateAddressInput("destination", "destination_lat", "destination_lng", "Destination");
+        setTimeout(function () {
+            validateAddressInput("destination", "destination_lat", "destination_lng", "Destination");
+        }, 700);
     });
 }
 
@@ -781,30 +866,13 @@ function validateAddressInput(inputId, latId, lngId, fieldName) {
     }
 
     if (input.value.trim() !== "" && (lat.value === "" || lng.value === "")) {
+        clearLocationInput(inputId === "origin" ? "origin" : "destination");
         alert(fieldName + " is not a valid Google Maps address. Please select from the Google suggestions or drag the pin on the map.");
-
-        input.value = "";
-        lat.value = "";
-        lng.value = "";
-
-        resetBookingButton();
         input.focus();
-
         return false;
     }
 
     return true;
-}
-
-function clearInvalidAddress(inputId, latId, lngId, fieldName) {
-    alert(fieldName + " is not valid. Please select from the Google suggestions.");
-
-    document.getElementById(inputId).value = "";
-    document.getElementById(latId).value = "";
-    document.getElementById(lngId).value = "";
-
-    resetBookingButton();
-    document.getElementById(inputId).focus();
 }
 
 function setOriginMarker(loc) {
@@ -934,11 +1002,13 @@ function setDestinationMarker(loc) {
 function updateOrigin(loc) {
     document.getElementById("origin_lat").value = loc.lat;
     document.getElementById("origin_lng").value = loc.lng;
+    originPlaceSelected = true;
 }
 
 function updateDestination(loc) {
     document.getElementById("destination_lat").value = loc.lat;
     document.getElementById("destination_lng").value = loc.lng;
+    destinationPlaceSelected = true;
 }
 
 function reverseGeocode(loc, type) {
@@ -947,11 +1017,21 @@ function reverseGeocode(loc, type) {
     geocoder.geocode({ location: loc }, function(results, status) {
         if (status === "OK" && results[0]) {
             if (type === "origin") {
+                suppressOriginInput = true;
                 document.getElementById("origin").value = results[0].formatted_address;
+                originPlaceSelected = true;
+                setTimeout(function() {
+                    suppressOriginInput = false;
+                }, 800);
             }
 
             if (type === "destination") {
+                suppressDestinationInput = true;
                 document.getElementById("destination").value = results[0].formatted_address;
+                destinationPlaceSelected = true;
+                setTimeout(function() {
+                    suppressDestinationInput = false;
+                }, 800);
             }
         }
     });
