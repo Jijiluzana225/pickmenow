@@ -798,3 +798,66 @@ def send_telegram_message(message):
         requests.post(url, data=data, timeout=10)
     except requests.RequestException:
         pass
+
+
+from django.http import JsonResponse
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
+
+@login_required(login_url="driver_login")
+def update_driver_location(request):
+    if not hasattr(request.user, "driver_profile"):
+        return JsonResponse({"success": False})
+
+    if request.method == "POST":
+        driver = request.user.driver_profile
+        driver.current_lat = request.POST.get("lat")
+        driver.current_lng = request.POST.get("lng")
+        driver.last_location_update = timezone.now()
+        driver.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False})
+
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
+@login_required
+def get_driver_location(request, booking_id):
+
+    if not hasattr(request.user, "customer_profile"):
+        return JsonResponse({
+            "success": False,
+            "error": "Customer profile not found."
+        })
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        customer=request.user.customer_profile
+    )
+
+    if not booking.driver:
+        return JsonResponse({
+            "success": False,
+            "error": "No driver assigned."
+        })
+
+    if booking.driver.current_lat is None or booking.driver.current_lng is None:
+        return JsonResponse({
+            "success": False,
+            "error": "Driver location not available yet.",
+            "driver_name": booking.driver.full_name,
+        })
+
+    return JsonResponse({
+        "success": True,
+        "driver_name": booking.driver.full_name,
+        "lat": booking.driver.current_lat,
+        "lng": booking.driver.current_lng,
+        "customer_lat": booking.origin_lat,
+        "customer_lng": booking.origin_lng,
+    })

@@ -116,30 +116,11 @@
             white-space: nowrap;
         }
 
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-assigned {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .status-accepted {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-completed {
-            background: #e0f2fe;
-            color: #075985;
-        }
-
-        .status-cancelled {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-assigned { background: #dbeafe; color: #1d4ed8; }
+        .status-accepted { background: #dcfce7; color: #166534; }
+        .status-completed { background: #e0f2fe; color: #075985; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
 
         .route-box {
             background: #f8fafc;
@@ -170,15 +151,8 @@
             font-size: 15px;
         }
 
-        .pickup-icon {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .destination-icon {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .pickup-icon { background: #dcfce7; color: #166534; }
+        .destination-icon { background: #fee2e2; color: #991b1b; }
 
         .label {
             font-size: 11px;
@@ -246,10 +220,49 @@
         }
 
         .notice-box {
-            border-radius: 20px;
-            padding: 14px;
-            margin-bottom: 16px;
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg,#fff7cc,#ffe8b5);
+            border-left: 6px solid #ff9800;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 30px rgba(255,152,0,.18);
+            animation: pulseNotice 2s infinite;
+        }
+
+        .notice-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #ff9800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+            box-shadow: 0 10px 20px rgba(255,152,0,.35);
+        }
+
+        .notice-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #b45309;
+            margin-bottom: 6px;
+        }
+
+        .notice-text {
+            font-size: 15px;
+            color: #7c2d12;
+            line-height: 1.5;
+        }
+
+        @keyframes pulseNotice {
+            0% { transform: scale(1); box-shadow: 0 12px 30px rgba(255,152,0,.18); }
+            50% { transform: scale(1.02); box-shadow: 0 18px 40px rgba(255,152,0,.30); }
+            100% { transform: scale(1); box-shadow: 0 12px 30px rgba(255,152,0,.18); }
         }
 
         .fare-box {
@@ -314,6 +327,12 @@
             border: none;
         }
 
+        .btn-track {
+            margin: 0 16px 16px;
+            width: calc(100% - 32px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
+        }
+
         .btn-outline-danger {
             border-width: 2px;
         }
@@ -349,6 +368,16 @@
             box-shadow: 0 14px 32px rgba(249, 115, 22, .22);
         }
 
+        .track-status {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        #driverTrackingMap {
+            height: 70vh;
+            width: 100%;
+        }
+
         @media (min-width: 768px) {
             .dashboard-wrapper {
                 padding: 28px;
@@ -380,98 +409,26 @@
                 flex-direction: column;
                 text-align: center;
             }
+
+            .notice-box {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .notice-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+
+            .notice-title {
+                font-size: 16px;
+            }
+
+            .notice-text {
+                font-size: 14px;
+            }
         }
-
-        .notice-box{
-    display:flex;
-    align-items:center;
-    gap:15px;
-
-    background:linear-gradient(135deg,#fff7cc,#ffe8b5);
-    border-left:6px solid #ff9800;
-    border-radius:18px;
-
-    padding:18px;
-    margin-bottom:20px;
-
-    box-shadow:0 12px 30px rgba(255,152,0,.18);
-
-    animation:pulseNotice 2s infinite;
-}
-
-.notice-icon{
-    width:58px;
-    height:58px;
-
-    border-radius:50%;
-
-    background:#ff9800;
-    color:#fff;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:28px;
-
-    flex-shrink:0;
-
-    box-shadow:0 10px 20px rgba(255,152,0,.35);
-}
-
-.notice-title{
-    font-size:18px;
-    font-weight:900;
-    color:#b45309;
-    margin-bottom:6px;
-}
-
-.notice-text{
-    font-size:15px;
-    color:#7c2d12;
-    line-height:1.5;
-}
-
-@keyframes pulseNotice{
-
-    0%{
-        transform:scale(1);
-        box-shadow:0 12px 30px rgba(255,152,0,.18);
-    }
-
-    50%{
-        transform:scale(1.02);
-        box-shadow:0 18px 40px rgba(255,152,0,.30);
-    }
-
-    100%{
-        transform:scale(1);
-        box-shadow:0 12px 30px rgba(255,152,0,.18);
-    }
-}
-
-@media (max-width:768px){
-
-    .notice-box{
-        padding:16px;
-        gap:12px;
-    }
-
-    .notice-icon{
-        width:48px;
-        height:48px;
-        font-size:22px;
-    }
-
-    .notice-title{
-        font-size:16px;
-    }
-
-    .notice-text{
-        font-size:14px;
-    }
-
-}
     </style>
 </head>
 
@@ -482,9 +439,7 @@
 <div class="dashboard-wrapper">
 
     <div class="hero-card">
-        <div class="hero-badge">
-            📋 Customer Ride Center
-        </div>
+        <div class="hero-badge">📋 Customer Ride Center</div>
 
         <h2>My Bookings</h2>
 
@@ -517,9 +472,7 @@
 
                     <div class="route-box">
                         <div class="route-item">
-                            <div class="route-icon pickup-icon">
-                                📍
-                            </div>
+                            <div class="route-icon pickup-icon">📍</div>
 
                             <div>
                                 <div class="label">Pickup</div>
@@ -528,9 +481,7 @@
                         </div>
 
                         <div class="route-item">
-                            <div class="route-icon destination-icon">
-                                🏁
-                            </div>
+                            <div class="route-icon destination-icon">🏁</div>
 
                             <div>
                                 <div class="label">Destination</div>
@@ -549,13 +500,9 @@
                             <div class="driver-info">
 
                                 {% if booking.driver.profile_picture %}
-                                    <img
-                                        src="{{ booking.driver.profile_picture.url }}"
-                                        class="driver-photo">
+                                    <img src="{{ booking.driver.profile_picture.url }}" class="driver-photo">
                                 {% else %}
-                                    <img
-                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="driver-photo">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="driver-photo">
                                 {% endif %}
 
                                 <div class="flex-grow-1">
@@ -582,28 +529,39 @@
                                 </div>
 
                             </div>
+
+                            {% if booking.status == "accepted" %}
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-track"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#trackDriverModal"
+                                    onclick="openDriverTracker({{ booking.id }})">
+                                    🗺️ Track Driver Location
+                                </button>
+                            {% endif %}
                         </div>
 
                     {% else %}
 
                         {% if booking.status == "cancelled" %}
-                            <div class="notice-box alert-danger">
+                            <div class="disabled-note">
                                 ❌ This booking has been cancelled.
                             </div>
                         {% else %}
-                           <div class="notice-box">
-    <div class="notice-icon">⚠️</div>
+                            <div class="notice-box">
+                                <div class="notice-icon">⚠️</div>
 
-    <div>
-        <div class="notice-title">
-            No Driver Has Accepted Your Booking Yet
-        </div>
+                                <div>
+                                    <div class="notice-title">
+                                        No Driver Has Accepted Your Booking Yet
+                                    </div>
 
-        <div class="notice-text">
-            Increase your <strong>🎁 Tip</strong> to make your booking more attractive to nearby riders and get accepted faster.
-        </div>
-    </div>
-</div>
+                                    <div class="notice-text">
+                                        Increase your <strong>🎁 Tip</strong> to make your booking more attractive to nearby riders and get accepted faster.
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
 
                     {% endif %}
@@ -669,7 +627,6 @@
                             <button type="submit" class="btn btn-outline-danger w-100">
                                 ❌ Cancel Booking
                             </button>
-
                         </form>
 
                     {% else %}
@@ -693,13 +650,9 @@
     {% else %}
 
         <div class="empty-state">
-            <div class="empty-icon">
-                🛵
-            </div>
+            <div class="empty-icon">🛵</div>
 
-            <h5 class="fw-bold mb-2">
-                No bookings yet
-            </h5>
+            <h5 class="fw-bold mb-2">No bookings yet</h5>
 
             <p class="text-muted mb-3">
                 Your ride bookings will appear here after you book a ride.
@@ -714,7 +667,194 @@
 
 </div>
 
+<div class="modal fade" id="trackDriverModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-xl modal-dialog-centered">
+        <div class="modal-content rounded-4 overflow-hidden">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold">Track Driver</h5>
+                    <small id="driverTrackName" class="track-status">
+                        Waiting for driver GPS location...
+                    </small>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <div id="driverTrackingMap"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let trackingMap;
+let customerMarker;
+let driverMarker;
+let trackingInterval;
+let trackingBookingId = null;
+let directionsService;
+let directionsRenderer;
+let googleMapsReady = false;
+
+function initCustomerTrackingMaps() {
+    googleMapsReady = true;
+}
+
+function initTrackingMap() {
+    trackingMap = new google.maps.Map(document.getElementById("driverTrackingMap"), {
+        center: { lat: 6.9214, lng: 122.0790 },
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+        mapTypeControl: true,
+        streetViewControl: false,
+        fullscreenControl: true
+    });
+
+    directionsService = new google.maps.DirectionsService();
+
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: false,
+        polylineOptions: {
+            strokeColor: "#2563eb",
+            strokeWeight: 6,
+            strokeOpacity: .9
+        }
+    });
+
+    directionsRenderer.setMap(trackingMap);
+}
+
+function openDriverTracker(bookingId) {
+    trackingBookingId = bookingId;
+
+    document.getElementById("driverTrackName").innerHTML =
+        "Loading driver location...";
+
+    setTimeout(function () {
+        if (!googleMapsReady || typeof google === "undefined") {
+            document.getElementById("driverTrackName").innerHTML =
+                "Map is still loading. Please try again.";
+            return;
+        }
+
+        if (!trackingMap) {
+            initTrackingMap();
+        }
+
+        google.maps.event.trigger(trackingMap, "resize");
+
+        loadDriverLocation();
+
+        if (trackingInterval) {
+            clearInterval(trackingInterval);
+        }
+
+        trackingInterval = setInterval(loadDriverLocation, 5000);
+    }, 400);
+}
+
+function loadDriverLocation() {
+    if (!trackingBookingId) return;
+
+    fetch("/booking/" + trackingBookingId + "/driver-location/")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success || !data.lat || !data.lng) {
+                document.getElementById("driverTrackName").innerHTML =
+                    data.error ? data.error : "Waiting for driver GPS location...";
+                return;
+            }
+
+            const driverName = data.driver_name || "Assigned Driver";
+
+            document.getElementById("driverTrackName").innerHTML =
+                "Driver: " + driverName + " • Updates every 5 seconds";
+
+            const driverPosition = {
+                lat: parseFloat(data.lat),
+                lng: parseFloat(data.lng)
+            };
+
+            const customerPosition = {
+                lat: parseFloat(data.customer_lat),
+                lng: parseFloat(data.customer_lng)
+            };
+
+            if (!customerMarker) {
+                customerMarker = new google.maps.Marker({
+                    position: customerPosition,
+                    map: trackingMap,
+                    title: "Your Pickup Location",
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    }
+                });
+            } else {
+                customerMarker.setPosition(customerPosition);
+            }
+
+            if (!driverMarker) {
+                driverMarker = new google.maps.Marker({
+                    position: driverPosition,
+                    map: trackingMap,
+                    title: "Driver Current Location",
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    }
+                });
+            } else {
+                driverMarker.setPosition(driverPosition);
+            }
+
+            directionsService.route({
+                origin: driverPosition,
+                destination: customerPosition,
+                travelMode: google.maps.TravelMode.DRIVING
+            }, function(result, status) {
+                if (status === "OK") {
+                    directionsRenderer.setDirections(result);
+
+                    const bounds = result.routes[0].bounds;
+                    trackingMap.fitBounds(bounds, 120);
+                } else {
+                    const bounds = new google.maps.LatLngBounds();
+                    bounds.extend(driverPosition);
+                    bounds.extend(customerPosition);
+                    trackingMap.fitBounds(bounds, 120);
+                }
+            });
+        })
+        .catch(error => {
+            document.getElementById("driverTrackName").innerHTML =
+                "Unable to load driver location.";
+            console.log(error);
+        });
+}
+
+document.addEventListener("hidden.bs.modal", function (event) {
+    if (event.target.id === "trackDriverModal") {
+        if (trackingInterval) {
+            clearInterval(trackingInterval);
+        }
+
+        trackingInterval = null;
+        trackingBookingId = null;
+
+        if (directionsRenderer) {
+            directionsRenderer.setDirections({ routes: [] });
+        }
+    }
+});
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initCustomerTrackingMaps">
+</script>
 
 </body>
 </html>

@@ -59,6 +59,10 @@ class DriverProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    current_lat = models.FloatField(blank=True, null=True)
+    current_lng = models.FloatField(blank=True, null=True)
+    last_location_update = models.DateTimeField(blank=True, null=True)
+
     def __str__(self):
         return self.full_name
 
