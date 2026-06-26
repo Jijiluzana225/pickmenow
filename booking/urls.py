@@ -36,6 +36,9 @@ urlpatterns = [
 
     path("driver/completed-bookings/",views.driver_completed_bookings, name="driver_completed_bookings"),
 
+    path("driver/update-location/", views.update_driver_location, name="update_driver_location"),
+    path("booking/<int:booking_id>/driver-location/", views.get_driver_location, name="get_driver_location"),
+
 
 
     

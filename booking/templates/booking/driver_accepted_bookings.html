@@ -273,5 +273,27 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    function sendDriverLocation() {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.watchPosition(function(position) {
+        fetch("{% url 'update_driver_location' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            })
+        });
+    });
+}
+
+sendDriverLocation();
+</script>
+
 </body>
 </html>
