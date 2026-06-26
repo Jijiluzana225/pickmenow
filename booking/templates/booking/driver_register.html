@@ -74,6 +74,12 @@
 
 <body>
 
+{% if error %}
+<script>
+    alert("{{ error|escapejs }}");
+</script>
+{% endif %}
+    
 <div class="register-wrapper">
 
     <div class="card register-card p-4">
