@@ -327,7 +327,30 @@
     {% endif %}
 </div>
 
-<div class="label">Booking Route</div>
+
+
+                        
+
+                        <div class="fare-box">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="label">Fare</div>
+                                    <div>₱{{ booking.fare }}</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="label">Tip</div>
+                                    <div>₱{{ booking.tip }}</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="label">Total</div>
+                                    <div class="fare-total">₱{{ booking.total_amount }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="label">Booking Route</div>
 <button
     type="button"
     class="btn btn-primary route-btn w-100 mb-2"
@@ -360,25 +383,6 @@
                                 Booking already taken
                             </div>
                         {% endif %}
-
-                        <div class="fare-box">
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <div class="label">Fare</div>
-                                    <div>₱{{ booking.fare }}</div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="label">Tip</div>
-                                    <div>₱{{ booking.tip }}</div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="label">Total</div>
-                                    <div class="fare-total">₱{{ booking.total_amount }}</div>
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
                 </div>
