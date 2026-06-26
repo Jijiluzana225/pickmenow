@@ -9,84 +9,150 @@
 
     <style>
         body {
-            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(250, 204, 21, .25), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, .18), transparent 30%),
+                linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: #1f2937;
         }
 
         .booking-wrapper {
-            max-width: 760px;
+            max-width: 820px;
             margin: auto;
-            padding: 16px;
+            padding: 14px;
         }
 
-        .page-header {
-            text-align: center;
-            margin-bottom: 18px;
+        .hero-card {
+            background: linear-gradient(135deg, #111827, #1e293b);
+            color: #ffffff;
+            border-radius: 26px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .22);
+            overflow: hidden;
+            position: relative;
         }
 
-        .page-header h2 {
-            font-weight: 800;
-            margin-bottom: 4px;
+        .hero-card::after {
+            content: "🛵";
+            position: absolute;
+            right: 18px;
+            bottom: -8px;
+            font-size: 82px;
+            opacity: .13;
         }
 
-        .page-header p {
-            color: #6b7280;
-            margin-bottom: 0;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(250, 204, 21, .16);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, .28);
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .hero-card h2 {
+            font-size: 26px;
+            font-weight: 950;
+            letter-spacing: -.5px;
+            margin-bottom: 6px;
+        }
+
+        .hero-card p {
+            color: #cbd5e1;
             font-size: 14px;
+            margin-bottom: 0;
+            max-width: 520px;
         }
 
         .booking-card {
-            border-radius: 22px;
-            border: none;
-            background: #ffffff;
+            border-radius: 26px;
+            border: 1px solid rgba(226, 232, 240, .9);
+            background: rgba(255, 255, 255, .96);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .10);
+            overflow: hidden;
         }
 
-        .section-label {
+        .card-inner {
+            padding: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: .08em;
-            color: #6b7280;
-            font-weight: 700;
-            margin-bottom: 10px;
+            color: #64748b;
+            font-weight: 900;
+            margin-bottom: 14px;
+        }
+
+        .section-title span {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            font-size: 16px;
+        }
+
+        .input-icon-wrap .form-control {
+            padding-left: 44px;
+        }
+
+        textarea.form-control {
+            padding-left: 15px;
         }
 
         .form-control {
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 13px 15px;
             border: 1px solid #d1d5db;
             font-size: 15px;
+            background: #ffffff;
         }
 
         .form-control:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .15);
+            border-color: #f97316;
+            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .16);
         }
 
         .form-control[readonly] {
             background: #f8fafc;
             color: #4b5563;
-        }
-
-        .btn {
-            border-radius: 14px;
-            padding: 12px 16px;
             font-weight: 700;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            border-color: #2563eb;
-        }
-
-        .btn-success {
-            background: #16a34a;
-            border-color: #16a34a;
-        }
-
-        .btn:disabled {
-            cursor: not-allowed;
-            opacity: .55;
         }
 
         .map-card {
@@ -94,21 +160,37 @@
             background: #ffffff;
             border-radius: 24px;
             padding: 10px;
-            box-shadow: 0 18px 40px rgba(15, 23, 42, .15);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, .14);
             border: 1px solid rgba(148, 163, 184, .25);
         }
 
         .map-header {
             padding: 8px 8px 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .map-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex: 0 0 auto;
         }
 
         .map-header h5 {
-            font-weight: 800;
+            font-weight: 900;
             margin-bottom: 2px;
         }
 
         .map-header small {
             color: #6b7280;
+            line-height: 1.3;
         }
 
         #map {
@@ -118,33 +200,20 @@
             border: 2px solid #e5e7eb;
         }
 
-        .pickup-info-label {
-            font-size: 13px;
-            font-weight: 800;
-            color: #0c0c0c;
-            white-space: nowrap;
-            margin-bottom: 10px;
-        }
-
+        .pickup-info-label,
         .destination-info-label {
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 900;
             color: #0c0c0c;
             white-space: nowrap;
             margin-bottom: 10px;
         }
 
-        /* Hide Google Maps InfoWindow close button */
-        .gm-ui-hover-effect {
-            display: none !important;
-        }
-
-        /* Hide InfoWindow header area that contains the close button */
+        .gm-ui-hover-effect,
         .gm-style-iw-chr {
             display: none !important;
         }
 
-        /* Adjust InfoWindow spacing after hiding close button */
         .gm-style .gm-style-iw-c {
             padding-top: 8px !important;
             padding-right: 12px !important;
@@ -154,21 +223,93 @@
             overflow: hidden !important;
         }
 
-        .result-box {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
+        .btn {
             border-radius: 16px;
-            padding: 14px;
-            margin-top: 16px;
+            padding: 13px 16px;
+            font-weight: 900;
         }
 
-        .result-box h5 {
-            margin: 0;
-            font-weight: 800;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+            box-shadow: 0 12px 24px rgba(22, 163, 74, .22);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+            box-shadow: none;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .result-row:first-child {
+            border-bottom: 1px dashed #d1d5db;
+            padding-bottom: 12px;
+            margin-bottom: 6px;
+        }
+
+        .result-label {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .result-value {
+            font-size: 17px;
+            font-weight: 950;
+            text-align: right;
         }
 
         .fare {
             color: #16a34a;
+            font-size: 20px;
+        }
+
+        .tip-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .tip-box label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+            color: #9a3412;
+            margin-bottom: 8px;
+        }
+
+        .hint-text {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 6px;
         }
 
         @media (min-width: 768px) {
@@ -176,8 +317,16 @@
                 padding: 28px;
             }
 
-            .page-header {
-                text-align: left;
+            .hero-card {
+                padding: 28px;
+            }
+
+            .hero-card h2 {
+                font-size: 34px;
+            }
+
+            .card-inner {
+                padding: 24px;
             }
 
             #map {
@@ -188,106 +337,171 @@
 </head>
 
 <body>
-    {% include "includes/navbar.html" %}
+
+{% include "includes/navbar.html" %}
 
 <div class="booking-wrapper">
 
-    <div class="page-header">
-        <h2>www.PickMeNow.Online Booking</h2>
-        <p>Pin your pickup and destination, calculate the route, then book your ride.</p>
+    <div class="hero-card">
+        <div class="hero-badge">
+            ⚡ Fast Local Motorcycle Booking
+        </div>
+
+        <h2>
+            www.PickMeNow.Online Booking
+        </h2>
+
+        <p>
+            Pin your pickup and destination, calculate your fare, add an optional tip, then book your ride.
+        </p>
     </div>
 
-    <div class="card booking-card shadow-sm p-4">
-        <div class="section-label">Ride Details</div>
+    <div class="card booking-card">
+        <div class="card-inner">
 
-        <form method="POST" action="/create-booking/">
-            {% csrf_token %}
-
-            <div class="mb-3">
-                <label class="form-label">Customer Name</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    value="{{ customer.full_name }}"
-                    readonly>
+            <div class="section-title">
+                <span>🛵</span>
+                Ride Details
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Contact Number</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    value="{{ customer.contact_number }}"
-                    readonly>
-            </div>
+            <form method="POST" action="/create-booking/">
+                {% csrf_token %}
 
-            <textarea
-                name="instructions"
-                class="form-control mb-3"
-                rows="3"
-                placeholder="Special instructions, landmark, gate number, etc."></textarea>
-
-            <input
-                type="text"
-                id="origin"
-                name="origin"
-                class="form-control mb-3"
-                placeholder="Getting your current GPS location..."
-                required>
-
-            <input
-                type="text"
-                id="destination"
-                name="destination"
-                class="form-control mb-3"
-                placeholder="Search Destination, Drag Pin if needed"
-                required>
-
-            <div class="map-card">
-                <div class="map-header">
-                    <h5>Route Map</h5>
-                    <small>Pickup is automatically pinned using your current GPS location. Drag the pin if needed.</small>
+                <div class="mb-3">
+                    <label class="form-label">👤 Customer Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        value="{{ customer.full_name }}"
+                        readonly>
                 </div>
 
-                <div id="map"></div>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">📱 Contact Number</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        value="{{ customer.contact_number }}"
+                        readonly>
+                </div>
 
-            <input type="hidden" id="origin_lat" name="origin_lat">
-            <input type="hidden" id="origin_lng" name="origin_lng">
+                <div class="mb-3">
+                    <label class="form-label">📝 Special Instructions</label>
+                    <textarea
+                        name="instructions"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Landmark, gate number, pickup notes, etc."></textarea>
+                </div>
 
-            <input type="hidden" id="destination_lat" name="destination_lat">
-            <input type="hidden" id="destination_lng" name="destination_lng">
+                <div class="mb-3">
+                    <label class="form-label">📍 Pickup Location</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">🟢</span>
+                        <input
+                            type="text"
+                            id="origin"
+                            name="origin"
+                            class="form-control"
+                            placeholder="Getting your current GPS location..."
+                            required>
+                    </div>
+                </div>
 
-            <input type="hidden" id="distance_km" name="distance_km">
+                <div class="mb-3">
+                    <label class="form-label">🏁 Destination</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">🔴</span>
+                        <input
+                            type="text"
+                            id="destination"
+                            name="destination"
+                            class="form-control"
+                            placeholder="Search destination, drag pin if needed"
+                            required>
+                    </div>
+                </div>
 
+                <div class="map-card">
+                    <div class="map-header">
+                        <div class="map-icon">
+                            🗺️
+                        </div>
 
-            <div class="d-grid gap-2">
-                <button type="button" class="btn btn-primary" onclick="calculateRoute()">
-                    Calculate Route and Fare
-                </button>
+                        <div>
+                            <h5>Route Map</h5>
+                            <small>
+                                Pickup is automatically pinned using your current GPS location. Drag the pins if needed.
+                            </small>
+                        </div>
+                    </div>
 
-               
-            </div>
+                    <div id="map"></div>
+                </div>
 
-            <div class="result-box">
-                <h5 id="distance_text">Distance: —</h5>
-                <h5 id="fare_text" class="fare mt-2">Estimated Fare: —</h5>
-            </div>
+                <input type="hidden" id="origin_lat" name="origin_lat">
+                <input type="hidden" id="origin_lng" name="origin_lng">
 
-            
-            <input
-                type="number"
-                name="tip"
-                class="form-control mb-3"
-                placeholder="Tip optional, ₱"
-                min="0"
-                step="1">
-            <div  class="d-grid gap-2">
-             <button type="submit" id="bookRideBtn" class="btn btn-success" disabled>
-                    Book Ride
-                </button>
-                </div>   
-        </form>
+                <input type="hidden" id="destination_lat" name="destination_lat">
+                <input type="hidden" id="destination_lng" name="destination_lng">
+
+                <input type="hidden" id="distance_km" name="distance_km">
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" onclick="calculateRoute()">
+                        🧭 Calculate Route and Fare
+                    </button>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-row">
+                        <div>
+                            <div class="result-label">Distance</div>
+                        </div>
+
+                        <div id="distance_text" class="result-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="result-row">
+                        <div>
+                            <div class="result-label">Estimated Fare</div>
+                        </div>
+
+                        <div id="fare_text" class="result-value fare">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <label>
+                        🎁 Optional Driver Tip
+                    </label>
+
+                    <input
+                        type="number"
+                        name="tip"
+                        class="form-control"
+                        placeholder="Enter tip amount, ₱"
+                        min="0"
+                        step="1">
+
+                    <div class="hint-text">
+                        Adding a tip may help your booking get accepted faster by nearby drivers.
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" id="bookRideBtn" class="btn btn-success" disabled>
+                        ✅ Book Ride Now
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
     </div>
 
 </div>
@@ -311,14 +525,10 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: defaultLocation,
         zoom: 15,
-
-        // Satellite with road labels
         mapTypeId: google.maps.MapTypeId.HYBRID,
-
         mapTypeControl: true,
         streetViewControl: false,
         fullscreenControl: true,
-
         mapTypeControlOptions: {
             style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
             position: google.maps.ControlPosition.TOP_RIGHT
@@ -334,6 +544,7 @@ function initMap() {
     directionsRenderer.setMap(map);
 
     autoPinCurrentLocation();
+    watchLocationInputChanges();
 
     const originInput = document.getElementById("origin");
     const originAuto = new google.maps.places.Autocomplete(originInput);
@@ -424,9 +635,22 @@ function autoPinCurrentLocation() {
 
 function resetBookingButton() {
     document.getElementById("bookRideBtn").disabled = true;
-    document.getElementById("distance_text").innerHTML = "Distance: —";
-    document.getElementById("fare_text").innerHTML = "Estimated Fare: —";
+    document.getElementById("distance_text").innerHTML = "—";
+    document.getElementById("fare_text").innerHTML = "—";
     document.getElementById("distance_km").value = "";
+}
+
+function watchLocationInputChanges() {
+    const originInput = document.getElementById("origin");
+    const destinationInput = document.getElementById("destination");
+
+    originInput.addEventListener("input", function () {
+        resetBookingButton();
+    });
+
+    destinationInput.addEventListener("input", function () {
+        resetBookingButton();
+    });
 }
 
 function setOriginMarker(loc) {
@@ -452,7 +676,6 @@ function setOriginMarker(loc) {
 
     pickupInfoWindow = new google.maps.InfoWindow({
         content: '<div class="pickup-info-label">📍 Pickup</div>',
-           
         disableAutoPan: true
     });
 
@@ -638,10 +861,10 @@ function calculateRoute() {
             const fare = Math.ceil(25 + (km * 8));
 
             document.getElementById("distance_text").innerHTML =
-                "Distance: " + leg.distance.text;
+                leg.distance.text;
 
             document.getElementById("fare_text").innerHTML =
-                "Estimated Fare: ₱" + fare;
+                "₱" + fare;
 
             document.getElementById("bookRideBtn").disabled = false;
 
@@ -663,6 +886,8 @@ function calculateRoute() {
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initMap">
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

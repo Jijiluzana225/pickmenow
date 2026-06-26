@@ -1,33 +1,210 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<style>
+    .pickme-navbar {
+        background: linear-gradient(135deg, #111827, #1e293b);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, .22);
+        border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .pickme-navbar .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 950;
+        letter-spacing: -.3px;
+        color: #ffffff !important;
+        white-space: nowrap;
+        font-size: clamp(.95rem, 3.5vw, 1.25rem);
+    }
+
+    .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #facc15, #f97316);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #111827;
+        font-size: 18px;
+        box-shadow: 0 10px 22px rgba(249, 115, 22, .25);
+        flex: 0 0 auto;
+    }
+
+    .pickme-navbar .nav-link {
+        color: rgba(255, 255, 255, .82) !important;
+        font-weight: 800;
+        border-radius: 14px;
+        padding: 9px 12px !important;
+        margin: 2px 0;
+    }
+
+    .pickme-navbar .nav-link:hover,
+    .pickme-navbar .nav-link:focus {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, .10);
+    }
+
+    .nav-pill-link {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .availability-card {
+        background: rgba(255, 255, 255, .10);
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 16px;
+        padding: 8px 12px;
+        color: #ffffff;
+    }
+
+    .availability-label {
+        font-size: 12px;
+        font-weight: 900;
+        color: #e5e7eb;
+        white-space: nowrap;
+    }
+
+    .availability-card .form-check-input {
+        width: 42px;
+        height: 22px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .availability-card .form-check-input:checked {
+        background-color: #16a34a;
+        border-color: #16a34a;
+    }
+
+    .profile-avatar {
+        width: 38px;
+        height: 38px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid rgba(250, 204, 21, .85);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, .22);
+    }
+
+    .profile-name {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 900;
+    }
+
+    .pickme-navbar .dropdown-menu {
+        border: none;
+        border-radius: 18px;
+        padding: 10px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, .18);
+    }
+
+    .pickme-navbar .dropdown-item {
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-weight: 800;
+        color: #1f2937;
+    }
+
+    .pickme-navbar .dropdown-item:hover {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .logout-btn {
+        border-radius: 14px;
+        font-weight: 900;
+        padding: 9px 14px;
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        border: none;
+        color: #ffffff !important;
+        box-shadow: 0 10px 20px rgba(220, 38, 38, .20);
+    }
+
+    .logout-btn:hover {
+        background: linear-gradient(135deg, #b91c1c, #991b1b);
+        color: #ffffff !important;
+    }
+
+    .login-btn {
+        border-radius: 14px;
+        font-weight: 900;
+        padding: 9px 14px !important;
+        background: rgba(255, 255, 255, .10);
+        border: 1px solid rgba(255, 255, 255, .18);
+        margin-top: 4px;
+    }
+
+    .driver-login-btn {
+        background: linear-gradient(135deg, #facc15, #f97316);
+        color: #111827 !important;
+        border: none;
+    }
+
+    .driver-login-btn:hover {
+        color: #111827 !important;
+        opacity: .95;
+    }
+
+    @media (max-width: 991px) {
+        .pickme-navbar .navbar-collapse {
+            padding-top: 14px;
+        }
+
+        .availability-card {
+            margin-bottom: 10px;
+            justify-content: space-between;
+        }
+
+        .profile-name {
+            max-width: 220px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            margin-top: 8px;
+        }
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark pickme-navbar">
 
     <div class="container">
 
         {% if user.is_authenticated %}
 
             {% if user.driver_profile %}
-                <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
-                    🛵 www.PickMeNow.Online
+                <a class="navbar-brand" href="{% url 'dashboard' %}">
+                    <span class="brand-icon">🛵</span>
+                    <span>www.PickMeNow.Online</span>
                 </a>
 
             {% elif user.customer_profile %}
-                <a class="navbar-brand fw-bold" href="{% url 'index' %}">
-                    🛵 www.PickMeNow.Online
+                <a class="navbar-brand" href="{% url 'index' %}">
+                    <span class="brand-icon">🛵</span>
+                    <span>www.PickMeNow.Online</span>
                 </a>
             {% endif %}
 
         {% else %}
 
-            <a class="navbar-brand fw-bold" href="{% url 'index' %}">
-                🛵 www.PickMeNow.Online
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <span class="brand-icon">🛵</span>
+                <span>www.PickMeNow.Online</span>
             </a>
 
         {% endif %}
 
         <button
-            class="navbar-toggler"
+            class="navbar-toggler border-0 shadow-none"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navbar">
+            data-bs-target="#navbar"
+            aria-controls="navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
 
             <span class="navbar-toggler-icon"></span>
 
@@ -40,54 +217,42 @@
                 {% if user.is_authenticated %}
 
                     {% if user.customer_profile %}
+
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'index' %}">
-                                Book Ride
+                            <a class="nav-link nav-pill-link" href="{% url 'index' %}">
+                                🚀 Book Ride
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'customer_dashboard' %}">
-                                My Bookings
+                            <a class="nav-link nav-pill-link" href="{% url 'customer_dashboard' %}">
+                                📋 My Bookings
                             </a>
                         </li>
-
 
                     {% endif %}
 
                     {% if user.driver_profile %}
 
-    <li>
-        <a
-            class="dropdown-item"
-            href="{% url 'dashboard' %}">
-            🛵 Available Bookings
-        </a>
-    </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-link" href="{% url 'dashboard' %}">
+                                🛵 Available Bookings
+                            </a>
+                        </li>
 
-    <li>
-        <a
-            class="dropdown-item"
-            href="{% url 'driver_accepted_bookings' %}">
-            📋 My Accepted Bookings
-        </a>
-    </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-link" href="{% url 'driver_accepted_bookings' %}">
+                                📋 Accepted
+                            </a>
+                        </li>
 
-    <li>
-        <a
-            class="dropdown-item"
-            href="{% url 'driver_completed_bookings' %}">
-            💰 Completed Bookings
-        </a>
-    </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-link" href="{% url 'driver_completed_bookings' %}">
+                                💰 Completed
+                            </a>
+                        </li>
 
-    <li><hr class="dropdown-divider"></li>
-
-    <li>
-     
-    </li>
-
-{% endif %}
+                    {% endif %}
 
                 {% endif %}
 
@@ -103,12 +268,12 @@
                                 method="POST"
                                 action="{% url 'toggle_driver_availability' %}"
                                 id="availabilityForm"
-                                class="d-flex align-items-center gap-2 text-white">
+                                class="availability-card d-flex align-items-center gap-2">
 
                                 {% csrf_token %}
 
-                                <span class="small fw-bold">
-                                    Available for Booking
+                                <span class="availability-label">
+                                    🟢 Available
                                 </span>
 
                                 <div class="form-check form-switch m-0">
@@ -131,23 +296,24 @@
                             class="nav-link dropdown-toggle d-flex align-items-center gap-2"
                             href="#"
                             role="button"
-                            data-bs-toggle="dropdown">
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
 
                             {% if user.customer_profile %}
 
                                 {% if user.customer_profile.profile_picture %}
                                     <img
                                         src="{{ user.customer_profile.profile_picture.url }}"
-                                        class="rounded-circle"
-                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                        class="profile-avatar">
                                 {% else %}
                                     <img
                                         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="rounded-circle"
-                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                        class="profile-avatar">
                                 {% endif %}
 
-                                <span>{{ user.customer_profile.full_name }}</span>
+                                <span class="profile-name">
+                                    {{ user.customer_profile.full_name }}
+                                </span>
 
                             {% endif %}
 
@@ -156,33 +322,26 @@
                                 {% if user.driver_profile.profile_picture %}
                                     <img
                                         src="{{ user.driver_profile.profile_picture.url }}"
-                                        class="rounded-circle"
-                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                        class="profile-avatar">
                                 {% else %}
                                     <img
                                         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="rounded-circle"
-                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                        class="profile-avatar">
                                 {% endif %}
 
-                                <span>{{ user.driver_profile.full_name }}</span>
+                                <span class="profile-name">
+                                    {{ user.driver_profile.full_name }}
+                                </span>
 
                             {% endif %}
 
                         </a>
 
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <ul class="dropdown-menu dropdown-menu-end">
 
                             {% if user.customer_profile %}
 
-                                <li>
-                                    <a
-                                        class="dropdown-item"
-                                        href="{% url 'customer_dashboard' %}">
-                                        📋 My Bookings
-                                    </a>
-                                </li>
-
+                             
                                 <li>
                                     <a
                                         class="dropdown-item"
@@ -199,9 +358,27 @@
                                     <a
                                         class="dropdown-item"
                                         href="{% url 'dashboard' %}">
-                                        🛵 Dashboard
+                                        🛵 Available Bookings
                                     </a>
                                 </li>
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'driver_accepted_bookings' %}">
+                                        📋 My Accepted Bookings
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'driver_completed_bookings' %}">
+                                        💰 Completed Bookings
+                                    </a>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
 
                                 <li>
                                     <a
@@ -220,9 +397,9 @@
                     {% if user.customer_profile %}
                         <li class="nav-item ms-lg-2">
                             <a
-                                class="btn btn-danger btn-sm mt-2 mt-lg-0"
+                                class="btn logout-btn"
                                 href="{% url 'customer_logout' %}">
-                                Logout
+                                🚪 Logout
                             </a>
                         </li>
                     {% endif %}
@@ -230,9 +407,9 @@
                     {% if user.driver_profile %}
                         <li class="nav-item ms-lg-2">
                             <a
-                                class="btn btn-danger btn-sm mt-2 mt-lg-0"
+                                class="btn logout-btn"
                                 href="{% url 'driver_logout' %}">
-                                Logout
+                                🚪 Logout
                             </a>
                         </li>
                     {% endif %}
@@ -241,17 +418,17 @@
 
                     <li class="nav-item">
                         <a
-                            class="nav-link"
+                            class="nav-link login-btn"
                             href="{% url 'customer_login' %}">
-                            Customer Login
+                            👤 Customer Login
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item ms-lg-2">
                         <a
-                            class="nav-link"
+                            class="nav-link login-btn driver-login-btn"
                             href="{% url 'driver_login' %}">
-                            Driver Login
+                            🛵 Driver Login
                         </a>
                     </li>
 

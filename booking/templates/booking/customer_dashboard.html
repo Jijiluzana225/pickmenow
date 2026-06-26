@@ -9,37 +9,74 @@
 
     <style>
         body {
-            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(250, 204, 21, .22), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, .16), transparent 32%),
+                linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: #1f2937;
         }
 
         .dashboard-wrapper {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
-            padding: 16px;
+            padding: 14px;
         }
 
-        .page-header {
-            margin-bottom: 20px;
+        .hero-card {
+            background: linear-gradient(135deg, #111827, #1e293b);
+            color: #ffffff;
+            border-radius: 26px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .22);
+            position: relative;
+            overflow: hidden;
         }
 
-        .page-header h2 {
+        .hero-card::after {
+            content: "🛵";
+            position: absolute;
+            right: 18px;
+            bottom: -12px;
+            font-size: 88px;
+            opacity: .12;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(250, 204, 21, .16);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, .28);
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
             font-weight: 900;
-            margin-bottom: 4px;
+            margin-bottom: 12px;
         }
 
-        .page-header p {
-            color: #6b7280;
+        .hero-card h2 {
+            font-size: 27px;
+            font-weight: 950;
+            letter-spacing: -.5px;
+            margin-bottom: 6px;
+        }
+
+        .hero-card p {
+            color: #cbd5e1;
             font-size: 14px;
             margin-bottom: 0;
+            max-width: 560px;
         }
 
         .booking-card {
-            background: #ffffff;
-            border: none;
-            border-radius: 22px;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            background: rgba(255,255,255,.96);
+            border: 1px solid rgba(226,232,240,.9);
+            border-radius: 26px;
+            box-shadow: 0 16px 42px rgba(15, 23, 42, .09);
             margin-bottom: 16px;
             overflow: hidden;
         }
@@ -48,29 +85,35 @@
             padding: 18px;
         }
 
-        .label {
-            font-size: 12px;
-            font-weight: 800;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            margin-bottom: 3px;
+        .booking-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .value {
-            font-size: 14px;
-            margin-bottom: 12px;
+        .booking-number {
+            font-size: 18px;
+            font-weight: 950;
+            margin-bottom: 2px;
+        }
+
+        .booking-date {
+            color: #6b7280;
+            font-size: 12px;
         }
 
         .status-badge {
             display: inline-block;
             padding: 7px 12px;
             border-radius: 999px;
-            font-size: 12px;
-            font-weight: 900;
+            font-size: 11px;
+            font-weight: 950;
             text-transform: uppercase;
             background: #e5e7eb;
             color: #374151;
+            white-space: nowrap;
         }
 
         .status-pending {
@@ -98,61 +141,212 @@
             color: #991b1b;
         }
 
-        .fare-box {
+        .route-box {
             background: #f8fafc;
             border: 1px solid #e5e7eb;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 14px;
+            margin-bottom: 14px;
         }
 
-        .total {
-            color: #16a34a;
-            font-size: 22px;
-            font-weight: 900;
+        .route-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
-        .btn {
-            border-radius: 14px;
-            font-weight: 800;
-            padding: 11px 14px;
+        .route-item:last-child {
+            margin-bottom: 0;
         }
 
-        .tip-input {
-            border-radius: 14px;
-            padding: 11px 14px;
+        .route-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            font-size: 15px;
+        }
+
+        .pickup-icon {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .destination-icon {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 950;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-size: 14px;
+            color: #1f2937;
+            line-height: 1.35;
         }
 
         .driver-card {
-            background: #ffffff;
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
             border: 1px solid #bbf7d0;
-            border-radius: 20px;
+            border-radius: 22px;
             overflow: hidden;
             box-shadow: 0 12px 30px rgba(22, 163, 74, .12);
             margin-bottom: 16px;
         }
 
         .driver-card-header {
-            background: #16a34a;
+            background: linear-gradient(135deg, #16a34a, #15803d);
             color: #ffffff;
             padding: 12px 16px;
-            font-weight: 900;
+            font-weight: 950;
+            font-size: 14px;
+        }
+
+        .driver-info {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
         .driver-photo {
-            width: 90px;
-            height: 90px;
+            width: 86px;
+            height: 86px;
             object-fit: cover;
             border-radius: 50%;
             border: 4px solid #16a34a;
             box-shadow: 0 8px 20px rgba(22, 163, 74, .25);
+            flex: 0 0 auto;
+        }
+
+        .driver-name {
+            font-weight: 950;
+            margin-bottom: 2px;
+        }
+
+        .driver-subtitle {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .driver-detail {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .notice-box {
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .fare-box {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .fare-value {
+            font-weight: 900;
+            font-size: 15px;
+        }
+
+        .total {
+            color: #16a34a;
+            font-size: 22px;
+            font-weight: 950;
+            line-height: 1;
+        }
+
+        .tip-edit-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 20px;
+            padding: 14px;
+            margin-top: 8px;
+        }
+
+        .tip-edit-box label {
+            color: #9a3412;
+            font-weight: 950;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .tip-input {
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+        }
+
+        .form-control:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .16);
+        }
+
+        .btn {
+            border-radius: 16px;
+            font-weight: 900;
+            padding: 12px 14px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+        }
+
+        .btn-outline-danger {
+            border-width: 2px;
+        }
+
+        .disabled-note {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 13px;
+            color: #6b7280;
+            font-size: 13px;
         }
 
         .empty-state {
             background: #ffffff;
-            border-radius: 22px;
-            padding: 34px 20px;
+            border-radius: 26px;
+            padding: 38px 20px;
             text-align: center;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            box-shadow: 0 16px 42px rgba(15, 23, 42, .09);
+            border: 1px solid rgba(226,232,240,.9);
+        }
+
+        .empty-icon {
+            width: 86px;
+            height: 86px;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 42px;
+            box-shadow: 0 14px 32px rgba(249, 115, 22, .22);
         }
 
         @media (min-width: 768px) {
@@ -160,8 +354,31 @@
                 padding: 28px;
             }
 
+            .hero-card {
+                padding: 28px;
+            }
+
+            .hero-card h2 {
+                font-size: 34px;
+            }
+
             .booking-card-body {
                 padding: 22px;
+            }
+
+            .driver-info {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .booking-top {
+                flex-direction: column;
+            }
+
+            .driver-info {
+                flex-direction: column;
+                text-align: center;
             }
         }
     </style>
@@ -173,9 +390,16 @@
 
 <div class="dashboard-wrapper">
 
-    <div class="page-header">
+    <div class="hero-card">
+        <div class="hero-badge">
+            📋 Customer Ride Center
+        </div>
+
         <h2>My Bookings</h2>
-        <p>Hello, {{ customer.full_name }}. Check your booking status and update your tip anytime.</p>
+
+        <p>
+            Hello, {{ customer.full_name }}. Track your ride status, check your assigned driver, update your tip, or cancel pending bookings.
+        </p>
     </div>
 
     {% if bookings %}
@@ -184,10 +408,15 @@
             <div class="booking-card">
                 <div class="booking-card-body">
 
-                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                    <div class="booking-top">
                         <div>
-                            <h5 class="fw-bold mb-1">Booking #{{ booking.id }}</h5>
-                            <small class="text-muted">{{ booking.created_at }}</small>
+                            <div class="booking-number">
+                                Booking #{{ booking.id }}
+                            </div>
+
+                            <div class="booking-date">
+                                🕒 {{ booking.created_at }}
+                            </div>
                         </div>
 
                         <span class="status-badge status-{{ booking.status }}">
@@ -195,90 +424,104 @@
                         </span>
                     </div>
 
-                    <div class="label">Pickup</div>
-                    <div class="value">{{ booking.origin }}</div>
+                    <div class="route-box">
+                        <div class="route-item">
+                            <div class="route-icon pickup-icon">
+                                📍
+                            </div>
 
-                    <div class="label">Destination</div>
-                    <div class="value">{{ booking.destination }}</div>
+                            <div>
+                                <div class="label">Pickup</div>
+                                <div class="value">{{ booking.origin }}</div>
+                            </div>
+                        </div>
+
+                        <div class="route-item">
+                            <div class="route-icon destination-icon">
+                                🏁
+                            </div>
+
+                            <div>
+                                <div class="label">Destination</div>
+                                <div class="value">{{ booking.destination }}</div>
+                            </div>
+                        </div>
+                    </div>
 
                     {% if booking.driver %}
 
                         <div class="driver-card">
-
                             <div class="driver-card-header">
                                 ✅ Driver Assigned
                             </div>
 
-                            <div class="p-3">
-                                <div class="d-flex align-items-center gap-3">
+                            <div class="driver-info">
 
-                                    {% if booking.driver.profile_picture %}
-                                        <img
-                                            src="{{ booking.driver.profile_picture.url }}"
-                                            class="driver-photo">
-                                    {% else %}
-                                        <img
-                                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                            class="driver-photo">
-                                    {% endif %}
+                                {% if booking.driver.profile_picture %}
+                                    <img
+                                        src="{{ booking.driver.profile_picture.url }}"
+                                        class="driver-photo">
+                                {% else %}
+                                    <img
+                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                        class="driver-photo">
+                                {% endif %}
 
-                                    <div class="flex-grow-1">
-                                        <h5 class="fw-bold mb-1">
-                                            {{ booking.driver.full_name }}
-                                        </h5>
+                                <div class="flex-grow-1">
+                                    <h5 class="driver-name">
+                                        {{ booking.driver.full_name }}
+                                    </h5>
 
-                                        <div class="text-muted small mb-2">
-                                            Your assigned rider
-                                        </div>
-
-                                        <div class="small mb-1">
-                                            📞 <strong>{{ booking.driver.contact_number }}</strong>
-                                        </div>
-
-                                        <div class="small mb-1">
-                                            🛵 {{ booking.driver.motorcycle_model }}
-                                        </div>
-
-                                        <div class="small">
-                                            🪪 Plate No:
-                                            <strong>{{ booking.driver.plate_number }}</strong>
-                                        </div>
+                                    <div class="driver-subtitle">
+                                        Your assigned rider is on the way
                                     </div>
 
-                                </div>
-                            </div>
+                                    <div class="driver-detail">
+                                        📞 <strong>{{ booking.driver.contact_number }}</strong>
+                                    </div>
 
+                                    <div class="driver-detail">
+                                        🛵 {{ booking.driver.motorcycle_model }}
+                                    </div>
+
+                                    <div class="driver-detail">
+                                        🪪 Plate No:
+                                        <strong>{{ booking.driver.plate_number }}</strong>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
 
                     {% else %}
 
                         {% if booking.status == "cancelled" %}
-                            <div class="alert alert-danger rounded-4">
-                                This booking has been cancelled.
+                            <div class="notice-box alert-danger">
+                                ❌ This booking has been cancelled.
                             </div>
                         {% else %}
-                            <div class="alert alert-warning rounded-4">
-                                <strong>No driver has accepted this booking yet.</strong><br>
-                                You may increase your tip to attract drivers.
+                            <div class="notice-box alert-warning">
+                                <strong>⏳ No driver has accepted this booking yet.</strong><br>
+                                You may increase your tip to attract nearby drivers.
                             </div>
                         {% endif %}
 
                     {% endif %}
 
-                    <div class="fare-box mb-3">
-                        <div class="row g-2">
+                    <div class="fare-box">
+                        <div class="row g-2 text-center">
                             <div class="col-4">
-                                <div class="label">Fare</div>
-                                <div>₱{{ booking.fare }}</div>
+                                <div class="label">💰 Fare</div>
+                                <div class="fare-value">₱{{ booking.fare }}</div>
                             </div>
 
                             <div class="col-4">
-                                <div class="label">Tip</div>
-                                <div>₱{{ booking.tip }}</div>
+                                <div class="label">🎁 Tip</div>
+                                <div class="fare-value">₱{{ booking.tip }}</div>
                             </div>
 
                             <div class="col-4">
-                                <div class="label">Total</div>
+                                <div class="label">💵 Total</div>
                                 <div class="total">₱{{ booking.total_amount }}</div>
                             </div>
                         </div>
@@ -286,26 +529,34 @@
 
                     {% if booking.status == "pending" or booking.status == "assigned" %}
 
-                        <form method="POST" action="{% url 'update_booking_tip' booking.id %}">
-                            {% csrf_token %}
+                        <div class="tip-edit-box">
+                            <form method="POST" action="{% url 'update_booking_tip' booking.id %}">
+                                {% csrf_token %}
 
-                            <label class="form-label fw-bold">Add or Edit Tip</label>
+                                <label class="form-label">
+                                    🎁 Add or Edit Driver Tip
+                                </label>
 
-                            <div class="d-flex gap-2">
-                                <input
-                                    type="number"
-                                    name="tip"
-                                    class="form-control tip-input"
-                                    min="0"
-                                    step="1"
-                                    value="{{ booking.tip }}"
-                                    required>
+                                <div class="d-flex gap-2">
+                                    <input
+                                        type="number"
+                                        name="tip"
+                                        class="form-control tip-input"
+                                        min="0"
+                                        step="1"
+                                        value="{{ booking.tip }}"
+                                        required>
 
-                                <button type="submit" class="btn btn-success">
-                                    Update
-                                </button>
-                            </div>
-                        </form>
+                                    <button type="submit" class="btn btn-success">
+                                        Update
+                                    </button>
+                                </div>
+
+                                <div class="text-muted small mt-2">
+                                    A higher tip may help your booking get accepted faster.
+                                </div>
+                            </form>
+                        </div>
 
                         <form
                             method="POST"
@@ -323,19 +574,14 @@
 
                     {% else %}
 
-                        <div class="text-muted small">
-
+                        <div class="disabled-note">
                             {% if booking.status == "accepted" %}
-                                Tip editing and cancellation are disabled because a driver has already accepted your booking.
-
+                                🚫 Tip editing and cancellation are disabled because a driver has already accepted your booking.
                             {% elif booking.status == "completed" %}
-                                This booking has already been completed.
-
+                                ✅ This booking has already been completed.
                             {% elif booking.status == "cancelled" %}
-                                This booking has been cancelled and can no longer be edited.
-
+                                ❌ This booking has been cancelled and can no longer be edited.
                             {% endif %}
-
                         </div>
 
                     {% endif %}
@@ -347,10 +593,20 @@
     {% else %}
 
         <div class="empty-state">
-            <h5 class="fw-bold mb-2">No bookings yet</h5>
-            <p class="text-muted mb-3">Your ride bookings will appear here.</p>
-            <a href="{% url 'index' %}" class="btn btn-primary">
-                Book a Ride
+            <div class="empty-icon">
+                🛵
+            </div>
+
+            <h5 class="fw-bold mb-2">
+                No bookings yet
+            </h5>
+
+            <p class="text-muted mb-3">
+                Your ride bookings will appear here after you book a ride.
+            </p>
+
+            <a href="{% url 'index' %}" class="btn btn-primary w-100">
+                🚀 Book a Ride
             </a>
         </div>
 
