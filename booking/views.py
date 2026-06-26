@@ -117,7 +117,7 @@ https://www.pickmenow.online/dashboard/
 
         send_telegram_message(message)
 
-        return redirect("index")
+        return redirect("customer_dashboard")
 
     return redirect("index")
 
