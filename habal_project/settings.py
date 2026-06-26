@@ -156,8 +156,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 TELEGRAM_BOT_TOKEN = "8720277303:AAErCO6K-6boOYJFwYGQ70lyLXgZisQz0bU"
 TELEGRAM_CHAT_ID = "-5415782958"
 
-UNISMS_API_KEY = "sk_1d6c9ca4-841a-45d0-971d-83353750a916"
-UNISMS_SENDER_ID = "OnlineRide"   # Your approved Sender ID
+
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
