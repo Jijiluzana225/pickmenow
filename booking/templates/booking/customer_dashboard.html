@@ -381,6 +381,97 @@
                 text-align: center;
             }
         }
+
+        .notice-box{
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    background:linear-gradient(135deg,#fff7cc,#ffe8b5);
+    border-left:6px solid #ff9800;
+    border-radius:18px;
+
+    padding:18px;
+    margin-bottom:20px;
+
+    box-shadow:0 12px 30px rgba(255,152,0,.18);
+
+    animation:pulseNotice 2s infinite;
+}
+
+.notice-icon{
+    width:58px;
+    height:58px;
+
+    border-radius:50%;
+
+    background:#ff9800;
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:28px;
+
+    flex-shrink:0;
+
+    box-shadow:0 10px 20px rgba(255,152,0,.35);
+}
+
+.notice-title{
+    font-size:18px;
+    font-weight:900;
+    color:#b45309;
+    margin-bottom:6px;
+}
+
+.notice-text{
+    font-size:15px;
+    color:#7c2d12;
+    line-height:1.5;
+}
+
+@keyframes pulseNotice{
+
+    0%{
+        transform:scale(1);
+        box-shadow:0 12px 30px rgba(255,152,0,.18);
+    }
+
+    50%{
+        transform:scale(1.02);
+        box-shadow:0 18px 40px rgba(255,152,0,.30);
+    }
+
+    100%{
+        transform:scale(1);
+        box-shadow:0 12px 30px rgba(255,152,0,.18);
+    }
+}
+
+@media (max-width:768px){
+
+    .notice-box{
+        padding:16px;
+        gap:12px;
+    }
+
+    .notice-icon{
+        width:48px;
+        height:48px;
+        font-size:22px;
+    }
+
+    .notice-title{
+        font-size:16px;
+    }
+
+    .notice-text{
+        font-size:14px;
+    }
+
+}
     </style>
 </head>
 
@@ -500,10 +591,19 @@
                                 ❌ This booking has been cancelled.
                             </div>
                         {% else %}
-                            <div class="notice-box alert-warning">
-                                <strong>⏳ No driver has accepted this booking yet.</strong><br>
-                                You may increase your tip to attract nearby drivers.
-                            </div>
+                           <div class="notice-box">
+    <div class="notice-icon">⚠️</div>
+
+    <div>
+        <div class="notice-title">
+            No Driver Has Accepted Your Booking Yet
+        </div>
+
+        <div class="notice-text">
+            Increase your <strong>🎁 Tip</strong> to make your booking more attractive to nearby riders and get accepted faster.
+        </div>
+    </div>
+</div>
                         {% endif %}
 
                     {% endif %}
