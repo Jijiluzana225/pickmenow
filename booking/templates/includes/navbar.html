@@ -1,0 +1,266 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+
+    <div class="container">
+
+        {% if user.is_authenticated %}
+
+            {% if user.driver_profile %}
+                <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+                    🛵 www.PickMeNow.Online
+                </a>
+
+            {% elif user.customer_profile %}
+                <a class="navbar-brand fw-bold" href="{% url 'index' %}">
+                    🛵 www.PickMeNow.Online
+                </a>
+            {% endif %}
+
+        {% else %}
+
+            <a class="navbar-brand fw-bold" href="{% url 'index' %}">
+                🛵 www.PickMeNow.Online
+            </a>
+
+        {% endif %}
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbar">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar">
+
+            <ul class="navbar-nav me-auto">
+
+                {% if user.is_authenticated %}
+
+                    {% if user.customer_profile %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">
+                                Book Ride
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_dashboard' %}">
+                                My Bookings
+                            </a>
+                        </li>
+
+
+                    {% endif %}
+
+                    {% if user.driver_profile %}
+
+    <li>
+        <a
+            class="dropdown-item"
+            href="{% url 'dashboard' %}">
+            🛵 Available Bookings
+        </a>
+    </li>
+
+    <li>
+        <a
+            class="dropdown-item"
+            href="{% url 'driver_accepted_bookings' %}">
+            📋 My Accepted Bookings
+        </a>
+    </li>
+
+    <li>
+        <a
+            class="dropdown-item"
+            href="{% url 'driver_completed_bookings' %}">
+            💰 Completed Bookings
+        </a>
+    </li>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <li>
+     
+    </li>
+
+{% endif %}
+
+                {% endif %}
+
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                {% if user.is_authenticated %}
+
+                    {% if user.driver_profile %}
+                        <li class="nav-item me-lg-3 mt-2 mt-lg-0">
+                            <form
+                                method="POST"
+                                action="{% url 'toggle_driver_availability' %}"
+                                id="availabilityForm"
+                                class="d-flex align-items-center gap-2 text-white">
+
+                                {% csrf_token %}
+
+                                <span class="small fw-bold">
+                                    Available for Booking
+                                </span>
+
+                                <div class="form-check form-switch m-0">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="is_available"
+                                        id="driverAvailabilityToggle"
+                                        {% if user.driver_profile.is_available %}checked{% endif %}
+                                        onchange="document.getElementById('availabilityForm').submit();">
+                                </div>
+
+                            </form>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item dropdown">
+
+                        <a
+                            class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown">
+
+                            {% if user.customer_profile %}
+
+                                {% if user.customer_profile.profile_picture %}
+                                    <img
+                                        src="{{ user.customer_profile.profile_picture.url }}"
+                                        class="rounded-circle"
+                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                {% else %}
+                                    <img
+                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                        class="rounded-circle"
+                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                {% endif %}
+
+                                <span>{{ user.customer_profile.full_name }}</span>
+
+                            {% endif %}
+
+                            {% if user.driver_profile %}
+
+                                {% if user.driver_profile.profile_picture %}
+                                    <img
+                                        src="{{ user.driver_profile.profile_picture.url }}"
+                                        class="rounded-circle"
+                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                {% else %}
+                                    <img
+                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                        class="rounded-circle"
+                                        style="width:36px;height:36px;object-fit:cover;border:2px solid rgba(255,255,255,.7);">
+                                {% endif %}
+
+                                <span>{{ user.driver_profile.full_name }}</span>
+
+                            {% endif %}
+
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                            {% if user.customer_profile %}
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'customer_dashboard' %}">
+                                        📋 My Bookings
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'customer_profile_update' %}">
+                                        👤 Update Profile
+                                    </a>
+                                </li>
+
+                            {% endif %}
+
+                            {% if user.driver_profile %}
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'dashboard' %}">
+                                        🛵 Dashboard
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'driver_profile_update' %}">
+                                        👤 Update Driver Profile
+                                    </a>
+                                </li>
+
+                            {% endif %}
+
+                        </ul>
+
+                    </li>
+
+                    {% if user.customer_profile %}
+                        <li class="nav-item ms-lg-2">
+                            <a
+                                class="btn btn-danger btn-sm mt-2 mt-lg-0"
+                                href="{% url 'customer_logout' %}">
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.driver_profile %}
+                        <li class="nav-item ms-lg-2">
+                            <a
+                                class="btn btn-danger btn-sm mt-2 mt-lg-0"
+                                href="{% url 'driver_logout' %}">
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
+
+                {% else %}
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{% url 'customer_login' %}">
+                            Customer Login
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{% url 'driver_login' %}">
+                            Driver Login
+                        </a>
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>

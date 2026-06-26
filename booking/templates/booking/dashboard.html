@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Driver Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #1f2937;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1200px;
+            margin: auto;
+            padding: 16px;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .active-warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            border-radius: 18px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            font-weight: 700;
+        }
+
+        .booking-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 22px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .booking-card-body {
+            padding: 18px;
+        }
+
+        .customer-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .value a {
+            color: #2563eb;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .fare-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .fare-total {
+            color: #16a34a;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .route-btn,
+        .accept-btn {
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 9px 12px;
+        }
+
+        .desktop-table-card {
+            display: none;
+        }
+
+        .table {
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .empty-state {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 32px 20px;
+            text-align: center;
+            color: #6b7280;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+
+        .modal-title {
+            font-weight: 900;
+        }
+
+        #bookingRouteMap {
+            width: 100%;
+            height: 70vh;
+            min-height: 420px;
+        }
+
+        .pickup-info-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #198754;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .destination-info-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #dc3545;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .gm-ui-hover-effect,
+        .gm-style-iw-chr {
+            display: none !important;
+        }
+
+        .gm-style .gm-style-iw-c {
+            padding-top: 8px !important;
+            padding-right: 12px !important;
+        }
+
+        .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-wrapper {
+                padding: 28px;
+            }
+
+            .mobile-bookings {
+                display: none;
+            }
+
+            .desktop-table-card {
+                display: block;
+                background: #ffffff;
+                border-radius: 22px;
+                overflow: hidden;
+                box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            }
+
+            .page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+{% include "includes/navbar.html" %}
+
+<div class="dashboard-wrapper">
+
+    <div class="page-header">
+        <div>
+            <h2>Driver Dashboard</h2>
+            <p>View customer bookings, routes, fares, tips, and accept available bookings.</p>
+        </div>
+    </div>
+
+    {% if has_active_booking %}
+        <div class="active-warning">
+            ⚠️ You already have an accepted booking. Complete it first before accepting another booking.
+        </div>
+    {% endif %}
+
+    {% if bookings %}
+
+        <div class="mobile-bookings">
+            {% for booking in bookings %}
+                <div class="booking-card">
+                    <div class="booking-card-body">
+
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+
+    <div class="d-flex align-items-center">
+
+        {% if booking.customer.profile_picture %}
+            <img
+                src="{{ booking.customer.profile_picture.url }}"
+                class="rounded-circle me-3"
+                style="
+                    width:55px;
+                    height:55px;
+                    object-fit:cover;
+                    border:3px solid #0d6efd;
+                ">
+        {% else %}
+            <img
+                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                class="rounded-circle me-3"
+                style="
+                    width:55px;
+                    height:55px;
+                    object-fit:cover;
+                    border:3px solid #0d6efd;
+                ">
+        {% endif %}
+
+        <div>
+            <div class="customer-name">
+                {{ booking.customer_name }}
+            </div>
+
+            <div class="text-muted small">
+                {{ booking.distance_km }} KM
+            </div>
+        </div>
+
+    </div>
+
+    <span class="status-badge status-{{ booking.status }}">
+        {{ booking.status }}
+    </span>
+
+</div>
+
+                        <div class="label">Pickup</div>
+                        <div class="value">
+                            <a href="/navigate/{{ booking.id }}/" target="_blank">
+                                {{ booking.origin }}
+                            </a>
+                        </div>
+
+                        <div class="label">Destination</div>
+<div class="value">
+    {{ booking.destination }}
+</div>
+
+<div class="label">Instruction</div>
+<div class="value">
+    {% if booking.instructions %}
+        {{ booking.instructions }}
+    {% else %}
+        <span class="text-muted small"></span>
+    {% endif %}
+</div>
+
+<div class="label">Booking Route</div>
+<button
+    type="button"
+    class="btn btn-primary route-btn w-100 mb-2"
+    data-bs-toggle="modal"
+    data-bs-target="#bookingRouteModal"
+    onclick="showBookingRoute(
+        {{ booking.origin_lat }},
+        {{ booking.origin_lng }},
+        {{ booking.destination_lat }},
+        {{ booking.destination_lng }},
+        '{{ booking.customer_name|escapejs }}',
+        '{{ booking.distance_km }}'
+    )">
+    View Booking Route
+</button>
+
+                        {% if booking.status == "pending" and not booking.driver and not has_active_booking %}
+                            <form method="POST" action="{% url 'accept_booking' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success accept-btn w-100 mb-3">
+                                    Accept Booking
+                                </button>
+                            </form>
+                        {% elif has_active_booking %}
+                            <button class="btn btn-secondary accept-btn w-100 mb-3" disabled>
+                                You already have an accepted booking
+                            </button>
+                        {% else %}
+                            <div class="alert alert-secondary rounded-4 py-2 mb-3">
+                                Booking already taken
+                            </div>
+                        {% endif %}
+
+                        <div class="fare-box">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="label">Fare</div>
+                                    <div>₱{{ booking.fare }}</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="label">Tip</div>
+                                    <div>₱{{ booking.tip }}</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="label">Total</div>
+                                    <div class="fare-total">₱{{ booking.total_amount }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="desktop-table-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                             <th>Instruction</th>
+                            <th>Route</th>
+                            <th>Distance</th>
+                           
+                            <th>Fare</th>
+                            <th>Tip</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                               <td>
+
+    <div class="d-flex align-items-center">
+
+        {% if booking.customer.profile_picture %}
+            <img
+                src="{{ booking.customer.profile_picture.url }}"
+                class="rounded-circle me-2"
+                style="
+                    width:42px;
+                    height:42px;
+                    object-fit:cover;
+                    border:2px solid #0d6efd;
+                ">
+        {% else %}
+            <img
+                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                class="rounded-circle me-2"
+                style="
+                    width:42px;
+                    height:42px;
+                    object-fit:cover;
+                    border:2px solid #0d6efd;
+                ">
+        {% endif %}
+
+        <strong>{{ booking.customer_name }}</strong>
+
+    </div>
+
+</td>
+
+                                <td>
+                                    <a href="/navigate/{{ booking.id }}/" target="_blank">
+                                        {{ booking.origin }}
+                                    </a>
+                                </td>
+
+                                <td>{{ booking.destination }}</td>
+                                <td>
+    {% if booking.instructions %}
+        {{ booking.instructions }}
+    {% else %}
+        <span class="text-muted small">No instruction</span>
+    {% endif %}
+</td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary route-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#bookingRouteModal"
+                                        onclick="showBookingRoute(
+                                            {{ booking.origin_lat }},
+                                            {{ booking.origin_lng }},
+                                            {{ booking.destination_lat }},
+                                            {{ booking.destination_lng }},
+                                            '{{ booking.customer_name|escapejs }}',
+                                            '{{ booking.distance_km }}'
+                                        )">
+                                        View Route
+                                    </button>
+                                </td>
+
+                                <td>{{ booking.distance_km }} KM</td>
+                                <td>₱{{ booking.fare }}</td>
+                                <td>₱{{ booking.tip }}</td>
+                                <td class="fw-bold text-success">₱{{ booking.total_amount }}</td>
+
+                                <td>
+                                    <span class="status-badge status-{{ booking.status }}">
+                                        {{ booking.status }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if booking.status == "pending" and not booking.driver and not has_active_booking %}
+                                        <form method="POST" action="{% url 'accept_booking' booking.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-sm accept-btn">
+                                                Accept
+                                            </button>
+                                        </form>
+                                    {% elif has_active_booking %}
+                                        <button class="btn btn-secondary btn-sm accept-btn" disabled>
+                                            Already Accepted One
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted small">
+                                            Taken
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h5 class="fw-bold mb-2">No bookings yet</h5>
+            <p class="mb-0">New customer bookings will appear here.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<div class="modal fade" id="bookingRouteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-xl modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">Booking Route</h5>
+                    <small id="routeCustomerName" class="text-muted d-block"></small>
+                    <small id="routeDistanceKm" class="text-muted d-block"></small>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <div id="bookingRouteMap"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+let bookingRouteMap;
+let bookingDirectionsService;
+let bookingDirectionsRenderer;
+
+let routeOriginMarker;
+let routeDestinationMarker;
+
+let routePickupInfoWindow;
+let routeDestinationInfoWindow;
+
+let pendingRouteData = null;
+
+function initBookingRouteMap() {
+
+    const defaultLocation = { lat: 6.9214, lng: 122.0790 };
+
+    bookingRouteMap = new google.maps.Map(document.getElementById("bookingRouteMap"), {
+        center: defaultLocation,
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+        mapTypeControl: true,
+        streetViewControl: false,
+        fullscreenControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+            position: google.maps.ControlPosition.TOP_RIGHT
+        }
+    });
+
+    bookingDirectionsService = new google.maps.DirectionsService();
+
+    bookingDirectionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true
+    });
+
+    bookingDirectionsRenderer.setMap(bookingRouteMap);
+
+    if (pendingRouteData) {
+        renderBookingRoute(
+            pendingRouteData.originLat,
+            pendingRouteData.originLng,
+            pendingRouteData.destinationLat,
+            pendingRouteData.destinationLng,
+            pendingRouteData.customerName,
+            pendingRouteData.distanceKm
+        );
+
+        pendingRouteData = null;
+    }
+}
+
+function showBookingRoute(originLat, originLng, destinationLat, destinationLng, customerName, distanceKm) {
+
+    if (!bookingRouteMap) {
+        pendingRouteData = {
+            originLat: originLat,
+            originLng: originLng,
+            destinationLat: destinationLat,
+            destinationLng: destinationLng,
+            customerName: customerName,
+            distanceKm: distanceKm
+        };
+        return;
+    }
+
+    setTimeout(function() {
+        google.maps.event.trigger(bookingRouteMap, "resize");
+
+        renderBookingRoute(
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            customerName,
+            distanceKm
+        );
+    }, 300);
+}
+
+function renderBookingRoute(originLat, originLng, destinationLat, destinationLng, customerName, distanceKm) {
+
+    document.getElementById("routeCustomerName").innerHTML = customerName;
+    document.getElementById("routeDistanceKm").innerHTML = "Distance: " + distanceKm + " KM";
+
+    const origin = {
+        lat: parseFloat(originLat),
+        lng: parseFloat(originLng)
+    };
+
+    const destination = {
+        lat: parseFloat(destinationLat),
+        lng: parseFloat(destinationLng)
+    };
+
+    clearRouteMarkers();
+
+    routeOriginMarker = new google.maps.Marker({
+        position: origin,
+        map: bookingRouteMap,
+        title: "Pickup Location",
+        animation: google.maps.Animation.DROP,
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+        }
+    });
+
+    routeDestinationMarker = new google.maps.Marker({
+        position: destination,
+        map: bookingRouteMap,
+        title: "Destination",
+        animation: google.maps.Animation.DROP,
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        }
+    });
+
+    routePickupInfoWindow = new google.maps.InfoWindow({
+        content: '<div class="pickup-info-label">📍 Pickup</div>',
+        disableAutoPan: true
+    });
+
+    routeDestinationInfoWindow = new google.maps.InfoWindow({
+        content: '<div class="destination-info-label">📍 Destination</div>',
+        disableAutoPan: true
+    });
+
+    routePickupInfoWindow.open({
+        anchor: routeOriginMarker,
+        map: bookingRouteMap,
+        shouldFocus: false
+    });
+
+    routeDestinationInfoWindow.open({
+        anchor: routeDestinationMarker,
+        map: bookingRouteMap,
+        shouldFocus: false
+    });
+
+    bookingDirectionsService.route({
+
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING
+
+    }, function(response, status) {
+
+        if (status === "OK") {
+            bookingDirectionsRenderer.setDirections(response);
+
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(origin);
+            bounds.extend(destination);
+
+            bookingRouteMap.fitBounds(bounds);
+        } else {
+            bookingRouteMap.setCenter(origin);
+            bookingRouteMap.setZoom(16);
+
+            alert("Unable to load route. Showing pickup and destination pins only.");
+        }
+    });
+}
+
+function clearRouteMarkers() {
+
+    if (routeOriginMarker) {
+        routeOriginMarker.setMap(null);
+        routeOriginMarker = null;
+    }
+
+    if (routeDestinationMarker) {
+        routeDestinationMarker.setMap(null);
+        routeDestinationMarker = null;
+    }
+
+    if (routePickupInfoWindow) {
+        routePickupInfoWindow.close();
+        routePickupInfoWindow = null;
+    }
+
+    if (routeDestinationInfoWindow) {
+        routeDestinationInfoWindow.close();
+        routeDestinationInfoWindow = null;
+    }
+
+    if (bookingDirectionsRenderer) {
+        bookingDirectionsRenderer.set("directions", null);
+    }
+}
+
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initBookingRouteMap">
+</script>
+
+</body>
+</html>

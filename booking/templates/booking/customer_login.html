@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>OnlineRides.Com | Customer Login</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255, 214, 10, .35), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(13, 110, 253, .30), transparent 35%),
+                linear-gradient(135deg, #07111f 0%, #0f172a 45%, #111827 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #1f2937;
+        }
+
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .brand-panel {
+            color: #ffffff;
+            padding: 24px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            color: #facc15;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 10px;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+   .brand-title{
+    text-align:center;
+    font-size:clamp(1.8rem,4vw,3.5rem);
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.small-text{
+    font-size:.7em;
+}
+
+.highlight{
+    color:#facc15;
+}
+
+        .brand-title span {
+            color: #facc15;
+        }
+
+        .brand-subtitle {
+            color: #cbd5e1;
+            font-size: 16px;
+            max-width: 420px;
+            margin-bottom: 24px;
+        }
+
+        .feature-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.15);
+            color: #e5e7eb;
+            border-radius: 16px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 4px;
+        }
+
+        .hero-bike {
+            width: 150px;
+            height: 150px;
+            border-radius: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 74px;
+            background: linear-gradient(135deg, #facc15, #f97316);
+            box-shadow: 0 24px 60px rgba(250, 204, 21, .28);
+            transform: rotate(-6deg);
+            margin-top: 24px;
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 28px;
+            box-shadow: 0 25px 70px rgba(0,0,0,.35);
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .login-card-header {
+            background: linear-gradient(135deg, #facc15, #f97316);
+            padding: 22px;
+            text-align: center;
+            color: #111827;
+        }
+
+        .app-logo {
+            width: 76px;
+            height: 76px;
+            border-radius: 24px;
+            background: #111827;
+            color: #facc15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin: auto auto 12px;
+            box-shadow: 0 14px 35px rgba(0,0,0,.25);
+        }
+
+        .login-title {
+            font-weight: 950;
+            margin-bottom: 3px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: .85;
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 800;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .input-group-text {
+            border-radius: 16px 0 0 16px;
+            background: #f8fafc;
+            border: 1px solid #d1d5db;
+            font-size: 18px;
+        }
+
+        .form-control {
+            border-radius: 0 16px 16px 0;
+            padding: 13px 15px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .18);
+        }
+
+        .btn {
+            border-radius: 16px;
+            padding: 13px 16px;
+            font-weight: 900;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f97316, #facc15);
+            border: none;
+            color: #111827;
+            box-shadow: 0 12px 25px rgba(249, 115, 22, .25);
+        }
+
+        .btn-login:hover {
+            color: #111827;
+            transform: translateY(-1px);
+        }
+
+        .btn-driver {
+            background: #111827;
+            border: none;
+            color: #ffffff;
+        }
+
+        .btn-driver:hover {
+            background: #020617;
+            color: #ffffff;
+        }
+
+        .btn-rider-apply {
+            border: 2px solid #111827;
+            color: #111827;
+            background: #ffffff;
+        }
+
+        .btn-rider-apply:hover {
+            background: #111827;
+            color: #ffffff;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #6b7280;
+            margin: 24px 0;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .08em;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .divider::before {
+            margin-right: 12px;
+        }
+
+        .divider::after {
+            margin-left: 12px;
+        }
+
+        .small-link {
+            color: #f97316;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .small-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 991px) {
+            .brand-panel {
+    color: #ffffff;
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+            .brand-title {
+                font-size: 34px;
+            }
+
+            .brand-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-bike {
+    width: 150px;
+    height: 150px;
+    border-radius: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 74px;
+    background: linear-gradient(135deg, #facc15, #f97316);
+    box-shadow: 0 24px 60px rgba(250,204,21,.28);
+    transform: rotate(-6deg);
+    margin: 30px auto 0;
+}
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <div class="container">
+
+        <div class="row align-items-center justify-content-center g-4">
+
+            <div class="col-lg-6">
+
+                <div class="brand-panel">
+
+                    <div class="brand-badge">
+                        ⚡ Fast Local Motorcycle Rides
+                    </div>
+<h1 class="brand-title">
+    <span class="small-text">www.</span>PickMe<span class="highlight">Now</span><span class="small-text">.Online</span>
+</h1>          
+                   
+
+                 
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-5 col-md-7">
+
+                <div class="card login-card">
+
+                    <div class="login-card-header">
+
+                        <div class="app-logo">
+                            🛵
+                        </div>
+
+                        <h2 class="login-title">
+                            Customer Login
+                        </h2>
+
+                        <p class="login-subtitle">
+                            Ride fast. Ride local. Ride easy.
+                        </p>
+
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        {% if error %}
+                            <div class="alert alert-danger rounded-4">
+                                {{ error }}
+                            </div>
+                        {% endif %}
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Contact Number
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        📱
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="contact_number"
+                                        class="form-control"
+                                        placeholder="09XXXXXXXXX"
+                                        required>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="form-label">
+                                    Password
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        🔒
+                                    </span>
+
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        class="form-control"
+                                        placeholder="Enter your password"
+                                        required>
+                                </div>
+
+                            </div>
+
+                            <button class="btn btn-login w-100">
+                                🚀 Login to Book Ride
+                            </button>
+
+                        </form>
+
+                        <div class="text-center mt-4">
+
+                            <small class="text-muted">
+                                Don't have a customer account?
+                            </small>
+
+                            <div class="mt-2">
+
+                                <a
+                                    href="{% url 'customer_register' %}"
+                                    class="btn btn-outline-warning w-100 fw-bold">
+
+                                    Create Customer Account
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        <div class="divider">
+                            DRIVER PORTAL
+                        </div>
+
+                        <div class="d-grid gap-3">
+
+                            <a
+                                href="{% url 'driver_login' %}"
+                                class="btn btn-driver">
+
+                                🛵 Login as Driver
+
+                            </a>
+
+                            <a
+                                href="{% url 'driver_register' %}"
+                                class="btn btn-rider-apply">
+
+                                🪪 Want to Apply as a Rider?
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

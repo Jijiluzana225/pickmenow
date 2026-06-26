@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Habal-Habal Booking</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #1f2937;
+        }
+
+        .booking-wrapper {
+            max-width: 760px;
+            margin: auto;
+            padding: 16px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .page-header h2 {
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .booking-card {
+            border-radius: 22px;
+            border: none;
+            background: #ffffff;
+        }
+
+        .section-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            border-radius: 14px;
+            padding: 13px 15px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .15);
+        }
+
+        .form-control[readonly] {
+            background: #f8fafc;
+            color: #4b5563;
+        }
+
+        .btn {
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+        }
+
+        .map-card {
+            margin: 16px 0;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 10px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, .15);
+            border: 1px solid rgba(148, 163, 184, .25);
+        }
+
+        .map-header {
+            padding: 8px 8px 12px;
+        }
+
+        .map-header h5 {
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .map-header small {
+            color: #6b7280;
+        }
+
+        #map {
+            height: 340px;
+            width: 100%;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .pickup-info-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0c0c0c;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .destination-info-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0c0c0c;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        /* Hide Google Maps InfoWindow close button */
+        .gm-ui-hover-effect {
+            display: none !important;
+        }
+
+        /* Hide InfoWindow header area that contains the close button */
+        .gm-style-iw-chr {
+            display: none !important;
+        }
+
+        /* Adjust InfoWindow spacing after hiding close button */
+        .gm-style .gm-style-iw-c {
+            padding-top: 8px !important;
+            padding-right: 12px !important;
+        }
+
+        .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+        }
+
+        .result-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+
+        .result-box h5 {
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .fare {
+            color: #16a34a;
+        }
+
+        @media (min-width: 768px) {
+            .booking-wrapper {
+                padding: 28px;
+            }
+
+            .page-header {
+                text-align: left;
+            }
+
+            #map {
+                height: 430px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% include "includes/navbar.html" %}
+
+<div class="booking-wrapper">
+
+    <div class="page-header">
+        <h2>Habal-Habal Booking</h2>
+        <p>Pin your pickup and destination, calculate the route, then book your ride.</p>
+    </div>
+
+    <div class="card booking-card shadow-sm p-4">
+        <div class="section-label">Ride Details</div>
+
+        <form method="POST" action="/create-booking/">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Customer Name</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ customer.full_name }}"
+                    readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contact Number</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ customer.contact_number }}"
+                    readonly>
+            </div>
+
+            <textarea
+                name="instructions"
+                class="form-control mb-3"
+                rows="3"
+                placeholder="Special instructions, landmark, gate number, etc."></textarea>
+
+            <input
+                type="text"
+                id="origin"
+                name="origin"
+                class="form-control mb-3"
+                placeholder="Getting your current GPS location..."
+                required>
+
+            <input
+                type="text"
+                id="destination"
+                name="destination"
+                class="form-control mb-3"
+                placeholder="Search Destination, Drag Pin if needed"
+                required>
+
+            <div class="map-card">
+                <div class="map-header">
+                    <h5>Route Map</h5>
+                    <small>Pickup is automatically pinned using your current GPS location. Drag the pin if needed.</small>
+                </div>
+
+                <div id="map"></div>
+            </div>
+
+            <input type="hidden" id="origin_lat" name="origin_lat">
+            <input type="hidden" id="origin_lng" name="origin_lng">
+
+            <input type="hidden" id="destination_lat" name="destination_lat">
+            <input type="hidden" id="destination_lng" name="destination_lng">
+
+            <input type="hidden" id="distance_km" name="distance_km">
+
+
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" onclick="calculateRoute()">
+                    Calculate Route and Fare
+                </button>
+
+               
+            </div>
+
+            <div class="result-box">
+                <h5 id="distance_text">Distance: —</h5>
+                <h5 id="fare_text" class="fare mt-2">Estimated Fare: —</h5>
+            </div>
+
+            
+            <input
+                type="number"
+                name="tip"
+                class="form-control mb-3"
+                placeholder="Tip optional, ₱"
+                min="0"
+                step="1">
+            <div  class="d-grid gap-2">
+             <button type="submit" id="bookRideBtn" class="btn btn-success" disabled>
+                    Book Ride
+                </button>
+                </div>   
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+let map;
+let directionsService;
+let directionsRenderer;
+
+let originMarker;
+let destinationMarker;
+
+let pickupInfoWindow;
+let destinationInfoWindow;
+
+function initMap() {
+
+    const defaultLocation = { lat: 6.9214, lng: 122.0790 };
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: defaultLocation,
+        zoom: 15,
+
+        // Satellite with road labels
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+
+        mapTypeControl: true,
+        streetViewControl: false,
+        fullscreenControl: true,
+
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+            position: google.maps.ControlPosition.TOP_RIGHT
+        }
+    });
+
+    directionsService = new google.maps.DirectionsService();
+
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: false
+    });
+
+    directionsRenderer.setMap(map);
+
+    autoPinCurrentLocation();
+
+    const originInput = document.getElementById("origin");
+    const originAuto = new google.maps.places.Autocomplete(originInput);
+
+    originAuto.addListener("place_changed", function() {
+
+        const place = originAuto.getPlace();
+        if (!place.geometry) return;
+
+        const loc = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+        };
+
+        map.setCenter(loc);
+        map.setZoom(17);
+
+        setOriginMarker(loc);
+        updateOrigin(loc);
+        resetBookingButton();
+    });
+
+    const destinationInput = document.getElementById("destination");
+    const destAuto = new google.maps.places.Autocomplete(destinationInput);
+
+    destAuto.addListener("place_changed", function() {
+
+        const place = destAuto.getPlace();
+        if (!place.geometry) return;
+
+        const loc = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+        };
+
+        map.setCenter(loc);
+        map.setZoom(17);
+
+        setDestinationMarker(loc);
+        updateDestination(loc);
+        resetBookingButton();
+    });
+}
+
+function autoPinCurrentLocation() {
+
+    if (!navigator.geolocation) {
+        alert("Your browser does not support GPS location. Please manually pin your pickup location.");
+        document.getElementById("origin").placeholder = "Search Pickup, Drag Pin if needed";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            map.setCenter(userLocation);
+            map.setZoom(17);
+
+            setOriginMarker(userLocation);
+            updateOrigin(userLocation);
+            reverseGeocode(userLocation, "origin");
+
+            resetBookingButton();
+        },
+
+        function(error) {
+
+            document.getElementById("origin").placeholder = "Search Pickup, Drag Pin if needed";
+
+            alert("Unable to access your current location. Please enable GPS/location permission or manually pin your pickup location.");
+
+            console.log(error);
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+function resetBookingButton() {
+    document.getElementById("bookRideBtn").disabled = true;
+    document.getElementById("distance_text").innerHTML = "Distance: —";
+    document.getElementById("fare_text").innerHTML = "Estimated Fare: —";
+    document.getElementById("distance_km").value = "";
+}
+
+function setOriginMarker(loc) {
+
+    if (originMarker) {
+        originMarker.setMap(null);
+    }
+
+    originMarker = new google.maps.Marker({
+        position: loc,
+        map: map,
+        draggable: true,
+        title: "Your Pickup Location",
+        animation: google.maps.Animation.DROP,
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+        }
+    });
+
+    if (pickupInfoWindow) {
+        pickupInfoWindow.close();
+    }
+
+    pickupInfoWindow = new google.maps.InfoWindow({
+        content: '<div class="pickup-info-label">📍 Pickup</div>',
+           
+        disableAutoPan: true
+    });
+
+    pickupInfoWindow.open({
+        anchor: originMarker,
+        map: map,
+        shouldFocus: false
+    });
+
+    originMarker.addListener("drag", function() {
+        if (pickupInfoWindow) {
+            pickupInfoWindow.close();
+            pickupInfoWindow.open({
+                anchor: originMarker,
+                map: map,
+                shouldFocus: false
+            });
+        }
+    });
+
+    originMarker.addListener("dragend", function(e) {
+
+        const updated = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng()
+        };
+
+        updateOrigin(updated);
+        reverseGeocode(updated, "origin");
+        resetBookingButton();
+
+        if (pickupInfoWindow) {
+            pickupInfoWindow.open({
+                anchor: originMarker,
+                map: map,
+                shouldFocus: false
+            });
+        }
+    });
+}
+
+function setDestinationMarker(loc) {
+
+    if (destinationMarker) {
+        destinationMarker.setMap(null);
+    }
+
+    destinationMarker = new google.maps.Marker({
+        position: loc,
+        map: map,
+        draggable: true,
+        title: "Destination",
+        animation: google.maps.Animation.DROP,
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        }
+    });
+
+    if (destinationInfoWindow) {
+        destinationInfoWindow.close();
+    }
+
+    destinationInfoWindow = new google.maps.InfoWindow({
+        content: '<div class="destination-info-label">📍 Destination</div>',
+        disableAutoPan: true
+    });
+
+    destinationInfoWindow.open({
+        anchor: destinationMarker,
+        map: map,
+        shouldFocus: false
+    });
+
+    destinationMarker.addListener("drag", function() {
+        if (destinationInfoWindow) {
+            destinationInfoWindow.close();
+            destinationInfoWindow.open({
+                anchor: destinationMarker,
+                map: map,
+                shouldFocus: false
+            });
+        }
+    });
+
+    destinationMarker.addListener("dragend", function(e) {
+
+        const updated = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng()
+        };
+
+        updateDestination(updated);
+        reverseGeocode(updated, "destination");
+        resetBookingButton();
+
+        if (destinationInfoWindow) {
+            destinationInfoWindow.open({
+                anchor: destinationMarker,
+                map: map,
+                shouldFocus: false
+            });
+        }
+    });
+}
+
+function updateOrigin(loc) {
+    document.getElementById("origin_lat").value = loc.lat;
+    document.getElementById("origin_lng").value = loc.lng;
+}
+
+function updateDestination(loc) {
+    document.getElementById("destination_lat").value = loc.lat;
+    document.getElementById("destination_lng").value = loc.lng;
+}
+
+function reverseGeocode(loc, type) {
+
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ location: loc }, function(results, status) {
+
+        if (status === "OK" && results[0]) {
+
+            if (type === "origin") {
+                document.getElementById("origin").value = results[0].formatted_address;
+            }
+
+            if (type === "destination") {
+                document.getElementById("destination").value = results[0].formatted_address;
+            }
+        }
+    });
+}
+
+function calculateRoute() {
+
+    const origin = document.getElementById("origin").value.trim();
+    const destination = document.getElementById("destination").value.trim();
+
+    const originLat = document.getElementById("origin_lat").value;
+    const originLng = document.getElementById("origin_lng").value;
+
+    const destinationLat = document.getElementById("destination_lat").value;
+    const destinationLng = document.getElementById("destination_lng").value;
+
+    if (origin === "" || originLat === "" || originLng === "") {
+        alert("Please Pin Origin.");
+        document.getElementById("origin").focus();
+        return;
+    }
+
+    if (destination === "" || destinationLat === "" || destinationLng === "") {
+        alert("Please Pin Destination.");
+        document.getElementById("destination").focus();
+        return;
+    }
+
+    directionsService.route({
+
+        origin: {
+            lat: parseFloat(originLat),
+            lng: parseFloat(originLng)
+        },
+
+        destination: {
+            lat: parseFloat(destinationLat),
+            lng: parseFloat(destinationLng)
+        },
+
+        travelMode: google.maps.TravelMode.DRIVING
+
+    }, function(response, status) {
+
+        if (status === "OK") {
+
+            directionsRenderer.setDirections(response);
+
+            const leg = response.routes[0].legs[0];
+            const km = leg.distance.value / 1000;
+
+            document.getElementById("distance_km").value = km;
+
+            const fare = Math.ceil(25 + (km * 8));
+
+            document.getElementById("distance_text").innerHTML =
+                "Distance: " + leg.distance.text;
+
+            document.getElementById("fare_text").innerHTML =
+                "Estimated Fare: ₱" + fare;
+
+            document.getElementById("bookRideBtn").disabled = false;
+
+        } else if (status === "ZERO_RESULTS") {
+
+            alert("No route could be found between the selected locations.");
+            document.getElementById("bookRideBtn").disabled = true;
+
+        } else {
+
+            alert("Unable to calculate route. Please check your pinned locations.");
+            document.getElementById("bookRideBtn").disabled = true;
+        }
+    });
+}
+
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initMap">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

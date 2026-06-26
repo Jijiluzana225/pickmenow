@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Accepted Bookings</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #1f2937;
+        }
+
+        .dashboard-wrapper {
+            max-width: 950px;
+            margin: auto;
+            padding: 16px;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .booking-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 22px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .booking-card-body {
+            padding: 18px;
+        }
+
+        .customer-name {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .value a {
+            color: #2563eb;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .value a:hover {
+            text-decoration: underline;
+        }
+
+        .fare-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .total {
+            color: #16a34a;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-completed {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .btn {
+            border-radius: 14px;
+            font-weight: 800;
+            padding: 11px 14px;
+        }
+
+        .empty-state {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 34px 20px;
+            text-align: center;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-wrapper {
+                padding: 28px;
+            }
+
+            .booking-card-body {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+{% include "includes/navbar.html" %}
+
+<div class="dashboard-wrapper">
+
+    <div class="page-header">
+        <h2>My Accepted Bookings</h2>
+        <p>Hello, {{ driver.full_name }}. These are the bookings currently accepted by you.</p>
+    </div>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+            <div class="booking-card">
+                <div class="booking-card-body">
+
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div>
+                            <div class="customer-name">
+                                {{ booking.customer_name }}
+                            </div>
+
+                            <small class="text-muted">
+                                Accepted:
+                                {% if booking.accepted_at %}
+                                    {{ booking.accepted_at }}
+                                {% else %}
+                                    {{ booking.assigned_at }}
+                                {% endif %}
+                            </small>
+                        </div>
+
+                        <span class="status-badge {% if booking.status == 'completed' %}status-completed{% endif %}">
+                            {{ booking.status }}
+                        </span>
+                    </div>
+
+                    <div class="label">Customer Contact</div>
+                    <div class="value">
+                        {{ booking.contact_number }}
+                    </div>
+
+                    <div class="label">Pickup</div>
+                    <div class="value">
+                        <a href="/navigate/{{ booking.id }}/" target="_blank">
+                            {{ booking.origin }}
+                        </a>
+                    </div>
+
+                    <div class="label">Destination</div>
+                    <div class="value">
+                        <a href="{% url 'navigate_to_destination' booking.id %}" target="_blank">
+                            {{ booking.destination }}
+                        </a>
+                    </div>
+
+                    {% if booking.instructions %}
+                        <div class="label">Instructions</div>
+                        <div class="value">
+                            {{ booking.instructions }}
+                        </div>
+                    {% endif %}
+
+                    <div class="fare-box mb-3">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="label">Fare</div>
+                                <div>₱{{ booking.fare }}</div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="label">Tip</div>
+                                <div>₱{{ booking.tip }}</div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="label">Total</div>
+                                <div class="total">₱{{ booking.total_amount }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if booking.status == "accepted" %}
+                        <div class="d-grid gap-2">
+                            <a
+                                href="/navigate/{{ booking.id }}/"
+                                target="_blank"
+                                class="btn btn-primary">
+                                Navigate to Pickup
+                            </a>
+
+                            <a
+                                href="{% url 'navigate_to_destination' booking.id %}"
+                                target="_blank"
+                                class="btn btn-outline-primary">
+                                Navigate to Destination
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{% url 'complete_booking' booking.id %}"
+                                onsubmit="return confirm('Mark this booking as completed?');">
+
+                                {% csrf_token %}
+
+                                <button type="submit" class="btn btn-success w-100">
+                                    ✅ Mark as Completed
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info rounded-4 mb-0">
+                            This booking is already completed and can no longer be edited.
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state">
+            <h5 class="fw-bold mb-2">No accepted bookings</h5>
+            <p class="text-muted mb-3">
+                Accepted customer bookings will appear here.
+            </p>
+
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                View Available Bookings
+            </a>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
