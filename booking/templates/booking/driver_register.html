@@ -69,6 +69,33 @@
             font-size: 13px;
             color: #6b7280;
         }
+
+        .login-section {
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    border: 1px solid #dbeafe;
+    border-radius: 20px;
+    padding: 18px;
+    margin-top: 24px;
+    text-align: center;
+}
+
+.login-section-title {
+    font-weight: 900;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.login-section-text {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.btn-login-existing {
+    border-radius: 14px;
+    padding: 12px;
+    font-weight: 900;
+}
     </style>
 </head>
 
@@ -222,6 +249,24 @@
             </button>
 
         </form>
+
+        <div class="login-section">
+
+    <div class="login-section-title">
+        Already registered?
+    </div>
+
+    <div class="login-section-text">
+        Login to your account and continue using PickMeNow.
+    </div>
+
+    <a
+        href="{% url 'customer_login' %}"
+        class="btn btn-outline-primary w-100 btn-login-existing">
+        Login Here
+    </a>
+
+</div>
 
     </div>
 
