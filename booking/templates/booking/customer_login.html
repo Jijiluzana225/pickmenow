@@ -1,15 +1,10 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html>
 <head>
 
-    <title>www.pickmenow.online | Customer Login</title>
+    <title>OnlineRides.Com | Customer Login</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    <meta name="theme-color" content="#0d6efd">
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -52,20 +47,20 @@
             margin-bottom: 18px;
         }
 
-        .brand-title{
-            text-align:center;
-            font-size:clamp(1.8rem,4vw,3.5rem);
-            font-weight:900;
-            white-space:nowrap;
-        }
+   .brand-title{
+    text-align:center;
+    font-size:clamp(1.8rem,4vw,3.5rem);
+    font-weight:900;
+    white-space:nowrap;
+}
 
-        .small-text{
-            font-size:.7em;
-        }
+.small-text{
+    font-size:.7em;
+}
 
-        .highlight{
-            color:#facc15;
-        }
+.highlight{
+    color:#facc15;
+}
 
         .brand-title span {
             color: #facc15;
@@ -250,14 +245,14 @@
 
         @media (max-width: 991px) {
             .brand-panel {
-                color: #ffffff;
-                padding: 24px;
+    color: #ffffff;
+    padding: 24px;
 
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
             .brand-title {
                 font-size: 34px;
@@ -269,18 +264,18 @@
             }
 
             .hero-bike {
-                width: 150px;
-                height: 150px;
-                border-radius: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 74px;
-                background: linear-gradient(135deg, #facc15, #f97316);
-                box-shadow: 0 24px 60px rgba(250,204,21,.28);
-                transform: rotate(-6deg);
-                margin: 30px auto 0;
-            }
+    width: 150px;
+    height: 150px;
+    border-radius: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 74px;
+    background: linear-gradient(135deg, #facc15, #f97316);
+    box-shadow: 0 24px 60px rgba(250,204,21,.28);
+    transform: rotate(-6deg);
+    margin: 30px auto 0;
+}
         }
     </style>
 
@@ -301,10 +296,12 @@
                     <div class="brand-badge">
                         ⚡ Fast Local Motorcycle Rides
                     </div>
+<h1 class="brand-title">
+    <span class="small-text">www.</span>PickMe<span class="highlight">Now</span><span class="small-text">.Online</span>
+</h1>          
+                   
 
-                    <h1 class="brand-title">
-                        <span class="small-text">www.</span>PickMe<span class="highlight">Now</span><span class="small-text">.Online</span>
-                    </h1>
+                 
 
                 </div>
 
@@ -448,13 +445,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js");
-}
-</script>
-
 </body>
 </html>
-
-
