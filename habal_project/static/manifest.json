@@ -1,7 +1,10 @@
 {
-  "name": "My Django App",
-  "short_name": "DjangoApp",
-  "start_url": "/",
+  "id": "/",
+  "name": "PickMeNow",
+  "short_name": "PickMeNow",
+  "description": "PickMeNow motorcycle ride booking app",
+  "start_url": "/customer/login/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
