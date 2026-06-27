@@ -1,5 +1,3 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -438,12 +436,6 @@
 
 {% include "includes/navbar.html" %}
 
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js");
-}
-</script>
-
 <div class="dashboard-wrapper">
 
     <div class="hero-card">
@@ -538,7 +530,7 @@ if ("serviceWorker" in navigator) {
 
                             </div>
 
-                            <!-- {% if booking.status == "accepted" %}
+                            {% if booking.status == "accepted" %}
                                 <button
                                     type="button"
                                     class="btn btn-primary btn-track"
@@ -547,7 +539,7 @@ if ("serviceWorker" in navigator) {
                                     onclick="openDriverTracker({{ booking.id }})">
                                     🗺️ Track Driver Location
                                 </button>
-                            {% endif %} -->
+                            {% endif %}
                         </div>
 
                     {% else %}

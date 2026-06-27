@@ -140,11 +140,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    BASE_DIR / "habal_project" / "static",
-]
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
@@ -161,24 +156,8 @@ TELEGRAM_CHAT_ID = "-5415782958"
 
 
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-SECURE_SSL_REDIRECT = False
-
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
-
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_STORAGE  = {
     'CLOUD_NAME': 'dyiqfwpib',
     'API_KEY': '966484153513976',
