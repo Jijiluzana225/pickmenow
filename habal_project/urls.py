@@ -1,13 +1,22 @@
-from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+from django.http import HttpResponse
 from django.conf import settings
-from django.conf.urls.static import static
+from pathlib import Path
+
+
+def service_worker(request):
+    sw_path = settings.BASE_DIR / "habal_project" / "static" / "service-worker.js"
+
+    with open(sw_path, "r", encoding="utf-8") as file:
+        return HttpResponse(
+            file.read(),
+            content_type="application/javascript"
+        )
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('booking.urls')),
+    path("admin/", admin.site.urls),
+    path("service-worker.js", service_worker, name="service_worker"),
+    path("", include("booking.urls")),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
