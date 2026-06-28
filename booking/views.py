@@ -863,7 +863,18 @@ def get_driver_location(request, booking_id):
     })
 
 
-from django.shortcuts import render
+from django.http import FileResponse, Http404
+from django.conf import settings
+from pathlib import Path
 
-def download_app(request):
-    return render(request, "booking/download.html")
+def download_apk(request):
+    apk_path = settings.BASE_DIR / "apk" / "PickMeNow-v1.0.apk"
+
+    if not apk_path.exists():
+        raise Http404("APK file not found")
+
+    return FileResponse(
+        open(apk_path, "rb"),
+        as_attachment=True,
+        filename="PickMeNow-v1.0.apk"
+    )

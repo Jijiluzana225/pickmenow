@@ -39,7 +39,7 @@ urlpatterns = [
     path("driver/update-location/", views.update_driver_location, name="update_driver_location"),
     path("booking/<int:booking_id>/driver-location/", views.get_driver_location, name="get_driver_location"),
 
-    path("download/", views.download_app, name="download_app"),
+   path("download-apk/", views.download_apk, name="download_apk"),
 
 
 
