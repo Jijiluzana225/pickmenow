@@ -861,3 +861,9 @@ def get_driver_location(request, booking_id):
         "customer_lat": booking.origin_lat,
         "customer_lng": booking.origin_lng,
     })
+
+
+from django.shortcuts import render
+
+def download_app(request):
+    return render(request, "booking/download.html")
