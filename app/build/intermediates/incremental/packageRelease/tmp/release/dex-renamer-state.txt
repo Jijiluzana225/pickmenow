@@ -1,0 +1,4 @@
+#Sun Jun 28 19:40:25 PST 2026
+base.0=C\:\\Users\\Jiji\\Desktop\\Django Live\\pickmenow\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
