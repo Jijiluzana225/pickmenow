@@ -1,13 +1,33 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from django.http import JsonResponse
 
+def manifest(request):
+    return JsonResponse({
+        "name": "PickMeNow",
+        "short_name": "PickMeNow",
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#000000",
+        "orientation": "portrait",
+        "icons": [
+            {
+                "src": "/static/icons/icon-192.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "/static/icons/icon-512.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    })
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('booking.urls')),
+    path("admin/", admin.site.urls),
+    path("manifest.json", manifest, name="manifest"),
+    path("", include("booking.urls")),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
