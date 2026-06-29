@@ -429,6 +429,40 @@
                 font-size: 14px;
             }
         }
+
+        .driver-detail a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.driver-detail a:hover {
+    text-decoration: underline;
+}
+
+.call-driver-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 10px 16px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.call-driver-btn:hover {
+    background-color: #218838;
+    color: #fff;
+    text-decoration: none;
+}
+
+.call-driver-btn:active {
+    transform: scale(0.98);
+}
     </style>
 </head>
 
@@ -514,9 +548,11 @@
                                         Your assigned rider is on the way
                                     </div>
 
-                                    <div class="driver-detail">
-                                        📞 <strong>{{ booking.driver.contact_number }}</strong>
-                                    </div>
+   <div class="driver-detail">
+    <a href="tel:{{ booking.driver.contact_number }}" class="call-driver-btn">
+        📞 Call {{ booking.driver.contact_number }}
+    </a>
+</div>
 
                                     <div class="driver-detail">
                                         🛵 {{ booking.driver.motorcycle_model }}
