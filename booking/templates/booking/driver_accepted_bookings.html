@@ -48,6 +48,30 @@
             padding: 18px;
         }
 
+        .customer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .customer-photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.customer-photo:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 18px rgba(0,0,0,.25);
+}
+
         .customer-name {
             font-size: 18px;
             font-weight: 900;
@@ -76,6 +100,26 @@
 
         .value a:hover {
             text-decoration: underline;
+        }
+
+        .call-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            background: #16a34a;
+            color: #ffffff !important;
+            font-weight: 900;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .call-btn:hover {
+            background: #15803d;
+            color: #ffffff !important;
+            text-decoration: none;
         }
 
         .fare-box {
@@ -129,6 +173,10 @@
             .booking-card-body {
                 padding: 22px;
             }
+
+            .call-btn {
+                width: auto;
+            }
         }
     </style>
 </head>
@@ -151,19 +199,35 @@
                 <div class="booking-card-body">
 
                     <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-                        <div>
-                            <div class="customer-name">
-                                {{ booking.customer_name }}
-                            </div>
+                        <div class="customer-header">
+                            {% if booking.customer.profile_picture %}
+    <a href="{{ booking.customer.profile_picture.url }}" target="_blank">
+        <img
+            src="{{ booking.customer.profile_picture.url }}"
+            alt="{{ booking.customer_name }}"
+            class="customer-photo">
+    </a>
+{% else %}
+    <img
+        src="https://ui-avatars.com/api/?name={{ booking.customer_name|urlencode }}&background=e5e7eb&color=111827"
+        alt="{{ booking.customer_name }}"
+        class="customer-photo">
+{% endif %}
 
-                            <small class="text-muted">
-                                Accepted:
-                                {% if booking.accepted_at %}
-                                    {{ booking.accepted_at }}
-                                {% else %}
-                                    {{ booking.assigned_at }}
-                                {% endif %}
-                            </small>
+                            <div>
+                                <div class="customer-name">
+                                    {{ booking.customer_name }}
+                                </div>
+
+                                <small class="text-muted">
+                                    Accepted:
+                                    {% if booking.accepted_at %}
+                                        {{ booking.accepted_at }}
+                                    {% else %}
+                                        {{ booking.assigned_at }}
+                                    {% endif %}
+                                </small>
+                            </div>
                         </div>
 
                         <span class="status-badge {% if booking.status == 'completed' %}status-completed{% endif %}">
@@ -173,7 +237,9 @@
 
                     <div class="label">Customer Contact</div>
                     <div class="value">
-                        {{ booking.contact_number }}
+                        <a href="tel:{{ booking.contact_number }}" class="call-btn">
+                            📞 Call {{ booking.contact_number }}
+                        </a>
                     </div>
 
                     <div class="label">Pickup</div>
@@ -275,24 +341,24 @@
 
 <script>
     function sendDriverLocation() {
-    if (!navigator.geolocation) return;
+        if (!navigator.geolocation) return;
 
-    navigator.geolocation.watchPosition(function(position) {
-        fetch("{% url 'update_driver_location' %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}",
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            })
+        navigator.geolocation.watchPosition(function(position) {
+            fetch("{% url 'update_driver_location' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                })
+            });
         });
-    });
-}
+    }
 
-sendDriverLocation();
+    sendDriverLocation();
 </script>
 
 </body>
