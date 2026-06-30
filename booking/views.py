@@ -664,6 +664,8 @@ def cancel_booking(request, booking_id):
     return redirect("customer_dashboard")
 
 
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Booking
@@ -681,6 +683,14 @@ def driver_accepted_bookings(request):
         driver=driver,
         status="accepted"
     ).order_by("-accepted_at", "-assigned_at", "-created_at")
+
+    for booking in bookings:
+        booking.can_no_show = (
+            booking.status == "accepted"
+            and booking.accepted_at
+            and timezone.now() >= booking.accepted_at + timedelta(minutes=2)
+        )
+
 
     return render(request, "booking/driver_accepted_bookings.html", {
         "driver": driver,
@@ -769,6 +779,8 @@ def driver_completed_bookings(request):
     total_fare = summary["total_fare"] or 0
     total_tip = summary["total_tip"] or 0
     grand_total = total_fare + total_tip
+
+
 
     return render(request, "booking/driver_completed_bookings.html", {
         "driver": driver,
@@ -878,3 +890,30 @@ def download_apk(request):
         as_attachment=True,
         filename="PickMeNow-v1.0.apk"
     )
+
+
+
+@login_required(login_url="driver_login")
+def no_show_booking(request, booking_id):
+
+    if not hasattr(request.user, "driver_profile"):
+        return redirect("driver_login")
+
+    driver = request.user.driver_profile
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        driver=driver,
+        status="accepted"
+    )
+
+    if request.method == "POST":
+        booking.status = "no_show"
+        booking.instructions = "No Show"
+        booking.save()
+
+        driver.is_available = True
+        driver.save()
+
+    return redirect("driver_accepted_bookings")

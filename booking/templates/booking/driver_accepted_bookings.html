@@ -307,8 +307,16 @@
 
                                 <button type="submit" class="btn btn-success w-100">
                                     ✅ Mark as Completed
-                                </button>
+                                </button>                                
                             </form>
+                            {% if booking.can_no_show %}
+<form method="POST" action="{% url 'no_show_booking' booking.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger w-100">
+        🚫 No Show
+    </button>
+</form>
+{% endif %}
                         </div>
                     {% else %}
                         <div class="alert alert-info rounded-4 mb-0">

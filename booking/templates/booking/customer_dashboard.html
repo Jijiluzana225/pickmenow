@@ -668,13 +668,15 @@
                     {% else %}
 
                         <div class="disabled-note">
-                            {% if booking.status == "accepted" %}
-                                🚫 Tip editing and cancellation are disabled because a driver has already accepted your booking.
-                            {% elif booking.status == "completed" %}
-                                ✅ This booking has already been completed.
-                            {% elif booking.status == "cancelled" %}
-                                ❌ This booking has been cancelled and can no longer be edited.
-                            {% endif %}
+                           {% if booking.status == "accepted" %}
+    🚫 Tip editing and cancellation are disabled because a driver has already accepted your booking.
+{% elif booking.status == "completed" %}
+    ✅ This booking has already been completed.
+{% elif booking.status == "cancelled" %}
+    ❌ This booking has been cancelled and can no longer be edited.
+{% elif booking.status == "no_show" %}
+    🚷 No Show at the pickup location.
+{% endif %}
                         </div>
 
                     {% endif %}
