@@ -40,6 +40,7 @@ urlpatterns = [
     path("booking/<int:booking_id>/driver-location/", views.get_driver_location, name="get_driver_location"),
 
    path("download-apk/", views.download_apk, name="download_apk"),
+   path("booking/<int:booking_id>/no-show/",views.no_show_booking,name="no_show_booking",),
 
 
 

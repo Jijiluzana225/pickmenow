@@ -75,6 +75,7 @@ class Booking(models.Model):
         ("accepted", "Accepted"),
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
+        ("no_show", "No Show"),
     ]
 
     customer = models.ForeignKey(
