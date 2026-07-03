@@ -904,43 +904,34 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT
 
 <script>
 {% for booking in bookings %}
-    {% if booking.status == "pending" or booking.status == "assigned" %}
-        const protocol{{ booking.id }} =
-            window.location.protocol === "https:" ? "wss://" : "ws://";
+    const protocol{{ booking.id }} =
+        window.location.protocol === "https:" ? "wss://" : "ws://";
 
-        const bookingSocket{{ booking.id }} = new WebSocket(
-            protocol{{ booking.id }} + window.location.host + "/ws/booking/{{ booking.id }}/"
-        );
+    const bookingSocket{{ booking.id }} = new WebSocket(
+        protocol{{ booking.id }} + window.location.host + "/ws/booking/{{ booking.id }}/"
+    );
 
-        bookingSocket{{ booking.id }}.onmessage = function(event) {
-            const data = JSON.parse(event.data);
+    bookingSocket{{ booking.id }}.onmessage = function(event) {
 
-            if (
-                data.type === "booking_accepted" &&
-                data.booking_id == "{{ booking.id }}"
-            ) {
-                const sound = document.getElementById("bookingAcceptedSound");
+    const data = JSON.parse(event.data);
 
-                if (sound) {
-                    sound.currentTime = 0;
+    if (
+        data.type === "booking_accepted" &&
+        data.booking_id == "{{ booking.id }}"
+    ) {
 
-                    sound.play()
-                        .then(function () {
-                            sound.onended = function () {
-                                window.location.reload();
-                            };
-                        })
-                        .catch(function () {
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 1500);
-                        });
-                } else {
-                    window.location.reload();
-                }
-            }
+        const sound = document.getElementById("bookingAcceptedSound");
+
+        sound.currentTime = 0;
+        sound.play();
+
+        
+
+        sound.onended = function () {
+            window.location.reload();
         };
-    {% endif %}
+    }
+};
 {% endfor %}
 </script>
 
