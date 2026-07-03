@@ -472,9 +472,7 @@
 
 {% include "includes/navbar.html" %}
 
-<audio id="bookingAcceptedSound" preload="auto">
-     <audio id="bookingAcceptedSound" preload="auto" src="{% static 'sounds/accepted.mp3' %}"></audio>
-</audio>
+<audio id="bookingAcceptedSound" preload="auto" src="{% static 'sounds/accepted.mp3' %}"></audio>
 
 <div class="dashboard-wrapper">
 
@@ -904,34 +902,41 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT
 
 <script>
 {% for booking in bookings %}
-    const protocol{{ booking.id }} =
-        window.location.protocol === "https:" ? "wss://" : "ws://";
+    {% if booking.status == "pending" or booking.status == "assigned" %}
+        const protocol{{ booking.id }} =
+            window.location.protocol === "https:" ? "wss://" : "ws://";
 
-    const bookingSocket{{ booking.id }} = new WebSocket(
-        protocol{{ booking.id }} + window.location.host + "/ws/booking/{{ booking.id }}/"
-    );
+        const bookingSocket{{ booking.id }} = new WebSocket(
+            protocol{{ booking.id }} + window.location.host + "/ws/booking/{{ booking.id }}/"
+        );
 
-    bookingSocket{{ booking.id }}.onmessage = function(event) {
+        bookingSocket{{ booking.id }}.onmessage = function(event) {
+            const data = JSON.parse(event.data);
 
-    const data = JSON.parse(event.data);
+            if (
+                data.type === "booking_accepted" &&
+                data.booking_id == "{{ booking.id }}"
+            ) {
+                const sound = document.getElementById("bookingAcceptedSound");
 
-    if (
-        data.type === "booking_accepted" &&
-        data.booking_id == "{{ booking.id }}"
-    ) {
+                if (sound) {
+                    sound.currentTime = 0;
 
-        const sound = document.getElementById("bookingAcceptedSound");
-
-        sound.currentTime = 0;
-        sound.play();
-
-        
-
-        sound.onended = function () {
-            window.location.reload();
+                    sound.play()
+                        .then(function () {
+                            sound.onended = function () {
+                                window.location.reload();
+                            };
+                        })
+                        .catch(function () {
+                            window.location.reload();
+                        });
+                } else {
+                    window.location.reload();
+                }
+            }
         };
-    }
-};
+    {% endif %}
 {% endfor %}
 </script>
 
