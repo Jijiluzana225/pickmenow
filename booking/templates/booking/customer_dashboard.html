@@ -922,12 +922,13 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT
 
         const sound = document.getElementById("bookingAcceptedSound");
 
-        sound.currentTime = 0;   // restart from beginning
-        sound.play().catch(err => console.log(err));
+        sound.currentTime = 0;
+        sound.play();
+        
 
-        setTimeout(function () {
-            location.reload();
-        }, 1500);
+        sound.onended = function () {
+            window.location.reload();
+        };
     }
 };
 {% endfor %}
