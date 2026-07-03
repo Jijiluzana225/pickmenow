@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -470,6 +472,10 @@
 
 {% include "includes/navbar.html" %}
 
+<audio id="bookingAcceptedSound" preload="auto">
+    <source src="{% static 'sounds/notification.wav' %}" type="audio/wav">
+</audio>
+
 <div class="dashboard-wrapper">
 
     <div class="hero-card">
@@ -906,12 +912,24 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT
     );
 
     bookingSocket{{ booking.id }}.onmessage = function(event) {
-        const data = JSON.parse(event.data);
 
-        if (data.type === "booking_accepted") {
-            window.location.reload();
-        }
-    };
+    const data = JSON.parse(event.data);
+
+    if (
+        data.type === "booking_accepted" &&
+        data.booking_id == "{{ booking.id }}"
+    ) {
+
+        const sound = document.getElementById("bookingAcceptedSound");
+
+        sound.currentTime = 0;   // restart from beginning
+        sound.play().catch(err => console.log(err));
+
+        setTimeout(function () {
+            location.reload();
+        }, 1500);
+    }
+};
 {% endfor %}
 </script>
 
