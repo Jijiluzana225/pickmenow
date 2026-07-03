@@ -581,6 +581,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import transaction
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from .models import Booking
 from .sms import send_sms
 
@@ -616,6 +619,16 @@ def accept_booking(request, booking_id):
             driver.is_available = False
             driver.save()
 
+        # Send WebSocket message to customer dashboard
+        channel_layer = get_channel_layer()
+
+        async_to_sync(channel_layer.group_send)(
+            f"booking_{booking.id}",
+            {
+                "type": "booking_accepted",
+            }
+        )
+
         message = (
             f"Good day {booking.customer_name}!\n\n"
             f"Your PickMeNow booking has been accepted. Your Ride is on the way.\n\n"
@@ -637,6 +650,8 @@ def accept_booking(request, booking_id):
         print("SMS SEND RESULT")
         print(sms_result)
         print("=" * 60)
+
+        print("WEBSOCKET SENT TO:", f"booking_{booking.id}")
 
     return redirect("driver_accepted_bookings")
 
@@ -917,3 +932,6 @@ def no_show_booking(request, booking_id):
         driver.save()
 
     return redirect("driver_accepted_bookings")
+
+
+    

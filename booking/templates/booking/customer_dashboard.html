@@ -894,5 +894,27 @@ document.addEventListener("hidden.bs.modal", function (event) {
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initCustomerTrackingMaps">
 </script>
 
+
+
+<script>
+{% for booking in bookings %}
+    const protocol{{ booking.id }} =
+        window.location.protocol === "https:" ? "wss://" : "ws://";
+
+    const bookingSocket{{ booking.id }} = new WebSocket(
+        protocol{{ booking.id }} + window.location.host + "/ws/booking/{{ booking.id }}/"
+    );
+
+    bookingSocket{{ booking.id }}.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "booking_accepted") {
+            window.location.reload();
+        }
+    };
+{% endfor %}
+</script>
+
+
 </body>
 </html>

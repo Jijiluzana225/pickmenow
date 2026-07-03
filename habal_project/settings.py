@@ -35,6 +35,8 @@ CSRF_TRUSTED_ORIGINS = ['https://*.railway.app',
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "channels",    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,6 +78,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'habal_project.wsgi.application'
+
+
+ASGI_APPLICATION = "habal_project.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 
 # Database
