@@ -485,7 +485,11 @@
             Hello, {{ customer.full_name }}. Track your ride status, check your assigned driver, update your tip, or cancel pending bookings.
         </p>
     </div>
-
+<div class="d-flex justify-content-center mt-3 mb-3">
+    <a href="{% url 'index' %}" class="btn btn-warning btn-lg fw-bold px-4">
+        ➕ Book a New Ride
+    </a>
+</div>
     {% if bookings %}
 
         {% for booking in bookings %}
