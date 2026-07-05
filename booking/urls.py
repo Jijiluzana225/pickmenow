@@ -39,8 +39,11 @@ urlpatterns = [
     path("driver/update-location/", views.update_driver_location, name="update_driver_location"),
     path("booking/<int:booking_id>/driver-location/", views.get_driver_location, name="get_driver_location"),
 
-   path("download-apk/", views.download_apk, name="download_apk"),
-   path("booking/<int:booking_id>/no-show/",views.no_show_booking,name="no_show_booking",),
+    path("download-apk/", views.download_apk, name="download_apk"),
+    path("booking/<int:booking_id>/no-show/",views.no_show_booking,name="no_show_booking",),
+
+    path("customer/location/", views.choose_customer_location, name="choose_customer_location"),
+    path("driver/location/", views.choose_driver_location, name="choose_driver_location"),
 
 
 

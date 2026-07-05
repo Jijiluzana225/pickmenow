@@ -137,6 +137,31 @@
 
             <div class="mb-3">
 
+    <label class="form-label">
+        Location / Area
+    </label>
+
+    <select
+        name="location"
+        class="form-control"
+        required>
+
+        <option value="">Select Location</option>
+
+        {% for location in locations %}
+            <option
+                value="{{ location.id }}"
+                {% if selected_location == location.id|stringformat:"s" %}selected{% endif %}>
+                {{ location.name }}
+            </option>
+        {% endfor %}
+
+    </select>
+
+</div>
+
+            <div class="mb-3">
+
                 <label class="form-label">
                     Full Name
                 </label>
