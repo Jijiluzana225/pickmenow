@@ -215,27 +215,12 @@ class DriverDashboardConsumer(AsyncWebsocketConsumer):
             )
 
     async def dashboard_refresh(self, event):
-        """
-        Handles messages with:
-
-        {
-            "type": "dashboard_refresh",
-            "booking_id": ...,
-            "booking_status": ...
-        }
-        """
-
         await self.send(
             text_data=json.dumps({
                 "type": "dashboard_refresh",
                 "booking_id": event.get("booking_id"),
-                "booking_status": event.get(
-                    "booking_status"
-                ),
-                "reason": event.get(
-                    "reason",
-                    "booking_updated"
-                ),
+                "booking_status": event.get("booking_status"),
+                "reason": event.get("reason"),
             })
         )
 

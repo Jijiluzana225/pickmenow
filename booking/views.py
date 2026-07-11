@@ -203,10 +203,10 @@ def create_booking(request):
         fare=fare,
         status="pending",
 
-        # Nearest recently active driver.
         priority_driver=nearest_driver,
 
-        # Always create a one-minute priority window.
+        # The nearest driver can accept immediately.
+        # Other drivers can accept after one minute.
         priority_until=now + timedelta(minutes=1),
     )
 
@@ -231,13 +231,36 @@ def create_booking(request):
 https://www.pickmenow.online/dashboard/
 """
 
+    # Send Telegram notification to the location group.
     if booking.location and booking.location.telegram_chat_id:
         send_telegram_message(
             booking.location.telegram_chat_id,
             message
         )
 
+    # Refresh every connected driver dashboard
+    # belonging to the same service location.
+    if booking.location_id:
+        channel_layer = get_channel_layer()
+
+        async_to_sync(channel_layer.group_send)(
+            f"driver_dashboard_location_{booking.location_id}",
+            {
+                "type": "dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "reason": "new_booking",
+            }
+        )
+
+        print(
+            "NEW BOOKING DASHBOARD REFRESH SENT TO:",
+            f"driver_dashboard_location_{booking.location_id}"
+        )
+
     return redirect("customer_dashboard")
+
+
 
 
 @login_required(login_url="driver_login")
