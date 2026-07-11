@@ -733,7 +733,6 @@ def toggle_driver_availability(request):
     return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
 
-
 @login_required(login_url="driver_login")
 def accept_booking(request, booking_id):
     if not hasattr(request.user, "driver_profile"):
@@ -752,8 +751,6 @@ def accept_booking(request, booking_id):
 
     active_statuses = ["accepted"]
 
-    # Prevent this driver from accepting another booking
-    # when they already have an active booking.
     if Booking.objects.filter(
         driver=driver,
         status__in=active_statuses
@@ -761,14 +758,11 @@ def accept_booking(request, booking_id):
         return redirect("dashboard")
 
     with transaction.atomic():
+        # Lock only the Booking row.
+        # Do not use select_related() here because customer and
+        # location are nullable foreign keys.
         booking = get_object_or_404(
-            Booking.objects
-            .select_for_update()
-            .select_related(
-                "customer",
-                "customer__user",
-                "location",
-            ),
+            Booking.objects.select_for_update(),
             id=booking_id,
             status="pending",
             driver__isnull=True,
@@ -787,16 +781,9 @@ def accept_booking(request, booking_id):
             and booking.priority_driver_id == driver.id
         )
 
-        # During the first minute, only the saved nearest
-        # driver may accept the booking.
-        #
-        # If no priority driver was found, nobody can accept
-        # until the one-minute priority period expires.
         if priority_window_active and not is_priority_driver:
             return redirect("dashboard")
 
-        # Recheck inside the transaction in case another request
-        # assigned an active booking to this driver.
         if Booking.objects.select_for_update().filter(
             driver=driver,
             status__in=active_statuses
@@ -818,16 +805,23 @@ def accept_booking(request, booking_id):
         )
 
         driver.is_available = False
-
         driver.save(
             update_fields=[
                 "is_available"
             ]
         )
 
+    # Load related objects after the transaction lock query.
+    booking = Booking.objects.select_related(
+        "customer",
+        "customer__user",
+        "location",
+        "driver",
+    ).get(id=booking.id)
+
     channel_layer = get_channel_layer()
 
-    # Notify the customer-specific booking page.
+    # Notify the customer booking page.
     async_to_sync(channel_layer.group_send)(
         f"booking_{booking.id}",
         {
@@ -840,8 +834,7 @@ def accept_booking(request, booking_id):
         }
     )
 
-    # Refresh all connected driver dashboards
-    # in the same service location.
+    # Refresh all driver dashboards in the same service location.
     if booking.location_id:
         async_to_sync(channel_layer.group_send)(
             f"driver_dashboard_location_{booking.location_id}",
@@ -853,13 +846,8 @@ def accept_booking(request, booking_id):
             }
         )
 
-    # Refresh the dashboard of the customer
-    # who created this booking.
-    if (
-        booking.customer_id
-        and booking.customer
-        and booking.customer.user_id
-    ):
+    # Refresh the customer's dashboard.
+    if booking.customer_id and booking.customer.user_id:
         async_to_sync(channel_layer.group_send)(
             f"customer_dashboard_user_{booking.customer.user_id}",
             {
@@ -904,19 +892,13 @@ def accept_booking(request, booking_id):
             f"driver_dashboard_location_{booking.location_id}"
         )
 
-    if (
-        booking.customer_id
-        and booking.customer
-        and booking.customer.user_id
-    ):
+    if booking.customer_id and booking.customer.user_id:
         print(
             "CUSTOMER DASHBOARD WEBSOCKET SENT TO:",
             f"customer_dashboard_user_{booking.customer.user_id}"
         )
 
     return redirect("driver_accepted_bookings")
-
-
 
 
 @login_required
