@@ -1,16 +1,34 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+
     <title>Driver Dashboard</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <style>
         body {
-            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(
+                180deg,
+                #f8fafc 0%,
+                #eef2f7 100%
+            );
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
             color: #1f2937;
         }
 
@@ -49,9 +67,14 @@
             background: #ffffff;
             border: none;
             border-radius: 22px;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
             margin-bottom: 16px;
             overflow: hidden;
+        }
+
+        .booking-card.priority-booking {
+            border: 2px solid #22c55e;
+            box-shadow: 0 14px 35px rgba(34, 197, 94, 0.16);
         }
 
         .booking-card-body {
@@ -69,7 +92,7 @@
             font-weight: 700;
             color: #6b7280;
             text-transform: uppercase;
-            letter-spacing: .06em;
+            letter-spacing: 0.06em;
             margin-bottom: 3px;
         }
 
@@ -77,12 +100,17 @@
             font-size: 14px;
             color: #1f2937;
             margin-bottom: 12px;
+            word-break: break-word;
         }
 
         .value a {
             color: #2563eb;
             font-weight: 700;
             text-decoration: none;
+        }
+
+        .value a:hover {
+            text-decoration: underline;
         }
 
         .fare-box {
@@ -115,12 +143,77 @@
             color: #92400e;
         }
 
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .waiting-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
         .route-btn,
-        .accept-btn {
+        .accept-btn,
+        .waiting-btn {
             border-radius: 12px;
             font-weight: 800;
             font-size: 13px;
             padding: 9px 12px;
+        }
+
+        .waiting-btn {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: #4b5563;
+            opacity: 1;
+        }
+
+        .waiting-btn:disabled {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: #4b5563;
+            opacity: 1;
+        }
+
+        .priority-note {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            border-radius: 12px;
+            padding: 9px 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .waiting-note {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            border-radius: 12px;
+            padding: 9px 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .desktop-table-card {
@@ -137,7 +230,7 @@
             color: #6b7280;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: .06em;
+            letter-spacing: 0.06em;
             white-space: nowrap;
         }
 
@@ -146,13 +239,17 @@
             color: #1f2937;
         }
 
+        .priority-row {
+            background: #f0fdf4;
+        }
+
         .empty-state {
             background: #ffffff;
             border-radius: 22px;
             padding: 32px 20px;
             text-align: center;
             color: #6b7280;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
         }
 
         .modal-content {
@@ -220,7 +317,7 @@
                 background: #ffffff;
                 border-radius: 22px;
                 overflow: hidden;
-                box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+                box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
             }
 
             .page-header {
@@ -241,223 +338,430 @@
     <div class="page-header">
         <div>
             <h2>Driver Dashboard</h2>
-            <p>View customer bookings, routes, fares, tips, and accept available bookings.</p>
+
+            <p>
+                View customer bookings, routes, fares, tips,
+                and accept available bookings.
+            </p>
         </div>
     </div>
 
     {% if has_active_booking %}
         <div class="active-warning">
-            ⚠️ You already have an accepted booking. Complete it first before accepting another booking.
+            ⚠️ You already have an accepted booking.
+            Complete it first before accepting another booking.
         </div>
     {% endif %}
 
     {% if bookings %}
 
+        <!-- MOBILE BOOKING CARDS -->
         <div class="mobile-bookings">
+
             {% for booking in bookings %}
-                <div class="booking-card">
+
+                <div
+                    class="
+                        booking-card
+                        {% if booking.is_priority_driver %}
+                            priority-booking
+                        {% endif %}
+                    "
+                >
                     <div class="booking-card-body">
 
-                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-2
+                                mb-3
+                            "
+                        >
+                            <div class="d-flex align-items-center">
 
-    <div class="d-flex align-items-center">
+                                {% if booking.customer and booking.customer.profile_picture %}
+                                    <img
+                                        src="{{ booking.customer.profile_picture.url }}"
+                                        alt="{{ booking.customer_name }}"
+                                        class="rounded-circle me-3"
+                                        style="
+                                            width: 55px;
+                                            height: 55px;
+                                            object-fit: cover;
+                                            border: 3px solid #0d6efd;
+                                        "
+                                    >
+                                {% else %}
+                                    <img
+                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                        alt="Customer"
+                                        class="rounded-circle me-3"
+                                        style="
+                                            width: 55px;
+                                            height: 55px;
+                                            object-fit: cover;
+                                            border: 3px solid #0d6efd;
+                                        "
+                                    >
+                                {% endif %}
 
-        {% if booking.customer.profile_picture %}
-            <img
-                src="{{ booking.customer.profile_picture.url }}"
-                class="rounded-circle me-3"
-                style="
-                    width:55px;
-                    height:55px;
-                    object-fit:cover;
-                    border:3px solid #0d6efd;
-                ">
-        {% else %}
-            <img
-                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                class="rounded-circle me-3"
-                style="
-                    width:55px;
-                    height:55px;
-                    object-fit:cover;
-                    border:3px solid #0d6efd;
-                ">
-        {% endif %}
+                                <div>
+                                    <div class="customer-name">
+                                        {{ booking.customer_name }}
+                                    </div>
 
-        <div>
-            <div class="customer-name">
-                {{ booking.customer_name }}
-            </div>
-              <div class="text-muted small">
-                {{ booking.created_at }}
-            </div>
+                                    <div class="text-muted small">
+                                        {{ booking.created_at }}
+                                    </div>
 
+                                    <div class="text-muted small">
+                                        {{ booking.distance_km }} KM
+                                    </div>
+                                </div>
+                            </div>
 
-            <div class="text-muted small">
-                {{ booking.distance_km }} KM
-            </div>
-        </div>
+                            <div class="text-end">
+                                <span
+                                    class="
+                                        status-badge
+                                        status-{{ booking.status }}
+                                    "
+                                >
+                                    {{ booking.status }}
+                                </span>
 
-    </div>
+                                {% if booking.is_priority_driver and booking.wait_seconds > 0 %}
+                                    <div class="mt-2">
+                                        <span class="priority-badge">
+                                            ⭐ Nearest Driver
+                                        </span>
+                                    </div>
+                                {% elif booking.wait_seconds > 0 %}
+                                    <div class="mt-2">
+                                        <span class="waiting-badge">
+                                            ⏳ Priority Active
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
 
-    <span class="status-badge status-{{ booking.status }}">
-        {{ booking.status }}
-    </span>
+                        <div class="label">
+                            Pickup
+                        </div>
 
-</div>
-
-                        <div class="label">Pickup</div>
                         <div class="value">
-                            <a href="/navigate/{{ booking.id }}/" target="_blank">
+                            <a
+                                href="{% url 'navigate_to_origin' booking.id %}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 {{ booking.origin }}
                             </a>
                         </div>
 
-                        <div class="label">Destination</div>
-<div class="value">
-    {{ booking.destination }}
-</div>
+                        <div class="label">
+                            Destination
+                        </div>
 
-<div class="label">Instruction</div>
-<div class="value">
-    {% if booking.instructions %}
-        {{ booking.instructions }}
-    {% else %}
-        <span class="text-muted small"></span>
-    {% endif %}
-</div>
+                        <div class="value">
+                            {{ booking.destination }}
+                        </div>
 
+                        <div class="label">
+                            Instruction
+                        </div>
 
+                        <div class="value">
+                            {% if booking.instructions %}
+                                {{ booking.instructions }}
+                            {% else %}
+                                <span class="text-muted small">
+                                    No instruction
+                                </span>
+                            {% endif %}
+                        </div>
 
-                        
-
-                        <div class="fare-box" style="margin-bottom: 10px;">
+                        <div
+                            class="fare-box"
+                            style="margin-bottom: 10px;"
+                        >
                             <div class="row g-2">
+
                                 <div class="col-4">
-                                    <div class="label">Fare</div>
-                                    <div>₱{{ booking.fare }}</div>
+                                    <div class="label">
+                                        Fare
+                                    </div>
+
+                                    <div>
+                                        ₱{{ booking.fare }}
+                                    </div>
                                 </div>
 
                                 <div class="col-4">
-                                    <div class="label">Tip</div>
-                                    <div>₱{{ booking.tip }}</div>
+                                    <div class="label">
+                                        Tip
+                                    </div>
+
+                                    <div>
+                                        ₱{{ booking.tip }}
+                                    </div>
                                 </div>
 
                                 <div class="col-4">
-                                    <div class="label">Total</div>
-                                    <div class="fare-total">₱{{ booking.total_amount }}</div>
+                                    <div class="label">
+                                        Total
+                                    </div>
+
+                                    <div class="fare-total">
+                                        ₱{{ booking.total_amount }}
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
 
-                       
-<button
-    type="button"
-    class="btn btn-primary route-btn w-100 mb-2"
-    data-bs-toggle="modal"
-    data-bs-target="#bookingRouteModal"
-    onclick="showBookingRoute(
-        {{ booking.origin_lat }},
-        {{ booking.origin_lng }},
-        {{ booking.destination_lat }},
-        {{ booking.destination_lng }},
-        '{{ booking.customer_name|escapejs }}',
-        '{{ booking.distance_km }}'
-    )">
-    View Booking Route
-</button>
+                        <button
+                            type="button"
+                            class="
+                                btn
+                                btn-primary
+                                route-btn
+                                w-100
+                                mb-2
+                            "
+                            data-bs-toggle="modal"
+                            data-bs-target="#bookingRouteModal"
+                            onclick="showBookingRoute(
+                                {{ booking.origin_lat }},
+                                {{ booking.origin_lng }},
+                                {{ booking.destination_lat }},
+                                {{ booking.destination_lng }},
+                                '{{ booking.customer_name|escapejs }}',
+                                '{{ booking.distance_km|escapejs }}'
+                            )"
+                        >
+                            View Booking Route
+                        </button>
 
-                        {% if booking.status == "pending" and not booking.driver and not has_active_booking %}
-                            <form method="POST" action="{% url 'accept_booking' booking.id %}">
+                        {% if has_active_booking %}
+
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    btn-secondary
+                                    accept-btn
+                                    w-100
+                                    mb-3
+                                "
+                                disabled
+                            >
+                                You already have an accepted booking
+                            </button>
+
+                        {% elif booking.status != "pending" or booking.driver %}
+
+                            <div
+                                class="
+                                    alert
+                                    alert-secondary
+                                    rounded-4
+                                    py-2
+                                    mb-3
+                                "
+                            >
+                                Booking already taken
+                            </div>
+
+                        {% elif booking.can_accept %}
+
+                            {% if booking.is_priority_driver and booking.wait_seconds > 0 %}
+                                <div class="priority-note">
+                                    ⭐ You are currently the nearest driver.
+                                    You may accept this booking immediately.
+                                </div>
+                            {% endif %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'accept_booking' booking.id %}"
+                                class="accept-booking-form"
+                            >
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success accept-btn w-100 mb-3">
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        btn
+                                        btn-success
+                                        accept-btn
+                                        w-100
+                                        mb-3
+                                    "
+                                >
                                     Accept Booking
                                 </button>
                             </form>
-                        {% elif has_active_booking %}
-                            <button class="btn btn-secondary accept-btn w-100 mb-3" disabled>
-                                You already have an accepted booking
-                            </button>
-                        {% else %}
-                            <div class="alert alert-secondary rounded-4 py-2 mb-3">
-                                Booking already taken
+
+                        {% elif booking.wait_seconds > 0 %}
+
+                            <div class="waiting-note">
+                                The nearest driver currently has priority.
+                                Your Accept button will activate when the
+                                countdown ends.
                             </div>
+
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    waiting-btn
+                                    w-100
+                                    mb-3
+                                    priority-wait-button
+                                "
+                                disabled
+                                data-seconds="{{ booking.wait_seconds }}"
+                            >
+                                Available in
+                                <span class="countdown">
+                                    {{ booking.wait_seconds }}
+                                </span>
+                                seconds
+                            </button>
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'accept_booking' booking.id %}"
+                                class="accept-booking-form"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        btn
+                                        btn-success
+                                        accept-btn
+                                        w-100
+                                        mb-3
+                                    "
+                                >
+                                    Accept Booking
+                                </button>
+                            </form>
+
                         {% endif %}
 
                     </div>
                 </div>
+
             {% endfor %}
         </div>
 
+        <!-- DESKTOP TABLE -->
         <div class="desktop-table-card">
             <div class="table-responsive">
+
                 <table class="table table-hover align-middle">
+
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Origin</th>
                             <th>Destination</th>
-                             <th>Instruction</th>
+                            <th>Instruction</th>
                             <th>Route</th>
                             <th>Distance</th>
-                           
                             <th>Fare</th>
                             <th>Tip</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Priority</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody>
+
                         {% for booking in bookings %}
-                            <tr>
-                               <td>
 
-    <div class="d-flex align-items-center">
+                            <tr
+                                class="
+                                    {% if booking.is_priority_driver %}
+                                        priority-row
+                                    {% endif %}
+                                "
+                            >
+                                <td>
+                                    <div class="d-flex align-items-center">
 
-        {% if booking.customer.profile_picture %}
-            <img
-                src="{{ booking.customer.profile_picture.url }}"
-                class="rounded-circle me-2"
-                style="
-                    width:42px;
-                    height:42px;
-                    object-fit:cover;
-                    border:2px solid #0d6efd;
-                ">
-        {% else %}
-            <img
-                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                class="rounded-circle me-2"
-                style="
-                    width:42px;
-                    height:42px;
-                    object-fit:cover;
-                    border:2px solid #0d6efd;
-                ">
-        {% endif %}
+                                        {% if booking.customer and booking.customer.profile_picture %}
+                                            <img
+                                                src="{{ booking.customer.profile_picture.url }}"
+                                                alt="{{ booking.customer_name }}"
+                                                class="rounded-circle me-2"
+                                                style="
+                                                    width: 42px;
+                                                    height: 42px;
+                                                    object-fit: cover;
+                                                    border: 2px solid #0d6efd;
+                                                "
+                                            >
+                                        {% else %}
+                                            <img
+                                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                                alt="Customer"
+                                                class="rounded-circle me-2"
+                                                style="
+                                                    width: 42px;
+                                                    height: 42px;
+                                                    object-fit: cover;
+                                                    border: 2px solid #0d6efd;
+                                                "
+                                            >
+                                        {% endif %}
 
-        <strong>{{ booking.customer_name }}</strong>
+                                        <div>
+                                            <strong>
+                                                {{ booking.customer_name }}
+                                            </strong>
 
-    </div>
-
-</td>
+                                            <div class="text-muted small">
+                                                {{ booking.created_at }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
 
                                 <td>
-                                    <a href="/navigate/{{ booking.id }}/" target="_blank">
+                                    <a
+                                        href="{% url 'navigate_to_origin' booking.id %}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         {{ booking.origin }}
                                     </a>
                                 </td>
 
-                                <td>{{ booking.destination }}</td>
                                 <td>
-    {% if booking.instructions %}
-        {{ booking.instructions }}
-    {% else %}
-        <span class="text-muted small">No instruction</span>
-    {% endif %}
-</td>
+                                    {{ booking.destination }}
+                                </td>
+
+                                <td>
+                                    {% if booking.instructions %}
+                                        {{ booking.instructions }}
+                                    {% else %}
+                                        <span class="text-muted small">
+                                            No instruction
+                                        </span>
+                                    {% endif %}
+                                </td>
 
                                 <td>
                                     <button
@@ -471,71 +775,216 @@
                                             {{ booking.destination_lat }},
                                             {{ booking.destination_lng }},
                                             '{{ booking.customer_name|escapejs }}',
-                                            '{{ booking.distance_km }}'
-                                        )">
+                                            '{{ booking.distance_km|escapejs }}'
+                                        )"
+                                    >
                                         View Route
                                     </button>
                                 </td>
 
-                                <td>{{ booking.distance_km }} KM</td>
-                                <td>₱{{ booking.fare }}</td>
-                                <td>₱{{ booking.tip }}</td>
-                                <td class="fw-bold text-success">₱{{ booking.total_amount }}</td>
+                                <td>
+                                    {{ booking.distance_km }} KM
+                                </td>
 
                                 <td>
-                                    <span class="status-badge status-{{ booking.status }}">
+                                    ₱{{ booking.fare }}
+                                </td>
+
+                                <td>
+                                    ₱{{ booking.tip }}
+                                </td>
+
+                                <td class="fw-bold text-success">
+                                    ₱{{ booking.total_amount }}
+                                </td>
+
+                                <td>
+                                    <span
+                                        class="
+                                            status-badge
+                                            status-{{ booking.status }}
+                                        "
+                                    >
                                         {{ booking.status }}
                                     </span>
                                 </td>
 
                                 <td>
-                                    {% if booking.status == "pending" and not booking.driver and not has_active_booking %}
-                                        <form method="POST" action="{% url 'accept_booking' booking.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-success btn-sm accept-btn">
-                                                Accept
-                                            </button>
-                                        </form>
-                                    {% elif has_active_booking %}
-                                        <button class="btn btn-secondary btn-sm accept-btn" disabled>
-                                            Already Accepted One
-                                        </button>
+                                    {% if booking.is_priority_driver and booking.wait_seconds > 0 %}
+                                        <span class="priority-badge">
+                                            ⭐ Nearest
+                                        </span>
+                                    {% elif booking.wait_seconds > 0 %}
+                                        <span class="waiting-badge">
+                                            ⏳
+                                            <span
+                                                class="countdown"
+                                                data-countdown-display
+                                                data-seconds="{{ booking.wait_seconds }}"
+                                            >
+                                                {{ booking.wait_seconds }}
+                                            </span>s
+                                        </span>
                                     {% else %}
                                         <span class="text-muted small">
-                                            Taken
+                                            Open to all
                                         </span>
                                     {% endif %}
                                 </td>
+
+                                <td>
+                                    {% if has_active_booking %}
+
+                                        <button
+                                            type="button"
+                                            class="
+                                                btn
+                                                btn-secondary
+                                                btn-sm
+                                                accept-btn
+                                            "
+                                            disabled
+                                        >
+                                            Already Accepted One
+                                        </button>
+
+                                    {% elif booking.status != "pending" or booking.driver %}
+
+                                        <span class="text-muted small">
+                                            Taken
+                                        </span>
+
+                                    {% elif booking.can_accept %}
+
+                                        <form
+                                            method="POST"
+                                            action="{% url 'accept_booking' booking.id %}"
+                                            class="accept-booking-form"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="
+                                                    btn
+                                                    btn-success
+                                                    btn-sm
+                                                    accept-btn
+                                                "
+                                            >
+                                                Accept
+                                            </button>
+                                        </form>
+
+                                    {% elif booking.wait_seconds > 0 %}
+
+                                        <button
+                                            type="button"
+                                            class="
+                                                btn
+                                                waiting-btn
+                                                btn-sm
+                                                priority-wait-button
+                                            "
+                                            disabled
+                                            data-seconds="{{ booking.wait_seconds }}"
+                                        >
+                                            Wait
+                                            <span class="countdown">
+                                                {{ booking.wait_seconds }}
+                                            </span>s
+                                        </button>
+
+                                    {% else %}
+
+                                        <form
+                                            method="POST"
+                                            action="{% url 'accept_booking' booking.id %}"
+                                            class="accept-booking-form"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="
+                                                    btn
+                                                    btn-success
+                                                    btn-sm
+                                                    accept-btn
+                                                "
+                                            >
+                                                Accept
+                                            </button>
+                                        </form>
+
+                                    {% endif %}
+                                </td>
                             </tr>
+
                         {% endfor %}
+
                     </tbody>
                 </table>
+
             </div>
         </div>
 
     {% else %}
 
         <div class="empty-state">
-            <h5 class="fw-bold mb-2">No bookings yet</h5>
-            <p class="mb-0">New customer bookings will appear here.</p>
+            <h5 class="fw-bold mb-2">
+                No bookings yet
+            </h5>
+
+            <p class="mb-0">
+                New customer bookings will appear here.
+            </p>
         </div>
 
     {% endif %}
 
 </div>
 
-<div class="modal fade" id="bookingRouteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-xl modal-dialog-centered">
+<!-- BOOKING ROUTE MODAL -->
+<div
+    class="modal fade"
+    id="bookingRouteModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+    <div
+        class="
+            modal-dialog
+            modal-fullscreen-sm-down
+            modal-xl
+            modal-dialog-centered
+        "
+    >
         <div class="modal-content">
 
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title">Booking Route</h5>
-                    <small id="routeCustomerName" class="text-muted d-block"></small>
-                    <small id="routeDistanceKm" class="text-muted d-block"></small>
+                    <h5 class="modal-title">
+                        Booking Route
+                    </h5>
+
+                    <small
+                        id="routeCustomerName"
+                        class="text-muted d-block"
+                    ></small>
+
+                    <small
+                        id="routeDistanceKm"
+                        class="text-muted d-block"
+                    ></small>
                 </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
             </div>
 
             <div class="modal-body p-0">
@@ -546,205 +995,389 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+></script>
 
 <script>
-
-let bookingRouteMap;
-let bookingDirectionsService;
-let bookingDirectionsRenderer;
-
-let routeOriginMarker;
-let routeDestinationMarker;
-
-let routePickupInfoWindow;
-let routeDestinationInfoWindow;
-
-let pendingRouteData = null;
-
-function initBookingRouteMap() {
-
-    const defaultLocation = { lat: 6.9214, lng: 122.0790 };
-
-    bookingRouteMap = new google.maps.Map(document.getElementById("bookingRouteMap"), {
-        center: defaultLocation,
-        zoom: 15,
-        mapTypeId: google.maps.MapTypeId.HYBRID,
-        mapTypeControl: true,
-        streetViewControl: false,
-        fullscreenControl: true,
-        mapTypeControlOptions: {
-            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-            position: google.maps.ControlPosition.TOP_RIGHT
-        }
-    });
-
-    bookingDirectionsService = new google.maps.DirectionsService();
-
-    bookingDirectionsRenderer = new google.maps.DirectionsRenderer({
-        suppressMarkers: true
-    });
-
-    bookingDirectionsRenderer.setMap(bookingRouteMap);
-
-    if (pendingRouteData) {
-        renderBookingRoute(
-            pendingRouteData.originLat,
-            pendingRouteData.originLng,
-            pendingRouteData.destinationLat,
-            pendingRouteData.destinationLng,
-            pendingRouteData.customerName,
-            pendingRouteData.distanceKm
+    /*
+     * PRIORITY COUNTDOWN
+     *
+     * When the one-minute priority period expires, reload the page.
+     * Django will then verify whether the booking still exists and
+     * whether this driver is allowed to accept it.
+     */
+    document.addEventListener("DOMContentLoaded", function () {
+        const waitButtons = document.querySelectorAll(
+            ".priority-wait-button"
         );
 
-        pendingRouteData = null;
-    }
-}
+        const countdownDisplays = document.querySelectorAll(
+            "[data-countdown-display]"
+        );
 
-function showBookingRoute(originLat, originLng, destinationLat, destinationLng, customerName, distanceKm) {
+        let reloadScheduled = false;
 
-    if (!bookingRouteMap) {
-        pendingRouteData = {
-            originLat: originLat,
-            originLng: originLng,
-            destinationLat: destinationLat,
-            destinationLng: destinationLng,
-            customerName: customerName,
-            distanceKm: distanceKm
+        function reloadDashboard() {
+            if (reloadScheduled) {
+                return;
+            }
+
+            reloadScheduled = true;
+
+            window.setTimeout(function () {
+                window.location.reload();
+            }, 400);
+        }
+
+        waitButtons.forEach(function (button) {
+            let seconds = Number.parseInt(
+                button.dataset.seconds || "0",
+                10
+            );
+
+            const countdownElement = button.querySelector(
+                ".countdown"
+            );
+
+            if (!Number.isFinite(seconds) || seconds <= 0) {
+                reloadDashboard();
+                return;
+            }
+
+            const interval = window.setInterval(function () {
+                seconds -= 1;
+
+                if (countdownElement) {
+                    countdownElement.textContent = Math.max(
+                        seconds,
+                        0
+                    );
+                }
+
+                if (seconds <= 0) {
+                    window.clearInterval(interval);
+                    reloadDashboard();
+                }
+            }, 1000);
+        });
+
+        countdownDisplays.forEach(function (display) {
+            let seconds = Number.parseInt(
+                display.dataset.seconds || "0",
+                10
+            );
+
+            if (!Number.isFinite(seconds) || seconds <= 0) {
+                return;
+            }
+
+            const interval = window.setInterval(function () {
+                seconds -= 1;
+
+                display.textContent = Math.max(
+                    seconds,
+                    0
+                );
+
+                if (seconds <= 0) {
+                    window.clearInterval(interval);
+                }
+            }, 1000);
+        });
+
+        /*
+         * Prevent accidental double submission when a driver
+         * presses Accept repeatedly.
+         */
+        const acceptForms = document.querySelectorAll(
+            ".accept-booking-form"
+        );
+
+        acceptForms.forEach(function (form) {
+            form.addEventListener("submit", function () {
+                const submitButton = form.querySelector(
+                    'button[type="submit"]'
+                );
+
+                if (!submitButton) {
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Accepting...";
+            });
+        });
+    });
+</script>
+
+<script>
+    let bookingRouteMap;
+    let bookingDirectionsService;
+    let bookingDirectionsRenderer;
+
+    let routeOriginMarker;
+    let routeDestinationMarker;
+
+    let routePickupInfoWindow;
+    let routeDestinationInfoWindow;
+
+    let pendingRouteData = null;
+
+    function initBookingRouteMap() {
+        const defaultLocation = {
+            lat: 6.9214,
+            lng: 122.0790
         };
-        return;
-    }
 
-    setTimeout(function() {
-        google.maps.event.trigger(bookingRouteMap, "resize");
-
-        renderBookingRoute(
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
-            customerName,
-            distanceKm
+        bookingRouteMap = new google.maps.Map(
+            document.getElementById("bookingRouteMap"),
+            {
+                center: defaultLocation,
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.HYBRID,
+                mapTypeControl: true,
+                streetViewControl: false,
+                fullscreenControl: true,
+                mapTypeControlOptions: {
+                    style:
+                        google.maps.MapTypeControlStyle
+                            .DROPDOWN_MENU,
+                    position:
+                        google.maps.ControlPosition
+                            .TOP_RIGHT
+                }
+            }
         );
-    }, 300);
-}
 
-function renderBookingRoute(originLat, originLng, destinationLat, destinationLng, customerName, distanceKm) {
+        bookingDirectionsService =
+            new google.maps.DirectionsService();
 
-    document.getElementById("routeCustomerName").innerHTML = customerName;
-    document.getElementById("routeDistanceKm").innerHTML = "Distance: " + distanceKm + " KM";
+        bookingDirectionsRenderer =
+            new google.maps.DirectionsRenderer({
+                suppressMarkers: true
+            });
 
-    const origin = {
-        lat: parseFloat(originLat),
-        lng: parseFloat(originLng)
-    };
+        bookingDirectionsRenderer.setMap(
+            bookingRouteMap
+        );
 
-    const destination = {
-        lat: parseFloat(destinationLat),
-        lng: parseFloat(destinationLng)
-    };
+        if (pendingRouteData) {
+            renderBookingRoute(
+                pendingRouteData.originLat,
+                pendingRouteData.originLng,
+                pendingRouteData.destinationLat,
+                pendingRouteData.destinationLng,
+                pendingRouteData.customerName,
+                pendingRouteData.distanceKm
+            );
 
-    clearRouteMarkers();
-
-    routeOriginMarker = new google.maps.Marker({
-        position: origin,
-        map: bookingRouteMap,
-        title: "Pickup Location",
-        animation: google.maps.Animation.DROP,
-        icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+            pendingRouteData = null;
         }
-    });
+    }
 
-    routeDestinationMarker = new google.maps.Marker({
-        position: destination,
-        map: bookingRouteMap,
-        title: "Destination",
-        animation: google.maps.Animation.DROP,
-        icon: {
-            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+    function showBookingRoute(
+        originLat,
+        originLng,
+        destinationLat,
+        destinationLng,
+        customerName,
+        distanceKm
+    ) {
+        if (!bookingRouteMap) {
+            pendingRouteData = {
+                originLat: originLat,
+                originLng: originLng,
+                destinationLat: destinationLat,
+                destinationLng: destinationLng,
+                customerName: customerName,
+                distanceKm: distanceKm
+            };
+
+            return;
         }
-    });
 
-    routePickupInfoWindow = new google.maps.InfoWindow({
-        content: '<div class="pickup-info-label">📍 Pickup</div>',
-        disableAutoPan: true
-    });
+        window.setTimeout(function () {
+            google.maps.event.trigger(
+                bookingRouteMap,
+                "resize"
+            );
 
-    routeDestinationInfoWindow = new google.maps.InfoWindow({
-        content: '<div class="destination-info-label">📍 Destination</div>',
-        disableAutoPan: true
-    });
+            renderBookingRoute(
+                originLat,
+                originLng,
+                destinationLat,
+                destinationLng,
+                customerName,
+                distanceKm
+            );
+        }, 300);
+    }
 
-    routePickupInfoWindow.open({
-        anchor: routeOriginMarker,
-        map: bookingRouteMap,
-        shouldFocus: false
-    });
+    function renderBookingRoute(
+        originLat,
+        originLng,
+        destinationLat,
+        destinationLng,
+        customerName,
+        distanceKm
+    ) {
+        document.getElementById(
+            "routeCustomerName"
+        ).textContent = customerName;
 
-    routeDestinationInfoWindow.open({
-        anchor: routeDestinationMarker,
-        map: bookingRouteMap,
-        shouldFocus: false
-    });
+        document.getElementById(
+            "routeDistanceKm"
+        ).textContent =
+            "Distance: " + distanceKm + " KM";
 
-    bookingDirectionsService.route({
+        const origin = {
+            lat: Number.parseFloat(originLat),
+            lng: Number.parseFloat(originLng)
+        };
 
-        origin: origin,
-        destination: destination,
-        travelMode: google.maps.TravelMode.DRIVING
+        const destination = {
+            lat: Number.parseFloat(destinationLat),
+            lng: Number.parseFloat(destinationLng)
+        };
 
-    }, function(response, status) {
-
-        if (status === "OK") {
-            bookingDirectionsRenderer.setDirections(response);
-
-            const bounds = new google.maps.LatLngBounds();
-            bounds.extend(origin);
-            bounds.extend(destination);
-
-            bookingRouteMap.fitBounds(bounds);
-        } else {
-            bookingRouteMap.setCenter(origin);
-            bookingRouteMap.setZoom(16);
-
-            alert("Unable to load route. Showing pickup and destination pins only.");
+        if (
+            !Number.isFinite(origin.lat)
+            || !Number.isFinite(origin.lng)
+            || !Number.isFinite(destination.lat)
+            || !Number.isFinite(destination.lng)
+        ) {
+            alert("Invalid booking coordinates.");
+            return;
         }
-    });
-}
 
-function clearRouteMarkers() {
+        clearRouteMarkers();
 
-    if (routeOriginMarker) {
-        routeOriginMarker.setMap(null);
-        routeOriginMarker = null;
+        routeOriginMarker = new google.maps.Marker({
+            position: origin,
+            map: bookingRouteMap,
+            title: "Pickup Location",
+            animation: google.maps.Animation.DROP,
+            icon: {
+                url:
+                    "https://maps.google.com/mapfiles/"
+                    + "ms/icons/green-dot.png"
+            }
+        });
+
+        routeDestinationMarker =
+            new google.maps.Marker({
+                position: destination,
+                map: bookingRouteMap,
+                title: "Destination",
+                animation: google.maps.Animation.DROP,
+                icon: {
+                    url:
+                        "https://maps.google.com/mapfiles/"
+                        + "ms/icons/red-dot.png"
+                }
+            });
+
+        routePickupInfoWindow =
+            new google.maps.InfoWindow({
+                content:
+                    '<div class="pickup-info-label">'
+                    + "📍 Pickup"
+                    + "</div>",
+                disableAutoPan: true
+            });
+
+        routeDestinationInfoWindow =
+            new google.maps.InfoWindow({
+                content:
+                    '<div class="destination-info-label">'
+                    + "📍 Destination"
+                    + "</div>",
+                disableAutoPan: true
+            });
+
+        routePickupInfoWindow.open({
+            anchor: routeOriginMarker,
+            map: bookingRouteMap,
+            shouldFocus: false
+        });
+
+        routeDestinationInfoWindow.open({
+            anchor: routeDestinationMarker,
+            map: bookingRouteMap,
+            shouldFocus: false
+        });
+
+        bookingDirectionsService.route(
+            {
+                origin: origin,
+                destination: destination,
+                travelMode:
+                    google.maps.TravelMode.DRIVING
+            },
+            function (response, status) {
+                if (status === "OK") {
+                    bookingDirectionsRenderer.setDirections(
+                        response
+                    );
+
+                    const bounds =
+                        new google.maps.LatLngBounds();
+
+                    bounds.extend(origin);
+                    bounds.extend(destination);
+
+                    bookingRouteMap.fitBounds(bounds);
+                } else {
+                    bookingRouteMap.setCenter(origin);
+                    bookingRouteMap.setZoom(16);
+
+                    alert(
+                        "Unable to load route. "
+                        + "Showing pickup and destination "
+                        + "pins only."
+                    );
+                }
+            }
+        );
     }
 
-    if (routeDestinationMarker) {
-        routeDestinationMarker.setMap(null);
-        routeDestinationMarker = null;
-    }
+    function clearRouteMarkers() {
+        if (routeOriginMarker) {
+            routeOriginMarker.setMap(null);
+            routeOriginMarker = null;
+        }
 
-    if (routePickupInfoWindow) {
-        routePickupInfoWindow.close();
-        routePickupInfoWindow = null;
-    }
+        if (routeDestinationMarker) {
+            routeDestinationMarker.setMap(null);
+            routeDestinationMarker = null;
+        }
 
-    if (routeDestinationInfoWindow) {
-        routeDestinationInfoWindow.close();
-        routeDestinationInfoWindow = null;
-    }
+        if (routePickupInfoWindow) {
+            routePickupInfoWindow.close();
+            routePickupInfoWindow = null;
+        }
 
-    if (bookingDirectionsRenderer) {
-        bookingDirectionsRenderer.set("directions", null);
-    }
-}
+        if (routeDestinationInfoWindow) {
+            routeDestinationInfoWindow.close();
+            routeDestinationInfoWindow = null;
+        }
 
+        if (bookingDirectionsRenderer) {
+            bookingDirectionsRenderer.set(
+                "directions",
+                null
+            );
+        }
+    }
 </script>
 
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initBookingRouteMap">
-</script>
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initBookingRouteMap"
+></script>
 
 </body>
 </html>
+```

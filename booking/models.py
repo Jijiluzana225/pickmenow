@@ -121,6 +121,21 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     accepted_at = models.DateTimeField(blank=True, null=True)
 
+    priority_driver = models.ForeignKey(
+    DriverProfile,
+    on_delete=models.SET_NULL,
+    blank=True,
+    null=True,
+    related_name="priority_bookings"
+    )
+
+    priority_until = models.DateTimeField(
+    blank=True,
+    null=True,
+    db_index=True
+    )
+
+
     @property
     def total_amount(self):
         return self.fare + self.tip

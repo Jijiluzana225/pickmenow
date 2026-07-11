@@ -36,7 +36,6 @@ def index(request):
 
     return redirect("customer_login")
 
-
 @login_required(login_url="driver_login")
 def dashboard(request):
     if not hasattr(request.user, "driver_profile"):
@@ -48,61 +47,162 @@ def dashboard(request):
         return redirect("choose_driver_location")
 
     if not driver.is_available:
-        return render(request, "booking/driver_dashboard_locked.html", {
-            "driver": driver
-        })
+        return render(
+            request,
+            "booking/driver_dashboard_locked.html",
+            {
+                "driver": driver
+            }
+        )
 
     has_active_booking = Booking.objects.filter(
         driver=driver,
         status="accepted"
     ).exists()
 
+    now = timezone.now()
+
     bookings = Booking.objects.filter(
         status="pending",
         driver__isnull=True,
         location=driver.location
+    ).select_related(
+        "priority_driver"
     ).order_by("-created_at")
 
-    return render(request, "booking/dashboard.html", {
-        "bookings": bookings,
-        "driver": driver,
-        "has_active_booking": has_active_booking
-    })
+    for booking in bookings:
+        priority_is_active = (
+            booking.priority_driver_id is not None
+            and booking.priority_until is not None
+            and booking.priority_until > now
+        )
+
+        booking.is_priority_driver = (
+            booking.priority_driver_id == driver.id
+        )
+
+        booking.can_accept = (
+            not has_active_booking
+            and driver.is_available
+            and (
+                not priority_is_active
+                or booking.is_priority_driver
+            )
+        )
+
+        if priority_is_active and not booking.is_priority_driver:
+            booking.wait_seconds = max(
+                0,
+                int(
+                    (
+                        booking.priority_until - now
+                    ).total_seconds()
+                )
+            )
+        else:
+            booking.wait_seconds = 0
+
+    return render(
+        request,
+        "booking/dashboard.html",
+        {
+            "bookings": bookings,
+            "driver": driver,
+            "has_active_booking": has_active_booking,
+            "server_time": now,
+        }
+    )
+
+from decimal import Decimal, InvalidOperation
+from datetime import timedelta
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.utils import timezone
+
+from .models import Booking
+from .utils import get_nearest_driver
 
 
 @login_required
 def create_booking(request):
-    if request.method == "POST":
-        customer = request.user.customer_profile
+    if request.method != "POST":
+        return redirect("index")
 
-        if not customer.location:
-            return redirect("choose_customer_location")
+    if not hasattr(request.user, "customer_profile"):
+        return redirect("customer_login")
 
+    customer = request.user.customer_profile
+
+    if not customer.location:
+        return redirect("choose_customer_location")
+
+    try:
         distance_km = float(request.POST.get("distance_km", 0))
-        tip = float(request.POST.get("tip") or 0)
+        tip = Decimal(request.POST.get("tip") or "0")
 
-        base_fare = 25
-        per_km = 8
-        fare = math.ceil(base_fare + (distance_km * per_km))
+        origin_lat = float(request.POST.get("origin_lat"))
+        origin_lng = float(request.POST.get("origin_lng"))
+        destination_lat = float(request.POST.get("destination_lat"))
+        destination_lng = float(request.POST.get("destination_lng"))
 
-        booking = Booking.objects.create(
-            customer=customer,
-            customer_name=customer.full_name,
-            contact_number=customer.contact_number,
-            location=customer.location,
-            origin=request.POST.get("origin"),
-            destination=request.POST.get("destination"),
-            origin_lat=float(request.POST.get("origin_lat")),
-            origin_lng=float(request.POST.get("origin_lng")),
-            destination_lat=float(request.POST.get("destination_lat")),
-            destination_lng=float(request.POST.get("destination_lng")),
-            distance_km=distance_km,
-            tip=tip,
-            instructions=request.POST.get("instructions"),
-            fare=fare
-        )
+    except (TypeError, ValueError, InvalidOperation):
+        return redirect("index")
 
-        message = f"""
+    origin = request.POST.get("origin", "").strip()
+    destination = request.POST.get("destination", "").strip()
+    instructions = request.POST.get("instructions", "").strip()
+
+    if not origin or not destination or distance_km <= 0:
+        return redirect("index")
+
+    if tip < 0:
+        tip = Decimal("0.00")
+
+    base_fare = Decimal("25.00")
+    per_km = Decimal("8.00")
+
+    calculated_fare = (
+        base_fare
+        + Decimal(str(distance_km)) * per_km
+    )
+
+    fare = Decimal(
+        math.ceil(calculated_fare)
+    ).quantize(Decimal("0.01"))
+
+    nearest_driver, nearest_distance = get_nearest_driver(
+        service_location=customer.location,
+        booking_lat=origin_lat,
+        booking_lng=origin_lng,
+    )
+
+    booking = Booking.objects.create(
+        customer=customer,
+        customer_name=customer.full_name,
+        contact_number=customer.contact_number,
+        location=customer.location,
+        origin=origin,
+        destination=destination,
+        origin_lat=origin_lat,
+        origin_lng=origin_lng,
+        destination_lat=destination_lat,
+        destination_lng=destination_lng,
+        distance_km=distance_km,
+        tip=tip,
+        instructions=instructions or None,
+        fare=fare,
+        status="pending",
+
+        priority_driver=nearest_driver,
+        priority_until=(
+            timezone.now() + timedelta(minutes=1)
+            if nearest_driver
+            else None
+        ),
+    )
+
+    message = f"""
 🛵 <b>New Booking Alert</b>
 
 📍 <b>Area:</b> {booking.location.name if booking.location else "No Location"}
@@ -113,7 +213,7 @@ def create_booking(request):
 📍 <b>Pickup:</b> {booking.origin}
 🏁 <b>Destination:</b> {booking.destination}
 
-📏 <b>Distance:</b> {booking.distance_km} KM
+📏 <b>Distance:</b> {booking.distance_km:.2f} KM
 💰 <b>Fare:</b> ₱{booking.fare}
 🎁 <b>Tip:</b> ₱{booking.tip}
 💵 <b>Total:</b> ₱{booking.total_amount}
@@ -123,15 +223,14 @@ def create_booking(request):
 https://www.pickmenow.online/dashboard/
 """
 
-        if booking.location and booking.location.telegram_chat_id:
-            send_telegram_message(
-                booking.location.telegram_chat_id,
-                message
-            )
+    # Notify the entire location group immediately.
+    if booking.location and booking.location.telegram_chat_id:
+        send_telegram_message(
+            booking.location.telegram_chat_id,
+            message
+        )
 
-        return redirect("customer_dashboard")
-
-    return redirect("index")
+    return redirect("customer_dashboard")
 
 
 @login_required(login_url="driver_login")
@@ -581,73 +680,114 @@ def accept_booking(request, booking_id):
     if not driver.location:
         return redirect("choose_driver_location")
 
-    active_statuses = ["accepted"]
-
-    if Booking.objects.filter(driver=driver, status__in=active_statuses).exists():
+    if not driver.is_approved or not driver.is_available:
         return redirect("dashboard")
 
-    if request.method == "POST":
-        with transaction.atomic():
-            booking = get_object_or_404(
-                Booking.objects.select_for_update(),
-                id=booking_id,
-                status="pending",
-                driver__isnull=True,
-                location=driver.location
-            )
+    active_statuses = ["accepted"]
 
-            if Booking.objects.select_for_update().filter(
-                driver=driver,
-                status__in=active_statuses
-            ).exists():
-                return redirect("dashboard")
+    if Booking.objects.filter(
+        driver=driver,
+        status__in=active_statuses
+    ).exists():
+        return redirect("dashboard")
 
-            booking.driver = driver
-            booking.status = "accepted"
-            booking.assigned_at = timezone.now()
-            booking.accepted_at = timezone.now()
-            booking.save()
+    if request.method != "POST":
+        return redirect("dashboard")
 
-            driver.is_available = False
-            driver.save()
-
-        channel_layer = get_channel_layer()
-
-        async_to_sync(channel_layer.group_send)(
-            f"booking_{booking.id}",
-            {
-                "type": "booking_accepted",
-                "booking_id": booking.id,
-                "driver_name": driver.full_name,
-                "contact_number": driver.contact_number,
-                "motorcycle_model": driver.motorcycle_model,
-                "plate_number": driver.plate_number,
-            }
+    with transaction.atomic():
+        booking = get_object_or_404(
+            Booking.objects.select_for_update(),
+            id=booking_id,
+            status="pending",
+            driver__isnull=True,
+            location=driver.location
         )
 
-        message = (
-            f"Good day {booking.customer_name}!\n\n"
-            f"Your PickMeNow booking has been accepted. Your Ride is on the way.\n\n"
-            f"Driver: {driver.full_name}\n"
-            f"Contact: {driver.contact_number}\n"
-            f"Motorcycle: {driver.motorcycle_model}\n"
-            f"Plate No: {driver.plate_number}\n\n"
-            f"Pickup: {booking.origin}\n"
-            f"Destination: {booking.destination}\n\n"
-            f"Ride safely!"
+        now = timezone.now()
+
+        priority_is_active = (
+            booking.priority_driver_id is not None
+            and booking.priority_until is not None
+            and booking.priority_until > now
         )
 
-        sms_result = send_sms(booking.contact_number, message)
+        # During the first minute, only the nearest driver
+        # is allowed to accept.
+        if (
+            priority_is_active
+            and booking.priority_driver_id != driver.id
+        ):
+            return redirect("dashboard")
 
-        print("=" * 60)
-        print("SMS SEND RESULT")
-        print(sms_result)
-        print("=" * 60)
-        print("WEBSOCKET SENT TO:", f"booking_{booking.id}")
+        if Booking.objects.select_for_update().filter(
+            driver=driver,
+            status__in=active_statuses
+        ).exists():
+            return redirect("dashboard")
 
-        return redirect("driver_accepted_bookings")
+        booking.driver = driver
+        booking.status = "accepted"
+        booking.assigned_at = now
+        booking.accepted_at = now
 
-    return redirect("dashboard")
+        booking.save(
+            update_fields=[
+                "driver",
+                "status",
+                "assigned_at",
+                "accepted_at",
+            ]
+        )
+
+        driver.is_available = False
+        driver.save(
+            update_fields=[
+                "is_available"
+            ]
+        )
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        f"booking_{booking.id}",
+        {
+            "type": "booking_accepted",
+            "booking_id": booking.id,
+            "driver_name": driver.full_name,
+            "contact_number": driver.contact_number,
+            "motorcycle_model": driver.motorcycle_model,
+            "plate_number": driver.plate_number,
+        }
+    )
+
+    message = (
+        f"Good day {booking.customer_name}!\n\n"
+        f"Your PickMeNow booking has been accepted. "
+        f"Your ride is on the way.\n\n"
+        f"Driver: {driver.full_name}\n"
+        f"Contact: {driver.contact_number}\n"
+        f"Motorcycle: {driver.motorcycle_model}\n"
+        f"Plate No: {driver.plate_number}\n\n"
+        f"Pickup: {booking.origin}\n"
+        f"Destination: {booking.destination}\n\n"
+        f"Ride safely!"
+    )
+
+    sms_result = send_sms(
+        booking.contact_number,
+        message
+    )
+
+    print("=" * 60)
+    print("SMS SEND RESULT")
+    print(sms_result)
+    print("=" * 60)
+    print(
+        "WEBSOCKET SENT TO:",
+        f"booking_{booking.id}"
+    )
+
+    return redirect("driver_accepted_bookings")
 
 @login_required
 def cancel_booking(request, booking_id):
