@@ -741,7 +741,7 @@ def driver_completed_bookings(request):
     bookings = bookings.order_by("-created_at")
 
     summary = bookings.aggregate(
-        total_fare=Sum("fare"),
+        total_fare=Sum("fare"),                     
         total_tip=Sum("tip")
     )
 
