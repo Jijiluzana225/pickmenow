@@ -67,33 +67,40 @@ def dashboard(request):
         driver__isnull=True,
         location=driver.location
     ).select_related(
-        "priority_driver"
+        "priority_driver",
+        "customer",
     ).order_by("-created_at")
 
     for booking in bookings:
-        priority_is_active = (
-            booking.priority_driver_id is not None
-            and booking.priority_until is not None
+        # Active whenever the one-minute deadline has not expired.
+        priority_window_active = (
+            booking.priority_until is not None
             and booking.priority_until > now
         )
 
         booking.is_priority_driver = (
-            booking.priority_driver_id == driver.id
+            booking.priority_driver_id is not None
+            and booking.priority_driver_id == driver.id
         )
 
+        # During the first minute:
+        # - only the nearest driver can accept;
+        # - if no nearest driver was found, nobody can accept.
+        #
+        # After one minute, all eligible drivers can accept.
         booking.can_accept = (
             not has_active_booking
             and driver.is_available
             and (
-                not priority_is_active
+                not priority_window_active
                 or booking.is_priority_driver
             )
         )
 
-        if priority_is_active and not booking.is_priority_driver:
+        if priority_window_active and not booking.is_priority_driver:
             booking.wait_seconds = max(
-                0,
-                int(
+                1,
+                math.ceil(
                     (
                         booking.priority_until - now
                     ).total_seconds()
@@ -177,6 +184,8 @@ def create_booking(request):
         booking_lng=origin_lng,
     )
 
+    now = timezone.now()
+
     booking = Booking.objects.create(
         customer=customer,
         customer_name=customer.full_name,
@@ -194,12 +203,11 @@ def create_booking(request):
         fare=fare,
         status="pending",
 
+        # Nearest recently active driver.
         priority_driver=nearest_driver,
-        priority_until=(
-            timezone.now() + timedelta(minutes=1)
-            if nearest_driver
-            else None
-        ),
+
+        # Always create a one-minute priority window.
+        priority_until=now + timedelta(minutes=1),
     )
 
     message = f"""
@@ -223,7 +231,6 @@ def create_booking(request):
 https://www.pickmenow.online/dashboard/
 """
 
-    # Notify the entire location group immediately.
     if booking.location and booking.location.telegram_chat_id:
         send_telegram_message(
             booking.location.telegram_chat_id,
@@ -683,15 +690,15 @@ def accept_booking(request, booking_id):
     if not driver.is_approved or not driver.is_available:
         return redirect("dashboard")
 
+    if request.method != "POST":
+        return redirect("dashboard")
+
     active_statuses = ["accepted"]
 
     if Booking.objects.filter(
         driver=driver,
         status__in=active_statuses
     ).exists():
-        return redirect("dashboard")
-
-    if request.method != "POST":
         return redirect("dashboard")
 
     with transaction.atomic():
@@ -705,18 +712,22 @@ def accept_booking(request, booking_id):
 
         now = timezone.now()
 
-        priority_is_active = (
-            booking.priority_driver_id is not None
-            and booking.priority_until is not None
+        priority_window_active = (
+            booking.priority_until is not None
             and booking.priority_until > now
         )
 
-        # During the first minute, only the nearest driver
-        # is allowed to accept.
-        if (
-            priority_is_active
-            and booking.priority_driver_id != driver.id
-        ):
+        is_priority_driver = (
+            booking.priority_driver_id is not None
+            and booking.priority_driver_id == driver.id
+        )
+
+        # While the one-minute window is active,
+        # only the saved nearest driver may accept.
+        #
+        # When priority_driver is None, nobody may accept
+        # until the minute expires.
+        if priority_window_active and not is_priority_driver:
             return redirect("dashboard")
 
         if Booking.objects.select_for_update().filter(
