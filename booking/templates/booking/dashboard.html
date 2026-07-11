@@ -62,6 +62,36 @@
             font-weight: 700;
         }
 
+        .socket-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .socket-status.connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .socket-status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .socket-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
         .booking-card {
             background: #ffffff;
             border: none;
@@ -342,6 +372,16 @@
                 View customer bookings, routes, fares, tips,
                 and accept available bookings.
             </p>
+
+            <div
+                id="dashboardSocketStatus"
+                class="socket-status"
+            >
+                <span class="socket-dot"></span>
+                <span id="dashboardSocketStatusText">
+                    Connecting to live updates...
+                </span>
+            </div>
         </div>
     </div>
 
@@ -998,14 +1038,172 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
 ></script>
 
+<!-- LIVE DRIVER DASHBOARD WEBSOCKET -->
 <script>
-    /*
-     * PRIORITY COUNTDOWN
-     *
-     * When the one-minute priority period expires, reload the page.
-     * Django will then verify whether the booking still exists and
-     * whether this driver is allowed to accept it.
-     */
+    document.addEventListener("DOMContentLoaded", function () {
+        const socketStatus = document.getElementById(
+            "dashboardSocketStatus"
+        );
+
+        const socketStatusText = document.getElementById(
+            "dashboardSocketStatusText"
+        );
+
+        const socketProtocol =
+            window.location.protocol === "https:"
+                ? "wss"
+                : "ws";
+
+        let dashboardSocket = null;
+        let reconnectTimer = null;
+        let reconnectAttempts = 0;
+        let dashboardReloadStarted = false;
+
+        function updateSocketStatus(status, text) {
+            if (!socketStatus || !socketStatusText) {
+                return;
+            }
+
+            socketStatus.classList.remove(
+                "connected",
+                "disconnected"
+            );
+
+            if (status) {
+                socketStatus.classList.add(status);
+            }
+
+            socketStatusText.textContent = text;
+        }
+
+        function scheduleReconnect() {
+            if (dashboardReloadStarted || reconnectTimer) {
+                return;
+            }
+
+            reconnectAttempts += 1;
+
+            const delay = Math.min(
+                1000 * reconnectAttempts,
+                10000
+            );
+
+            reconnectTimer = window.setTimeout(function () {
+                reconnectTimer = null;
+                connectDashboardSocket();
+            }, delay);
+        }
+
+        function refreshDashboard() {
+            if (dashboardReloadStarted) {
+                return;
+            }
+
+            dashboardReloadStarted = true;
+
+            updateSocketStatus(
+                "connected",
+                "Booking updated. Refreshing..."
+            );
+
+            window.setTimeout(function () {
+                window.location.reload();
+            }, 250);
+        }
+
+        function connectDashboardSocket() {
+            updateSocketStatus(
+                "",
+                "Connecting to live updates..."
+            );
+
+            dashboardSocket = new WebSocket(
+                socketProtocol
+                + "://"
+                + window.location.host
+                + "/ws/driver-dashboard/"
+            );
+
+            dashboardSocket.onopen = function () {
+                reconnectAttempts = 0;
+
+                if (reconnectTimer) {
+                    window.clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+
+                updateSocketStatus(
+                    "connected",
+                    "Live updates connected"
+                );
+            };
+
+            dashboardSocket.onmessage = function (event) {
+                let data;
+
+                try {
+                    data = JSON.parse(event.data);
+                } catch (error) {
+                    console.error(
+                        "Invalid dashboard WebSocket message:",
+                        error
+                    );
+                    return;
+                }
+
+                if (data.type === "dashboard_refresh") {
+                    refreshDashboard();
+                }
+            };
+
+            dashboardSocket.onerror = function (error) {
+                console.error(
+                    "Driver dashboard WebSocket error:",
+                    error
+                );
+
+                updateSocketStatus(
+                    "disconnected",
+                    "Live update connection error"
+                );
+            };
+
+            dashboardSocket.onclose = function (event) {
+                if (dashboardReloadStarted) {
+                    return;
+                }
+
+                updateSocketStatus(
+                    "disconnected",
+                    "Live updates disconnected. Reconnecting..."
+                );
+
+                console.log(
+                    "Driver dashboard WebSocket closed:",
+                    event.code
+                );
+
+                scheduleReconnect();
+            };
+        }
+
+        connectDashboardSocket();
+
+        window.addEventListener("beforeunload", function () {
+            dashboardReloadStarted = true;
+
+            if (
+                dashboardSocket
+                && dashboardSocket.readyState === WebSocket.OPEN
+            ) {
+                dashboardSocket.close();
+            }
+        });
+    });
+</script>
+
+<!-- PRIORITY COUNTDOWN AND ACCEPT FORM -->
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         const waitButtons = document.querySelectorAll(
             ".priority-wait-button"
@@ -1015,14 +1213,14 @@
             "[data-countdown-display]"
         );
 
-        let reloadScheduled = false;
+        let countdownReloadScheduled = false;
 
-        function reloadDashboard() {
-            if (reloadScheduled) {
+        function reloadDashboardAfterCountdown() {
+            if (countdownReloadScheduled) {
                 return;
             }
 
-            reloadScheduled = true;
+            countdownReloadScheduled = true;
 
             window.setTimeout(function () {
                 window.location.reload();
@@ -1040,7 +1238,7 @@
             );
 
             if (!Number.isFinite(seconds) || seconds <= 0) {
-                reloadDashboard();
+                reloadDashboardAfterCountdown();
                 return;
             }
 
@@ -1056,7 +1254,7 @@
 
                 if (seconds <= 0) {
                     window.clearInterval(interval);
-                    reloadDashboard();
+                    reloadDashboardAfterCountdown();
                 }
             }, 1000);
         });
@@ -1085,10 +1283,6 @@
             }, 1000);
         });
 
-        /*
-         * Prevent accidental double submission when a driver
-         * presses Accept repeatedly.
-         */
         const acceptForms = document.querySelectorAll(
             ".accept-booking-form"
         );
@@ -1110,6 +1304,7 @@
     });
 </script>
 
+<!-- GOOGLE MAP BOOKING ROUTE -->
 <script>
     let bookingRouteMap;
     let bookingDirectionsService;
@@ -1379,4 +1574,4 @@
 
 </body>
 </html>
-```
+

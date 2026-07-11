@@ -677,6 +677,7 @@ def toggle_driver_availability(request):
 
     return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
+
 @login_required(login_url="driver_login")
 def accept_booking(request, booking_id):
     if not hasattr(request.user, "driver_profile"):
@@ -695,6 +696,8 @@ def accept_booking(request, booking_id):
 
     active_statuses = ["accepted"]
 
+    # Prevent the driver from accepting another booking
+    # when they already have an active accepted booking.
     if Booking.objects.filter(
         driver=driver,
         status__in=active_statuses
@@ -722,14 +725,16 @@ def accept_booking(request, booking_id):
             and booking.priority_driver_id == driver.id
         )
 
-        # While the one-minute window is active,
-        # only the saved nearest driver may accept.
+        # During the first minute, only the saved nearest
+        # driver may accept the booking.
         #
-        # When priority_driver is None, nobody may accept
-        # until the minute expires.
+        # If no priority driver was found, nobody can accept
+        # until the priority period expires.
         if priority_window_active and not is_priority_driver:
             return redirect("dashboard")
 
+        # Recheck inside the transaction in case the driver
+        # accepted another booking in a separate request.
         if Booking.objects.select_for_update().filter(
             driver=driver,
             status__in=active_statuses
@@ -751,6 +756,7 @@ def accept_booking(request, booking_id):
         )
 
         driver.is_available = False
+
         driver.save(
             update_fields=[
                 "is_available"
@@ -759,6 +765,7 @@ def accept_booking(request, booking_id):
 
     channel_layer = get_channel_layer()
 
+    # Notify the customer-specific booking page.
     async_to_sync(channel_layer.group_send)(
         f"booking_{booking.id}",
         {
@@ -770,6 +777,19 @@ def accept_booking(request, booking_id):
             "plate_number": driver.plate_number,
         }
     )
+
+    # Refresh all connected driver dashboards
+    # assigned to the same service location.
+    if booking.location_id:
+        async_to_sync(channel_layer.group_send)(
+            f"driver_dashboard_location_{booking.location_id}",
+            {
+                "type": "dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "reason": "booking_accepted",
+            }
+        )
 
     message = (
         f"Good day {booking.customer_name}!\n\n"
@@ -794,11 +814,19 @@ def accept_booking(request, booking_id):
     print(sms_result)
     print("=" * 60)
     print(
-        "WEBSOCKET SENT TO:",
+        "CUSTOMER WEBSOCKET SENT TO:",
         f"booking_{booking.id}"
     )
 
+    if booking.location_id:
+        print(
+            "DRIVER DASHBOARD WEBSOCKET SENT TO:",
+            f"driver_dashboard_location_{booking.location_id}"
+        )
+
     return redirect("driver_accepted_bookings")
+
+
 
 @login_required
 def cancel_booking(request, booking_id):
