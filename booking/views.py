@@ -15,6 +15,38 @@ from channels.layers import get_channel_layer
 import math
 import requests
 
+
+
+def refresh_booking_dashboards(booking, reason):
+    """
+    Refresh both the driver dashboards in the booking's location
+    and the dashboard of the customer who owns the booking.
+    """
+
+    channel_layer = get_channel_layer()
+
+    if booking.location_id:
+        async_to_sync(channel_layer.group_send)(
+            f"driver_dashboard_location_{booking.location_id}",
+            {
+                "type": "dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "reason": reason,
+            }
+        )
+
+    if booking.customer_id and booking.customer.user_id:
+        async_to_sync(channel_layer.group_send)(
+            f"customer_dashboard_user_{booking.customer.user_id}",
+            {
+                "type": "customer_dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "reason": reason,
+            }
+        )
+
 from .models import Booking, CustomerProfile, DriverProfile, ServiceLocation
 from .sms import send_sms
 
@@ -701,6 +733,7 @@ def toggle_driver_availability(request):
     return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
 
+
 @login_required(login_url="driver_login")
 def accept_booking(request, booking_id):
     if not hasattr(request.user, "driver_profile"):
@@ -719,8 +752,8 @@ def accept_booking(request, booking_id):
 
     active_statuses = ["accepted"]
 
-    # Prevent the driver from accepting another booking
-    # when they already have an active accepted booking.
+    # Prevent this driver from accepting another booking
+    # when they already have an active booking.
     if Booking.objects.filter(
         driver=driver,
         status__in=active_statuses
@@ -729,7 +762,13 @@ def accept_booking(request, booking_id):
 
     with transaction.atomic():
         booking = get_object_or_404(
-            Booking.objects.select_for_update(),
+            Booking.objects
+            .select_for_update()
+            .select_related(
+                "customer",
+                "customer__user",
+                "location",
+            ),
             id=booking_id,
             status="pending",
             driver__isnull=True,
@@ -752,12 +791,12 @@ def accept_booking(request, booking_id):
         # driver may accept the booking.
         #
         # If no priority driver was found, nobody can accept
-        # until the priority period expires.
+        # until the one-minute priority period expires.
         if priority_window_active and not is_priority_driver:
             return redirect("dashboard")
 
-        # Recheck inside the transaction in case the driver
-        # accepted another booking in a separate request.
+        # Recheck inside the transaction in case another request
+        # assigned an active booking to this driver.
         if Booking.objects.select_for_update().filter(
             driver=driver,
             status__in=active_statuses
@@ -802,12 +841,29 @@ def accept_booking(request, booking_id):
     )
 
     # Refresh all connected driver dashboards
-    # assigned to the same service location.
+    # in the same service location.
     if booking.location_id:
         async_to_sync(channel_layer.group_send)(
             f"driver_dashboard_location_{booking.location_id}",
             {
                 "type": "dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "reason": "booking_accepted",
+            }
+        )
+
+    # Refresh the dashboard of the customer
+    # who created this booking.
+    if (
+        booking.customer_id
+        and booking.customer
+        and booking.customer.user_id
+    ):
+        async_to_sync(channel_layer.group_send)(
+            f"customer_dashboard_user_{booking.customer.user_id}",
+            {
+                "type": "customer_dashboard_refresh",
                 "booking_id": booking.id,
                 "booking_status": booking.status,
                 "reason": "booking_accepted",
@@ -836,8 +892,9 @@ def accept_booking(request, booking_id):
     print("SMS SEND RESULT")
     print(sms_result)
     print("=" * 60)
+
     print(
-        "CUSTOMER WEBSOCKET SENT TO:",
+        "CUSTOMER BOOKING WEBSOCKET SENT TO:",
         f"booking_{booking.id}"
     )
 
@@ -847,7 +904,18 @@ def accept_booking(request, booking_id):
             f"driver_dashboard_location_{booking.location_id}"
         )
 
+    if (
+        booking.customer_id
+        and booking.customer
+        and booking.customer.user_id
+    ):
+        print(
+            "CUSTOMER DASHBOARD WEBSOCKET SENT TO:",
+            f"customer_dashboard_user_{booking.customer.user_id}"
+        )
+
     return redirect("driver_accepted_bookings")
+
 
 
 

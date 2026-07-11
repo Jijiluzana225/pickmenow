@@ -241,3 +241,63 @@ class DriverDashboardConsumer(AsyncWebsocketConsumer):
 
         return await fetch_driver()
 
+
+class CustomerDashboardConsumer(AsyncWebsocketConsumer):
+    """
+    Refreshes the logged-in customer's dashboard whenever one
+    of their bookings changes status.
+
+    Group:
+        customer_dashboard_user_<user_id>
+    """
+
+    async def connect(self):
+        user = self.scope.get("user")
+
+        if not user or not user.is_authenticated:
+            await self.close()
+            return
+
+        has_customer_profile = await self.user_has_customer_profile(user)
+
+        if not has_customer_profile:
+            await self.close()
+            return
+
+        self.room_group_name = (
+            f"customer_dashboard_user_{user.id}"
+        )
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, "room_group_name"):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+
+    async def customer_dashboard_refresh(self, event):
+        await self.send(
+            text_data=json.dumps({
+                "type": "customer_dashboard_refresh",
+                "booking_id": event.get("booking_id"),
+                "booking_status": event.get("booking_status"),
+                "reason": event.get("reason"),
+            })
+        )
+
+    @staticmethod
+    async def user_has_customer_profile(user):
+        from channels.db import database_sync_to_async
+
+        @database_sync_to_async
+        def check_profile():
+            return hasattr(user, "customer_profile")
+
+        return await check_profile()
