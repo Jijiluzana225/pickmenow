@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,7 +209,13 @@
             padding: 9px 12px;
         }
 
-        .waiting-btn,
+        .waiting-btn {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: #4b5563;
+            opacity: 1;
+        }
+
         .waiting-btn:disabled {
             background: #e5e7eb;
             border-color: #d1d5db;
@@ -295,7 +300,6 @@
             width: 100%;
             height: 70vh;
             min-height: 420px;
-            background: #e5e7eb;
         }
 
         .pickup-info-label {
@@ -374,7 +378,6 @@
                 class="socket-status"
             >
                 <span class="socket-dot"></span>
-
                 <span id="dashboardSocketStatusText">
                     Connecting to live updates...
                 </span>
@@ -391,6 +394,7 @@
 
     {% if bookings %}
 
+        <!-- MOBILE BOOKING CARDS -->
         <div class="mobile-bookings">
 
             {% for booking in bookings %}
@@ -569,13 +573,14 @@
                             "
                             data-bs-toggle="modal"
                             data-bs-target="#bookingRouteModal"
-                            data-origin-lat="{{ booking.origin_lat }}"
-                            data-origin-lng="{{ booking.origin_lng }}"
-                            data-destination-lat="{{ booking.destination_lat }}"
-                            data-destination-lng="{{ booking.destination_lng }}"
-                            data-customer-name="{{ booking.customer_name|escape }}"
-                            data-distance-km="{{ booking.distance_km }}"
-                            onclick="showBookingRouteFromButton(this)"
+                            onclick="showBookingRoute(
+                                {{ booking.origin_lat }},
+                                {{ booking.origin_lng }},
+                                {{ booking.destination_lat }},
+                                {{ booking.destination_lng }},
+                                '{{ booking.customer_name|escapejs }}',
+                                '{{ booking.distance_km|escapejs }}'
+                            )"
                         >
                             View Booking Route
                         </button>
@@ -661,11 +666,9 @@
                                 data-seconds="{{ booking.wait_seconds }}"
                             >
                                 Available in
-
                                 <span class="countdown">
                                     {{ booking.wait_seconds }}
                                 </span>
-
                                 seconds
                             </button>
 
@@ -700,6 +703,7 @@
             {% endfor %}
         </div>
 
+        <!-- DESKTOP TABLE -->
         <div class="desktop-table-card">
             <div class="table-responsive">
 
@@ -804,13 +808,14 @@
                                         class="btn btn-primary route-btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#bookingRouteModal"
-                                        data-origin-lat="{{ booking.origin_lat }}"
-                                        data-origin-lng="{{ booking.origin_lng }}"
-                                        data-destination-lat="{{ booking.destination_lat }}"
-                                        data-destination-lng="{{ booking.destination_lng }}"
-                                        data-customer-name="{{ booking.customer_name|escape }}"
-                                        data-distance-km="{{ booking.distance_km }}"
-                                        onclick="showBookingRouteFromButton(this)"
+                                        onclick="showBookingRoute(
+                                            {{ booking.origin_lat }},
+                                            {{ booking.origin_lng }},
+                                            {{ booking.destination_lat }},
+                                            {{ booking.destination_lng }},
+                                            '{{ booking.customer_name|escapejs }}',
+                                            '{{ booking.distance_km|escapejs }}'
+                                        )"
                                     >
                                         View Route
                                     </button>
@@ -851,7 +856,6 @@
                                     {% elif booking.wait_seconds > 0 %}
                                         <span class="waiting-badge">
                                             ⏳
-
                                             <span
                                                 class="countdown"
                                                 data-countdown-display
@@ -925,7 +929,6 @@
                                             data-seconds="{{ booking.wait_seconds }}"
                                         >
                                             Wait
-
                                             <span class="countdown">
                                                 {{ booking.wait_seconds }}
                                             </span>s
@@ -981,6 +984,7 @@
 
 </div>
 
+<!-- BOOKING ROUTE MODAL -->
 <div
     class="modal fade"
     id="bookingRouteModal"
@@ -1034,6 +1038,7 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
 ></script>
 
+<!-- LIVE DRIVER DASHBOARD WEBSOCKET -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const socketStatus = document.getElementById(
@@ -1163,7 +1168,7 @@
                 );
             };
 
-            dashboardSocket.onclose = function () {
+            dashboardSocket.onclose = function (event) {
                 if (dashboardReloadStarted) {
                     return;
                 }
@@ -1171,6 +1176,11 @@
                 updateSocketStatus(
                     "disconnected",
                     "Live updates disconnected. Reconnecting..."
+                );
+
+                console.log(
+                    "Driver dashboard WebSocket closed:",
+                    event.code
                 );
 
                 scheduleReconnect();
@@ -1192,6 +1202,7 @@
     });
 </script>
 
+<!-- PRIORITY COUNTDOWN AND ACCEPT FORM -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const waitButtons = document.querySelectorAll(
@@ -1272,9 +1283,11 @@
             }, 1000);
         });
 
-        document.querySelectorAll(
+        const acceptForms = document.querySelectorAll(
             ".accept-booking-form"
-        ).forEach(function (form) {
+        );
+
+        acceptForms.forEach(function (form) {
             form.addEventListener("submit", function () {
                 const submitButton = form.querySelector(
                     'button[type="submit"]'
@@ -1290,7 +1303,7 @@
         });
     });
 </script>
-
+<!-- GOOGLE MAP BOOKING ROUTE -->
 <script>
     let bookingRouteMap = null;
     let bookingDirectionsService = null;
@@ -1302,9 +1315,12 @@
     let routePickupInfoWindow = null;
     let routeDestinationInfoWindow = null;
 
-    let selectedRouteData = null;
+    let pendingRouteData = null;
     let bookingMapReady = false;
 
+    /*
+     * Called automatically by the Google Maps API.
+     */
     function initBookingRouteMap() {
         const mapElement = document.getElementById(
             "bookingRouteMap"
@@ -1312,18 +1328,20 @@
 
         if (!mapElement) {
             console.error(
-                "bookingRouteMap element was not found."
+                "Booking route map element was not found."
             );
             return;
         }
 
+        const defaultLocation = {
+            lat: 6.9214,
+            lng: 122.0790
+        };
+
         bookingRouteMap = new google.maps.Map(
             mapElement,
             {
-                center: {
-                    lat: 6.9214,
-                    lng: 122.0790
-                },
+                center: defaultLocation,
                 zoom: 15,
                 mapTypeId: google.maps.MapTypeId.HYBRID,
                 mapTypeControl: true,
@@ -1357,83 +1375,166 @@
 
         bookingMapReady = true;
 
-        console.log(
-            "Booking route map initialized."
-        );
-    }
+        /*
+         * Render a route that was requested before
+         * Google Maps finished loading.
+         */
+        if (pendingRouteData) {
+            const routeData = pendingRouteData;
+            pendingRouteData = null;
 
-    function showBookingRouteFromButton(button) {
-        selectedRouteData = {
-            originLat: Number.parseFloat(
-                button.dataset.originLat
-            ),
-            originLng: Number.parseFloat(
-                button.dataset.originLng
-            ),
-            destinationLat: Number.parseFloat(
-                button.dataset.destinationLat
-            ),
-            destinationLng: Number.parseFloat(
-                button.dataset.destinationLng
-            ),
-            customerName:
-                button.dataset.customerName || "Customer",
-            distanceKm:
-                button.dataset.distanceKm || "0"
-        };
-
-        if (
-            !Number.isFinite(selectedRouteData.originLat)
-            || !Number.isFinite(selectedRouteData.originLng)
-            || !Number.isFinite(
-                selectedRouteData.destinationLat
-            )
-            || !Number.isFinite(
-                selectedRouteData.destinationLng
-            )
-        ) {
-            alert(
-                "Invalid pickup or destination coordinates."
+            renderBookingRoute(
+                routeData.originLat,
+                routeData.originLng,
+                routeData.destinationLat,
+                routeData.destinationLng,
+                routeData.customerName,
+                routeData.distanceKm
             );
-
-            selectedRouteData = null;
         }
     }
 
-    function renderSelectedBookingRoute() {
+    /*
+     * Called by the View Booking Route button.
+     */
+    function showBookingRoute(
+        originLat,
+        originLng,
+        destinationLat,
+        destinationLng,
+        customerName,
+        distanceKm
+    ) {
+        const routeData = {
+            originLat: Number.parseFloat(originLat),
+            originLng: Number.parseFloat(originLng),
+            destinationLat: Number.parseFloat(
+                destinationLat
+            ),
+            destinationLng: Number.parseFloat(
+                destinationLng
+            ),
+            customerName: customerName,
+            distanceKm: distanceKm
+        };
+
         if (
-            !selectedRouteData
-            || !bookingMapReady
-            || !bookingRouteMap
-            || !bookingDirectionsService
-            || !bookingDirectionsRenderer
+            !Number.isFinite(routeData.originLat)
+            || !Number.isFinite(routeData.originLng)
+            || !Number.isFinite(routeData.destinationLat)
+            || !Number.isFinite(routeData.destinationLng)
         ) {
+            alert(
+                "The pickup or destination coordinates are invalid."
+            );
             return;
         }
 
+        /*
+         * Save the route if Google Maps is still loading.
+         */
+        if (
+            !bookingMapReady
+            || !bookingRouteMap
+            || !bookingDirectionsService
+        ) {
+            pendingRouteData = routeData;
+            return;
+        }
+
+        /*
+         * Wait for the Bootstrap modal to become visible
+         * before resizing and rendering the map.
+         */
+        window.setTimeout(function () {
+            google.maps.event.trigger(
+                bookingRouteMap,
+                "resize"
+            );
+
+            renderBookingRoute(
+                routeData.originLat,
+                routeData.originLng,
+                routeData.destinationLat,
+                routeData.destinationLng,
+                routeData.customerName,
+                routeData.distanceKm
+            );
+        }, 350);
+    }
+
+    function renderBookingRoute(
+        originLat,
+        originLng,
+        destinationLat,
+        destinationLng,
+        customerName,
+        distanceKm
+    ) {
+        if (
+            !bookingRouteMap
+            || !bookingDirectionsService
+            || !bookingDirectionsRenderer
+        ) {
+            pendingRouteData = {
+                originLat: originLat,
+                originLng: originLng,
+                destinationLat: destinationLat,
+                destinationLng: destinationLng,
+                customerName: customerName,
+                distanceKm: distanceKm
+            };
+
+            return;
+        }
+
+        const customerNameElement =
+            document.getElementById(
+                "routeCustomerName"
+            );
+
+        const distanceElement =
+            document.getElementById(
+                "routeDistanceKm"
+            );
+
+        if (customerNameElement) {
+            customerNameElement.textContent =
+                customerName || "Customer";
+        }
+
+        if (distanceElement) {
+            distanceElement.textContent =
+                "Distance: " + distanceKm + " KM";
+        }
+
         const origin = {
-            lat: selectedRouteData.originLat,
-            lng: selectedRouteData.originLng
+            lat: Number.parseFloat(originLat),
+            lng: Number.parseFloat(originLng)
         };
 
         const destination = {
-            lat: selectedRouteData.destinationLat,
-            lng: selectedRouteData.destinationLng
+            lat: Number.parseFloat(destinationLat),
+            lng: Number.parseFloat(destinationLng)
         };
 
-        document.getElementById(
-            "routeCustomerName"
-        ).textContent = selectedRouteData.customerName;
-
-        document.getElementById(
-            "routeDistanceKm"
-        ).textContent =
-            "Distance: "
-            + selectedRouteData.distanceKm
-            + " KM";
+        if (
+            !Number.isFinite(origin.lat)
+            || !Number.isFinite(origin.lng)
+            || !Number.isFinite(destination.lat)
+            || !Number.isFinite(destination.lng)
+        ) {
+            alert(
+                "The pickup or destination coordinates are invalid."
+            );
+            return;
+        }
 
         clearBookingRoute();
 
+        /*
+         * Green pickup marker.
+         */
         routeOriginMarker = new google.maps.Marker({
             position: origin,
             map: bookingRouteMap,
@@ -1446,6 +1547,9 @@
             }
         });
 
+        /*
+         * Red destination marker.
+         */
         routeDestinationMarker =
             new google.maps.Marker({
                 position: destination,
@@ -1489,14 +1593,6 @@
             shouldFocus: false
         });
 
-        const markerBounds =
-            new google.maps.LatLngBounds();
-
-        markerBounds.extend(origin);
-        markerBounds.extend(destination);
-
-        bookingRouteMap.fitBounds(markerBounds);
-
         bookingDirectionsService.route(
             {
                 origin: origin,
@@ -1505,32 +1601,45 @@
                     google.maps.TravelMode.DRIVING
             },
             function (response, status) {
-                if (status === "OK") {
+                if (
+                    status
+                    === google.maps.DirectionsStatus.OK
+                ) {
                     bookingDirectionsRenderer.setDirections(
                         response
                     );
 
-                    if (
+                    const route =
                         response.routes
-                        && response.routes.length > 0
-                        && response.routes[0].bounds
-                    ) {
+                        && response.routes.length
+                            ? response.routes[0]
+                            : null;
+
+                    if (route && route.bounds) {
                         bookingRouteMap.fitBounds(
-                            response.routes[0].bounds
+                            route.bounds
                         );
                     }
                 } else {
+                    /*
+                     * The route failed, but still show both
+                     * the pickup and destination markers.
+                     */
                     bookingDirectionsRenderer.set(
                         "directions",
                         null
                     );
 
-                    bookingRouteMap.fitBounds(
-                        markerBounds
-                    );
+                    const bounds =
+                        new google.maps.LatLngBounds();
+
+                    bounds.extend(origin);
+                    bounds.extend(destination);
+
+                    bookingRouteMap.fitBounds(bounds);
 
                     console.error(
-                        "Google Directions request failed:",
+                        "Google route request failed:",
                         status
                     );
                 }
@@ -1567,49 +1676,47 @@
         }
     }
 
+    /*
+     * Render the selected booking after the modal is
+     * fully displayed. This prevents a blank or tiny map.
+     */
     document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-            const routeModal =
-                document.getElementById(
-                    "bookingRouteModal"
-                );
-
-            if (!routeModal) {
+        "shown.bs.modal",
+        function (event) {
+            if (
+                event.target.id !== "bookingRouteModal"
+                || !bookingRouteMap
+            ) {
                 return;
             }
 
-            routeModal.addEventListener(
-                "shown.bs.modal",
-                function () {
-                    if (
-                        !bookingMapReady
-                        || !bookingRouteMap
-                    ) {
-                        console.warn(
-                            "Google Maps is not ready yet."
-                        );
-                        return;
-                    }
-
-                    google.maps.event.trigger(
-                        bookingRouteMap,
-                        "resize"
-                    );
-
-                    window.setTimeout(function () {
-                        renderSelectedBookingRoute();
-                    }, 150);
-                }
+            google.maps.event.trigger(
+                bookingRouteMap,
+                "resize"
             );
 
-            routeModal.addEventListener(
-                "hidden.bs.modal",
-                function () {
-                    clearBookingRoute();
-                    selectedRouteData = null;
-                }
-            );
+            if (pendingRouteData) {
+                const routeData = pendingRouteData;
+                pendingRouteData = null;
+
+                renderBookingRoute(
+                    routeData.originLat,
+                    routeData.originLng,
+                    routeData.destinationLat,
+                    routeData.destinationLng,
+                    routeData.customerName,
+                    routeData.distanceKm
+                );
+            }
+        }
+    );
+
+    document.addEventListener(
+        "hidden.bs.modal",
+        function (event) {
+            if (event.target.id === "bookingRouteModal") {
+                clearBookingRoute();
+            }
         }
     );
 </script>
@@ -1617,9 +1724,8 @@
 <script
     async
     defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initCustomerTrackingMaps"
-></script>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initBookingRouteMap">
+</script>
 
 </body>
 </html>
-
