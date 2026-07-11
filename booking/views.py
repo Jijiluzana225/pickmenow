@@ -904,7 +904,11 @@ def accept_booking(request, booking_id):
 @login_required
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(
-        Booking,
+        Booking.objects.select_related(
+            "customer",
+            "customer__user",
+            "location",
+        ),
         id=booking_id,
         customer=request.user.customer_profile
     )
@@ -912,7 +916,17 @@ def cancel_booking(request, booking_id):
     if request.method == "POST":
         if booking.status in ["pending", "assigned"]:
             booking.status = "cancelled"
-            booking.save()
+
+            booking.save(
+                update_fields=[
+                    "status"
+                ]
+            )
+
+            refresh_booking_dashboards(
+                booking,
+                reason="booking_cancelled"
+            )
 
     return redirect("customer_dashboard")
 
@@ -963,20 +977,52 @@ def complete_booking(request, booking_id):
     driver = request.user.driver_profile
 
     booking = get_object_or_404(
-        Booking,
+        Booking.objects.select_related(
+            "customer",
+            "customer__user",
+            "location",
+        ),
         id=booking_id,
         driver=driver,
         status="accepted"
     )
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return redirect("driver_accepted_bookings")
+
+    with transaction.atomic():
         booking.status = "completed"
-        booking.save()
+
+        booking.save(
+            update_fields=[
+                "status"
+            ]
+        )
 
         driver.is_available = True
-        driver.save()
+
+        driver.save(
+            update_fields=[
+                "is_available"
+            ]
+        )
+
+    # Refresh both:
+    # 1. Driver dashboards in the same location
+    # 2. The customer's dashboard
+    refresh_booking_dashboards(
+        booking,
+        reason="booking_completed"
+    )
+
+    print(
+        "BOOKING COMPLETED DASHBOARD REFRESH SENT:",
+        booking.id
+    )
 
     return redirect("driver_accepted_bookings")
+
+
 
 
 @login_required(login_url="driver_login")
@@ -1107,6 +1153,7 @@ def download_apk(request):
     )
 
 
+
 @login_required(login_url="driver_login")
 def no_show_booking(request, booking_id):
     if not hasattr(request.user, "driver_profile"):
@@ -1115,21 +1162,45 @@ def no_show_booking(request, booking_id):
     driver = request.user.driver_profile
 
     booking = get_object_or_404(
-        Booking,
+        Booking.objects.select_related(
+            "customer",
+            "customer__user",
+            "location",
+        ),
         id=booking_id,
         driver=driver,
         status="accepted"
     )
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return redirect("driver_accepted_bookings")
+
+    with transaction.atomic():
         booking.status = "no_show"
         booking.instructions = "No Show"
-        booking.save()
+
+        booking.save(
+            update_fields=[
+                "status",
+                "instructions",
+            ]
+        )
 
         driver.is_available = True
-        driver.save()
+
+        driver.save(
+            update_fields=[
+                "is_available"
+            ]
+        )
+
+    refresh_booking_dashboards(
+        booking,
+        reason="booking_no_show"
+    )
 
     return redirect("driver_accepted_bookings")
+
 
 
 @login_required
