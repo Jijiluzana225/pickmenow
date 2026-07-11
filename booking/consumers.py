@@ -52,3 +52,15 @@ class TrackingConsumer(AsyncWebsocketConsumer):
             "lat": event["lat"],
             "lng": event["lng"],
         }))
+
+
+
+async def booking_accepted(self, event):
+    await self.send(text_data=json.dumps({
+        "type": "booking_accepted",
+        "booking_id": event.get("booking_id", self.booking_id),
+        "driver_name": event.get("driver_name", ""),
+        "contact_number": event.get("contact_number", ""),
+        "motorcycle_model": event.get("motorcycle_model", ""),
+        "plate_number": event.get("plate_number", ""),
+    }))

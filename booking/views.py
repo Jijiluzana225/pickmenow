@@ -571,7 +571,6 @@ def toggle_driver_availability(request):
 
     return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
-
 @login_required(login_url="driver_login")
 def accept_booking(request, booking_id):
     if not hasattr(request.user, "driver_profile"):
@@ -582,7 +581,9 @@ def accept_booking(request, booking_id):
     if not driver.location:
         return redirect("choose_driver_location")
 
-    if Booking.objects.filter(driver=driver, status="accepted").exists():
+    active_statuses = ["accepted"]
+
+    if Booking.objects.filter(driver=driver, status__in=active_statuses).exists():
         return redirect("dashboard")
 
     if request.method == "POST":
@@ -594,6 +595,12 @@ def accept_booking(request, booking_id):
                 driver__isnull=True,
                 location=driver.location
             )
+
+            if Booking.objects.select_for_update().filter(
+                driver=driver,
+                status__in=active_statuses
+            ).exists():
+                return redirect("dashboard")
 
             booking.driver = driver
             booking.status = "accepted"
@@ -610,6 +617,11 @@ def accept_booking(request, booking_id):
             f"booking_{booking.id}",
             {
                 "type": "booking_accepted",
+                "booking_id": booking.id,
+                "driver_name": driver.full_name,
+                "contact_number": driver.contact_number,
+                "motorcycle_model": driver.motorcycle_model,
+                "plate_number": driver.plate_number,
             }
         )
 
@@ -625,10 +637,7 @@ def accept_booking(request, booking_id):
             f"Ride safely!"
         )
 
-        sms_result = send_sms(
-            booking.contact_number,
-            message
-        )
+        sms_result = send_sms(booking.contact_number, message)
 
         print("=" * 60)
         print("SMS SEND RESULT")
@@ -636,8 +645,9 @@ def accept_booking(request, booking_id):
         print("=" * 60)
         print("WEBSOCKET SENT TO:", f"booking_{booking.id}")
 
-    return redirect("driver_accepted_bookings")
+        return redirect("driver_accepted_bookings")
 
+    return redirect("dashboard")
 
 @login_required
 def cancel_booking(request, booking_id):
