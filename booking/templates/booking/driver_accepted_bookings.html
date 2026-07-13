@@ -178,6 +178,159 @@
                 width: auto;
             }
         }
+
+        /* SERVICE TYPE DISTINCTION */
+        .booking-card.ride-booking {
+            border-left: 7px solid #2563eb;
+            background:
+                linear-gradient(145deg, #eff6ff 0%, #ffffff 46%);
+        }
+
+        .booking-card.pasugo-booking {
+            border: 2px solid #86efac;
+            border-left: 7px solid #16a34a;
+            background:
+                linear-gradient(145deg, #f0fdf4 0%, #ffffff 46%);
+            box-shadow: 0 16px 40px rgba(22, 163, 74, .14);
+        }
+
+        .service-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: -18px -18px 16px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .ride-banner {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            color: #1d4ed8;
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .pasugo-banner {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #ffffff;
+            border-bottom: 1px solid #166534;
+        }
+
+        .service-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .service-type-ride {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .service-type-pasugo {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .pasugo-summary {
+            background: rgba(255, 255, 255, .95);
+            border: 1px solid #bbf7d0;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .pasugo-summary-title {
+            color: #166534;
+            font-size: 13px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 10px;
+        }
+
+        .pasugo-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .pasugo-detail {
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 14px;
+            padding: 11px 12px;
+        }
+
+        .pasugo-detail .label {
+            color: #15803d;
+        }
+
+        .pasugo-detail .value {
+            margin-bottom: 0;
+        }
+
+        .purchase-budget {
+            color: #15803d;
+            font-size: 18px;
+            font-weight: 950;
+        }
+
+        .ride-fare-box {
+            border-color: #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #ffffff);
+        }
+
+        .pasugo-fare-box {
+            border-color: #bbf7d0;
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
+        }
+
+        .pasugo-action-btn {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+            color: #ffffff;
+        }
+
+        .pasugo-action-btn:hover {
+            background: linear-gradient(135deg, #15803d, #166534);
+            color: #ffffff;
+        }
+
+        .ride-action-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            color: #ffffff;
+        }
+
+        .ride-action-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: #ffffff;
+        }
+
+        @media (min-width: 576px) {
+            .pasugo-detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .service-banner {
+                margin: -22px -22px 18px;
+            }
+        }
+
     </style>
 </head>
 
@@ -189,14 +342,26 @@
 
     <div class="page-header">
         <h2>My Accepted Bookings</h2>
-        <p>Hello, {{ driver.full_name }}. These are the bookings currently accepted by you.</p>
+        <p>Hello, {{ driver.full_name }}. These are the Ride and Pasugo bookings currently accepted by you.</p>
     </div>
 
     {% if bookings %}
 
         {% for booking in bookings %}
-            <div class="booking-card">
+            <div class="booking-card {% if booking.service_type == "pasugo" %}pasugo-booking{% else %}ride-booking{% endif %}">
                 <div class="booking-card-body">
+
+                    {% if booking.service_type == "pasugo" %}
+                        <div class="service-banner pasugo-banner">
+                            <span>🏃 Pasugo Errand</span>
+                            <span>Active Service</span>
+                        </div>
+                    {% else %}
+                        <div class="service-banner ride-banner">
+                            <span>🛵 Ride Booking</span>
+                            <span>Passenger Ride</span>
+                        </div>
+                    {% endif %}
 
                     <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                         <div class="customer-header">
@@ -227,6 +392,18 @@
                                         {{ booking.assigned_at }}
                                     {% endif %}
                                 </small>
+
+                                <div class="mt-2">
+                                    {% if booking.service_type == "pasugo" %}
+                                        <span class="service-type-badge service-type-pasugo">
+                                            🏃 Pasugo
+                                        </span>
+                                    {% else %}
+                                        <span class="service-type-badge service-type-ride">
+                                            🛵 Ride
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
 
@@ -242,19 +419,88 @@
                         </a>
                     </div>
 
-                    <div class="label">Pickup</div>
-                    <div class="value">
-                        <a href="/navigate/{{ booking.id }}/" target="_blank">
-                            {{ booking.origin }}
-                        </a>
-                    </div>
+                    {% if booking.service_type == "pasugo" %}
 
-                    <div class="label">Destination</div>
-                    <div class="value">
-                        <a href="{% url 'navigate_to_destination' booking.id %}" target="_blank">
-                            {{ booking.destination }}
-                        </a>
-                    </div>
+                        <div class="pasugo-summary">
+                            <div class="pasugo-summary-title">
+                                📋 Errand Information
+                            </div>
+
+                            <div class="pasugo-detail-grid">
+
+                                <div class="pasugo-detail">
+                                    <div class="label">Errand Type</div>
+                                    <div class="value">
+                                        {{ booking.errand_type|default:"General Errand" }}
+                                    </div>
+                                </div>
+
+                                <div class="pasugo-detail">
+                                    <div class="label">Requested Item / Task</div>
+                                    <div class="value">
+                                        {{ booking.item_description|default:"No description provided." }}
+                                    </div>
+                                </div>
+
+                                {% if booking.purchase_budget %}
+                                    <div class="pasugo-detail">
+                                        <div class="label">Purchase Budget</div>
+                                        <div class="purchase-budget">
+                                            ₱{{ booking.purchase_budget }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if booking.recipient_name or booking.recipient_contact_number %}
+                                    <div class="pasugo-detail">
+                                        <div class="label">Recipient</div>
+                                        <div class="value">
+                                            {{ booking.recipient_name|default:"Not specified" }}
+
+                                            {% if booking.recipient_contact_number %}
+                                                <br>
+                                                <a href="tel:{{ booking.recipient_contact_number }}">
+                                                    📞 {{ booking.recipient_contact_number }}
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                        <div class="label">Errand Pickup</div>
+                        <div class="value">
+                            <a href="/navigate/{{ booking.id }}/" target="_blank">
+                                {{ booking.origin }}
+                            </a>
+                        </div>
+
+                        <div class="label">Delivery Location</div>
+                        <div class="value">
+                            <a href="{% url 'navigate_to_destination' booking.id %}" target="_blank">
+                                {{ booking.destination }}
+                            </a>
+                        </div>
+
+                    {% else %}
+
+                        <div class="label">Pickup</div>
+                        <div class="value">
+                            <a href="/navigate/{{ booking.id }}/" target="_blank">
+                                {{ booking.origin }}
+                            </a>
+                        </div>
+
+                        <div class="label">Destination</div>
+                        <div class="value">
+                            <a href="{% url 'navigate_to_destination' booking.id %}" target="_blank">
+                                {{ booking.destination }}
+                            </a>
+                        </div>
+
+                    {% endif %}
 
                     {% if booking.instructions %}
                         <div class="label">Instructions</div>
@@ -263,10 +509,16 @@
                         </div>
                     {% endif %}
 
-                    <div class="fare-box mb-3">
+                    <div class="fare-box mb-3 {% if booking.service_type == "pasugo" %}pasugo-fare-box{% else %}ride-fare-box{% endif %}">
                         <div class="row g-2">
                             <div class="col-4">
-                                <div class="label">Fare</div>
+                                <div class="label">
+                                    {% if booking.service_type == "pasugo" %}
+                                        Service Fee
+                                    {% else %}
+                                        Fare
+                                    {% endif %}
+                                </div>
                                 <div>₱{{ booking.fare }}</div>
                             </div>
 
@@ -287,15 +539,23 @@
                             <a
                                 href="/navigate/{{ booking.id }}/"
                                 target="_blank"
-                                class="btn btn-primary">
-                                Navigate to Pickup
+                                class="btn {% if booking.service_type == 'pasugo' %}pasugo-action-btn{% else %}ride-action-btn{% endif %}">
+                                {% if booking.service_type == "pasugo" %}
+                                    Navigate to Errand Pickup
+                                {% else %}
+                                    Navigate to Pickup
+                                {% endif %}
                             </a>
 
                             <a
                                 href="{% url 'navigate_to_destination' booking.id %}"
                                 target="_blank"
                                 class="btn btn-outline-primary">
-                                Navigate to Destination
+                                {% if booking.service_type == "pasugo" %}
+                                    Navigate to Delivery
+                                {% else %}
+                                    Navigate to Destination
+                                {% endif %}
                             </a>
 
                             <form
@@ -306,21 +566,33 @@
                                 {% csrf_token %}
 
                                 <button type="submit" class="btn btn-success w-100">
-                                    ✅ Mark as Completed
+                                    {% if booking.service_type == "pasugo" %}
+                                        ✅ Complete Pasugo
+                                    {% else %}
+                                        ✅ Complete Ride
+                                    {% endif %}
                                 </button>                                
                             </form>
                             {% if booking.can_no_show %}
 <form method="POST" action="{% url 'no_show_booking' booking.id %}">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger w-100">
-        🚫 No Show
+        {% if booking.service_type == "pasugo" %}
+            🚫 Recipient / Customer Not Available
+        {% else %}
+            🚫 No Show
+        {% endif %}
     </button>
 </form>
 {% endif %}
                         </div>
                     {% else %}
                         <div class="alert alert-info rounded-4 mb-0">
-                            This booking is already completed and can no longer be edited.
+                            {% if booking.service_type == "pasugo" %}
+                                This Pasugo request is already completed and can no longer be edited.
+                            {% else %}
+                                This ride is already completed and can no longer be edited.
+                            {% endif %}
                         </div>
                     {% endif %}
 
