@@ -826,16 +826,17 @@ def accept_booking(request, booking_id):
 
     # Notify the customer booking page.
     async_to_sync(channel_layer.group_send)(
-        f"booking_{booking.id}",
-        {
-            "type": "booking_accepted",
-            "booking_id": booking.id,
-            "driver_name": driver.full_name,
-            "contact_number": driver.contact_number,
-            "motorcycle_model": driver.motorcycle_model,
-            "plate_number": driver.plate_number,
-        }
-    )
+    f"booking_{booking.id}",
+    {
+        "type": "booking_accepted",
+        "booking_id": booking.id,
+        "service_type": booking.service_type,
+        "driver_name": driver.full_name,
+        "contact_number": driver.contact_number,
+        "motorcycle_model": driver.motorcycle_model,
+        "plate_number": driver.plate_number,
+    }
+)
 
     # Refresh all driver dashboards in the same service location.
     if booking.location_id:
@@ -852,14 +853,15 @@ def accept_booking(request, booking_id):
     # Refresh the customer's dashboard.
     if booking.customer_id and booking.customer.user_id:
         async_to_sync(channel_layer.group_send)(
-            f"customer_dashboard_user_{booking.customer.user_id}",
-            {
-                "type": "customer_dashboard_refresh",
-                "booking_id": booking.id,
-                "booking_status": booking.status,
-                "reason": "booking_accepted",
-            }
-        )
+    f"customer_dashboard_user_{booking.customer.user_id}",
+    {
+        "type": "customer_dashboard_refresh",
+        "booking_id": booking.id,
+        "booking_status": booking.status,
+        "service_type": booking.service_type,
+        "reason": "booking_accepted",
+    }
+)
 
     message = (
         f"Good day {booking.customer_name}!\n\n"
