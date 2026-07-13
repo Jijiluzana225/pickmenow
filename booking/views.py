@@ -427,13 +427,13 @@ def customer_logout(request):
     logout(request)
     return redirect("customer_login")
 
-
 @login_required
 def customer_dashboard(request):
     customer = request.user.customer_profile
 
     bookings = Booking.objects.filter(
-        customer=customer
+        customer=customer,
+        status__in=["pending", "assigned", "accepted"]
     ).order_by("-created_at")
 
     return render(request, "booking/customer_dashboard.html", {
