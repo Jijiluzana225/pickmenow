@@ -664,18 +664,19 @@
             Hello, {{ customer.full_name }}. Track your Ride and Pasugo requests, check your assigned rider, update your tip, or cancel pending bookings.
         </p>
     </div>
+{% if bookings %}
 <div class="d-flex justify-content-between gap-3 mt-3 mb-3">
     <a href="{% url 'index' %}" class="btn btn-primary btn-lg fw-bold flex-fill">
         🛵 Book a New Ride
     </a>
 
     <a
-    href="{% url 'pasugo_booking' %}"
-    class="btn btn-success btn-lg fw-bold flex-fill">
-    🏃 Pasugo
+        href="{% url 'pasugo_booking' %}"
+        class="btn btn-success btn-lg fw-bold flex-fill">
+        🏃 Pasugo
     </a>
 </div>
-
+{% endif %}
 
 
 
