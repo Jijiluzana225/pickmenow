@@ -77,6 +77,10 @@ class DriverProfile(models.Model):
 
 
 class Booking(models.Model):
+    class ServiceType(models.TextChoices):
+        RIDE = "ride", "Ride"
+        PASUGO = "pasugo", "Pasugo"
+
     BOOKING_STATUS = [
         ("pending", "Pending"),
         ("assigned", "Assigned"),
@@ -86,7 +90,13 @@ class Booking(models.Model):
         ("no_show", "No Show"),
     ]
 
-    customer = models.ForeignKey(CustomerProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings")
+    customer = models.ForeignKey(
+        CustomerProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bookings"
+    )
 
     location = models.ForeignKey(
         ServiceLocation,
@@ -94,6 +104,13 @@ class Booking(models.Model):
         blank=True,
         null=True,
         related_name="bookings"
+    )
+
+    service_type = models.CharField(
+        max_length=20,
+        choices=ServiceType.choices,
+        default=ServiceType.RIDE,
+        db_index=True
     )
 
     customer_name = models.CharField(max_length=100)
@@ -108,37 +125,113 @@ class Booking(models.Model):
     destination_lng = models.FloatField()
 
     distance_km = models.FloatField(default=0)
-    tip = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fare = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    instructions = models.TextField(blank=True, null=True)
+    tip = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
 
-    driver = models.ForeignKey(DriverProfile, on_delete=models.SET_NULL, blank=True, null=True, related_name="bookings")
+    fare = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
 
-    status = models.CharField(max_length=20, choices=BOOKING_STATUS, default="pending")
+    instructions = models.TextField(
+        blank=True,
+        null=True
+    )
 
-    assigned_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    accepted_at = models.DateTimeField(blank=True, null=True)
+    # Pasugo-only fields
+    errand_type = models.CharField(
+        max_length=50,
+        blank=True,
+        default=""
+    )
+
+    item_description = models.TextField(
+        blank=True,
+        default=""
+    )
+
+    purchase_budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
+    recipient_name = models.CharField(
+        max_length=100,
+        blank=True,
+        default=""
+    )
+
+    recipient_contact_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default=""
+    )
+
+    driver = models.ForeignKey(
+        DriverProfile,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="bookings"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=BOOKING_STATUS,
+        default="pending",
+        db_index=True
+    )
+
+    assigned_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    accepted_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
 
     priority_driver = models.ForeignKey(
-    DriverProfile,
-    on_delete=models.SET_NULL,
-    blank=True,
-    null=True,
-    related_name="priority_bookings"
+        DriverProfile,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="priority_bookings"
     )
 
     priority_until = models.DateTimeField(
-    blank=True,
-    null=True,
-    db_index=True
+        blank=True,
+        null=True,
+        db_index=True
     )
-
 
     @property
     def total_amount(self):
         return self.fare + self.tip
 
+    @property
+    def is_ride(self):
+        return self.service_type == self.ServiceType.RIDE
+
+    @property
+    def is_pasugo(self):
+        return self.service_type == self.ServiceType.PASUGO
+
     def __str__(self):
-        return f"{self.customer_name} - {self.origin} to {self.destination}"
+        return (
+            f"{self.get_service_type_display()} #{self.id} - "
+            f"{self.customer_name}: "
+            f"{self.origin} to {self.destination}"
+        )

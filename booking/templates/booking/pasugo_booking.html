@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pasugo Errand | PickMeNow.Online</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(34, 197, 94, .20), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, .16), transparent 32%),
+                linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #1f2937;
+        }
+
+        .pasugo-wrapper {
+            max-width: 980px;
+            margin: auto;
+            padding: 14px;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, #052e16, #166534);
+            color: #ffffff;
+            border-radius: 26px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 18px 45px rgba(5, 46, 22, .24);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: "🏃";
+            position: absolute;
+            right: 20px;
+            bottom: -14px;
+            font-size: 92px;
+            opacity: .12;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, .12);
+            color: #bbf7d0;
+            border: 1px solid rgba(255, 255, 255, .18);
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .hero-card h2 {
+            font-size: 27px;
+            font-weight: 950;
+            letter-spacing: -.5px;
+            margin-bottom: 6px;
+        }
+
+        .hero-card p {
+            color: #dcfce7;
+            font-size: 14px;
+            margin-bottom: 0;
+            max-width: 650px;
+        }
+
+        .booking-card {
+            background: rgba(255, 255, 255, .97);
+            border: 1px solid rgba(226, 232, 240, .9);
+            border-radius: 26px;
+            box-shadow: 0 16px 42px rgba(15, 23, 42, .09);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .booking-card-body {
+            padding: 18px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 950;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 900;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 .2rem rgba(22, 163, 74, .16);
+        }
+
+        .form-control[readonly] {
+            background: #f8fafc;
+            color: #4b5563;
+            font-weight: 700;
+        }
+
+        .details-box,
+        .route-box {
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .details-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .route-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+        }
+
+        .map-card {
+            margin: 16px 0;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 10px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, .14);
+            border: 1px solid rgba(148, 163, 184, .25);
+        }
+
+        .map-header {
+            padding: 8px 8px 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .map-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex: 0 0 auto;
+        }
+
+        .map-header h5 {
+            font-weight: 950;
+            margin-bottom: 2px;
+        }
+
+        .map-header small {
+            color: #6b7280;
+            line-height: 1.3;
+        }
+
+        #map {
+            height: 340px;
+            width: 100%;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 14px;
+            margin: 16px 0;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .result-row:first-child {
+            border-bottom: 1px dashed #d1d5db;
+            margin-bottom: 6px;
+            padding-bottom: 12px;
+        }
+
+        .result-label {
+            font-size: 11px;
+            font-weight: 950;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+
+        .result-value {
+            font-size: 17px;
+            font-weight: 950;
+            text-align: right;
+        }
+
+        .fare {
+            color: #16a34a;
+        }
+
+        .tip-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .hint-text {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .btn {
+            border-radius: 16px;
+            font-weight: 900;
+            padding: 12px 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+            box-shadow: 0 12px 24px rgba(22, 163, 74, .22);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+            box-shadow: none;
+        }
+
+        @media (min-width: 768px) {
+            .pasugo-wrapper {
+                padding: 28px;
+            }
+
+            .hero-card {
+                padding: 28px;
+            }
+
+            .hero-card h2 {
+                font-size: 34px;
+            }
+
+            .booking-card-body {
+                padding: 22px;
+            }
+
+            #map {
+                height: 430px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+{% include "includes/navbar.html" %}
+
+<div class="pasugo-wrapper">
+
+    <div class="hero-card">
+        <div class="hero-badge">🏃 PickMeNow Pasugo</div>
+        <h2>Pasugo Request</h2>
+        <p>
+            Ask a rider to pick up documents, food, medicine, groceries,
+            parcels, or other allowed items and deliver them to your chosen location.
+        </p>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger rounded-4">{{ error }}</div>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} rounded-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="booking-card">
+        <div class="booking-card-body">
+
+            <div class="section-label">🏃 Pasugo Details</div>
+
+            <form method="POST" action="{% url 'create_pasugo_booking' %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="service_type" value="pasugo">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">👤 Customer Name</label>
+                        <input type="text" class="form-control" value="{{ customer.full_name }}" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">📱 Contact Number</label>
+                        <input type="text" class="form-control" value="{{ customer.contact_number }}" readonly>
+                    </div>
+                </div>
+
+                <div class="details-box">
+                    <div class="mb-3">
+                        <label class="form-label">📋 Errand Type</label>
+                        <select name="errand_type" class="form-select" required>
+                            <option value="">Select an errand type</option>
+                            <option value="Food Pickup">Food Pickup</option>
+                            <option value="Grocery Purchase">Grocery Purchase</option>
+                            <option value="Medicine Pickup">Medicine Pickup</option>
+                            <option value="Document Delivery">Document Delivery</option>
+                            <option value="Parcel Delivery">Parcel Delivery</option>
+                            <option value="Bill Payment">Bill Payment</option>
+                            <option value="Other Errand">Other Errand</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">📝 Item or Errand Description</label>
+                        <textarea
+                            name="item_description"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Example: Pick up one birthday cake under the name Maria, or buy the listed grocery items."
+                            required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="form-label">💳 Purchase Budget</label>
+                        <input
+                            type="number"
+                            name="purchase_budget"
+                            class="form-control"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter the maximum purchase amount">
+                        <div class="hint-text">
+                            Leave this blank when the rider does not need to buy anything.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="route-box">
+                    <div class="mb-3">
+                        <label class="form-label">📍 Errand Pickup Location</label>
+                        <input
+                            type="text"
+                            id="origin"
+                            name="origin"
+                            class="form-control"
+                            placeholder="Getting your current GPS location..."
+                            required>
+                    </div>
+
+                    <div>
+                        <label class="form-label">🏁 Delivery Location</label>
+                        <input
+                            type="text"
+                            id="destination"
+                            name="destination"
+                            class="form-control"
+                            placeholder="Search delivery destination"
+                            required>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">👤 Recipient Name</label>
+                        <input
+                            type="text"
+                            name="recipient_name"
+                            class="form-control"
+                            placeholder="Who will receive the item?">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">📱 Recipient Contact</label>
+                        <input
+                            type="text"
+                            name="recipient_contact_number"
+                            class="form-control"
+                            placeholder="09XXXXXXXXX">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">📝 Special Instructions</label>
+                    <textarea
+                        name="instructions"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Store name, landmark, preferred brand, quantity, person to contact, or delivery notes."></textarea>
+                </div>
+
+                <div class="map-card">
+                    <div class="map-header">
+                        <div class="map-icon">🗺️</div>
+                        <div>
+                            <h5>Errand Route</h5>
+                            <small>
+                                Pin the pickup and delivery points. Drag either marker when adjustment is needed.
+                            </small>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <input type="hidden" id="origin_lat" name="origin_lat">
+                <input type="hidden" id="origin_lng" name="origin_lng">
+                <input type="hidden" id="destination_lat" name="destination_lat">
+                <input type="hidden" id="destination_lng" name="destination_lng">
+                <input type="hidden" id="distance_km" name="distance_km">
+
+                <div class="d-grid gap-2">
+                    <button
+                        type="button"
+                        id="calculateBtn"
+                        class="btn btn-primary"
+                        onclick="calculateRoute()">
+                        🧭 Calculate Pasugo Route and Fee
+                    </button>
+
+                    <button
+                        type="button"
+                        id="changeBtn"
+                        class="btn btn-outline-secondary"
+                        style="display:none;"
+                        onclick="unlockRoute();">
+                        🔄 Change Pickup or Delivery
+                    </button>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-row">
+                        <div class="result-label">Distance</div>
+                        <div id="distance_text" class="result-value">—</div>
+                    </div>
+
+                    <div class="result-row">
+                        <div class="result-label">Estimated Service Fee</div>
+                        <div id="fare_text" class="result-value fare">—</div>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <label class="form-label">🎁 Optional Rider Tip</label>
+                    <input
+                        type="number"
+                        name="tip"
+                        class="form-control"
+                        placeholder="Enter tip amount, ₱"
+                        min="0"
+                        step="1">
+                    <div class="hint-text">
+                        The tip is added to the Pasugo service fee.
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button
+                        type="submit"
+                        id="bookPasugoBtn"
+                        class="btn btn-success"
+                        disabled>
+                        ✅ Request Pasugo Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let map;
+let directionsService;
+let directionsRenderer;
+let originMarker;
+let destinationMarker;
+
+function initMap() {
+    const defaultLocation = { lat: 6.9214, lng: 122.0790 };
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: defaultLocation,
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+        streetViewControl: false,
+        fullscreenControl: true
+    });
+
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+    directionsRenderer.setMap(map);
+
+    configureAutocomplete("origin", true);
+    configureAutocomplete("destination", false);
+    autoPinCurrentLocation();
+}
+
+function configureAutocomplete(inputId, isOrigin) {
+    const input = document.getElementById(inputId);
+    const autocomplete = new google.maps.places.Autocomplete(input);
+
+    autocomplete.addListener("place_changed", function () {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        const location = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+        };
+
+        if (isOrigin) {
+            setOriginMarker(location);
+            updateCoordinates("origin", location);
+        } else {
+            setDestinationMarker(location);
+            updateCoordinates("destination", location);
+        }
+
+        map.setCenter(location);
+        map.setZoom(17);
+        resetCalculation();
+    });
+}
+
+function autoPinCurrentLocation() {
+    if (!navigator.geolocation) {
+        document.getElementById("origin").placeholder = "Search errand pickup location";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+            const location = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            setOriginMarker(location);
+            updateCoordinates("origin", location);
+            reverseGeocode(location, "origin");
+            map.setCenter(location);
+            map.setZoom(17);
+        },
+        function () {
+            document.getElementById("origin").placeholder = "Search errand pickup location";
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+function createMarker(location, iconUrl, title, dragCallback) {
+    const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        draggable: true,
+        title: title,
+        animation: google.maps.Animation.DROP,
+        icon: { url: iconUrl }
+    });
+
+    marker.addListener("dragend", function (event) {
+        const updated = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng()
+        };
+
+        dragCallback(updated);
+        resetCalculation();
+    });
+
+    return marker;
+}
+
+function setOriginMarker(location) {
+    if (originMarker) originMarker.setMap(null);
+
+    originMarker = createMarker(
+        location,
+        "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+        "Errand Pickup",
+        function (updated) {
+            updateCoordinates("origin", updated);
+            reverseGeocode(updated, "origin");
+        }
+    );
+}
+
+function setDestinationMarker(location) {
+    if (destinationMarker) destinationMarker.setMap(null);
+
+    destinationMarker = createMarker(
+        location,
+        "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        "Delivery Location",
+        function (updated) {
+            updateCoordinates("destination", updated);
+            reverseGeocode(updated, "destination");
+        }
+    );
+}
+
+function updateCoordinates(type, location) {
+    document.getElementById(type + "_lat").value = location.lat;
+    document.getElementById(type + "_lng").value = location.lng;
+}
+
+function reverseGeocode(location, type) {
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ location: location }, function (results, status) {
+        if (status === "OK" && results[0]) {
+            document.getElementById(type).value = results[0].formatted_address;
+        }
+    });
+}
+
+function resetCalculation() {
+    document.getElementById("bookPasugoBtn").disabled = true;
+    document.getElementById("distance_text").textContent = "—";
+    document.getElementById("fare_text").textContent = "—";
+    document.getElementById("distance_km").value = "";
+    document.getElementById("calculateBtn").style.display = "block";
+    document.getElementById("changeBtn").style.display = "none";
+}
+
+function lockRoute() {
+    document.getElementById("origin").readOnly = true;
+    document.getElementById("destination").readOnly = true;
+    document.getElementById("calculateBtn").style.display = "none";
+    document.getElementById("changeBtn").style.display = "block";
+
+    if (originMarker) originMarker.setDraggable(false);
+    if (destinationMarker) destinationMarker.setDraggable(false);
+}
+
+function unlockRoute() {
+    document.getElementById("origin").readOnly = false;
+    document.getElementById("destination").readOnly = false;
+    document.getElementById("calculateBtn").style.display = "block";
+    document.getElementById("changeBtn").style.display = "none";
+    document.getElementById("bookPasugoBtn").disabled = true;
+
+    if (originMarker) originMarker.setDraggable(true);
+    if (destinationMarker) destinationMarker.setDraggable(true);
+}
+
+function calculateRoute() {
+    const originLat = document.getElementById("origin_lat").value;
+    const originLng = document.getElementById("origin_lng").value;
+    const destinationLat = document.getElementById("destination_lat").value;
+    const destinationLng = document.getElementById("destination_lng").value;
+
+    if (!originLat || !originLng) {
+        alert("Please pin the errand pickup location.");
+        return;
+    }
+
+    if (!destinationLat || !destinationLng) {
+        alert("Please pin the delivery location.");
+        return;
+    }
+
+    directionsService.route(
+        {
+            origin: {
+                lat: parseFloat(originLat),
+                lng: parseFloat(originLng)
+            },
+            destination: {
+                lat: parseFloat(destinationLat),
+                lng: parseFloat(destinationLng)
+            },
+            travelMode: google.maps.TravelMode.DRIVING
+        },
+        function (response, status) {
+            if (status !== "OK") {
+                alert("Unable to calculate the route. Please check the pinned locations.");
+                return;
+            }
+
+            directionsRenderer.setDirections(response);
+
+            const leg = response.routes[0].legs[0];
+            const kilometers = leg.distance.value / 1000;
+            const estimatedFee = Math.ceil(35 + (kilometers * 10));
+
+            document.getElementById("distance_km").value = kilometers.toFixed(3);
+            document.getElementById("distance_text").textContent = leg.distance.text;
+            document.getElementById("fare_text").textContent = "₱" + estimatedFee;
+            document.getElementById("bookPasugoBtn").disabled = false;
+
+            lockRoute();
+        }
+    );
+}
+</script>
+
+<!-- Replace YOUR_GOOGLE_MAPS_API_KEY with your restricted Google Maps API key. -->
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initMap">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

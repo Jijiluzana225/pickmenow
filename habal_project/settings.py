@@ -160,7 +160,7 @@ STATICFILES_DIRS = [
 
 
 LOGIN_URL = "customer_login"
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "customer_dashboard"
 LOGOUT_REDIRECT_URL = "customer_login"
 
 MEDIA_URL = "/media/"

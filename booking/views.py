@@ -223,6 +223,9 @@ def create_booking(request):
         customer_name=customer.full_name,
         contact_number=customer.contact_number,
         location=customer.location,
+
+        service_type=Booking.ServiceType.RIDE,
+
         origin=origin,
         destination=destination,
         origin_lat=origin_lat,
@@ -407,7 +410,7 @@ def customer_login(request):
                 if not user.customer_profile.location:
                     return redirect("choose_customer_location")
 
-                return redirect("index")
+                return redirect("customer_dashboard")
 
             return render(request, "booking/customer_login.html", {
                 "error": "This account is not a customer account."
@@ -1253,3 +1256,284 @@ def choose_driver_location(request):
     return render(request, "booking/choose_location.html", {
         "locations": locations
     })
+
+
+
+@login_required(login_url="customer_login")
+def pasugo_booking(request):
+    if not hasattr(request.user, "customer_profile"):
+        return redirect("customer_login")
+
+    customer = request.user.customer_profile
+
+    if not customer.location:
+        return redirect("choose_customer_location")
+
+    return render(
+        request,
+        "booking/pasugo_booking.html",
+        {
+            "customer": customer
+        }
+    )
+
+@login_required(login_url="customer_login")
+def create_pasugo_booking(request):
+    if request.method != "POST":
+        return redirect("pasugo_booking")
+
+    if not hasattr(request.user, "customer_profile"):
+        return redirect("customer_login")
+
+    customer = request.user.customer_profile
+
+    if not customer.location:
+        return redirect("choose_customer_location")
+
+    origin = request.POST.get("origin", "").strip()
+    destination = request.POST.get("destination", "").strip()
+
+    errand_type = request.POST.get(
+        "errand_type",
+        ""
+    ).strip()
+
+    item_description = request.POST.get(
+        "item_description",
+        ""
+    ).strip()
+
+    instructions = request.POST.get(
+        "instructions",
+        ""
+    ).strip()
+
+    recipient_name = request.POST.get(
+        "recipient_name",
+        ""
+    ).strip()
+
+    recipient_contact_number = request.POST.get(
+        "recipient_contact_number",
+        ""
+    ).strip()
+
+    try:
+        distance_km = float(
+            request.POST.get("distance_km", 0)
+        )
+
+        tip = Decimal(
+            request.POST.get("tip") or "0"
+        )
+
+        origin_lat = float(
+            request.POST.get("origin_lat")
+        )
+
+        origin_lng = float(
+            request.POST.get("origin_lng")
+        )
+
+        destination_lat = float(
+            request.POST.get("destination_lat")
+        )
+
+        destination_lng = float(
+            request.POST.get("destination_lng")
+        )
+
+        purchase_budget_value = request.POST.get(
+            "purchase_budget",
+            ""
+        ).strip()
+
+        purchase_budget = (
+            Decimal(purchase_budget_value)
+            if purchase_budget_value
+            else None
+        )
+
+    except (TypeError, ValueError, InvalidOperation):
+        return render(
+            request,
+            "booking/pasugo_booking.html",
+            {
+                "customer": customer,
+                "error": "Please enter valid booking information."
+            }
+        )
+
+    if not origin or not destination:
+        return render(
+            request,
+            "booking/pasugo_booking.html",
+            {
+                "customer": customer,
+                "error": (
+                    "Pickup and delivery locations are required."
+                )
+            }
+        )
+
+    if not errand_type:
+        return render(
+            request,
+            "booking/pasugo_booking.html",
+            {
+                "customer": customer,
+                "error": "Please select an errand type."
+            }
+        )
+
+    if not item_description:
+        return render(
+            request,
+            "booking/pasugo_booking.html",
+            {
+                "customer": customer,
+                "error": (
+                    "Please describe the requested errand."
+                )
+            }
+        )
+
+    if distance_km <= 0:
+        return render(
+            request,
+            "booking/pasugo_booking.html",
+            {
+                "customer": customer,
+                "error": (
+                    "Please calculate the Pasugo route."
+                )
+            }
+        )
+
+    if tip < 0:
+        tip = Decimal("0.00")
+
+    if (
+        purchase_budget is not None
+        and purchase_budget < 0
+    ):
+        purchase_budget = None
+
+    # Example Pasugo pricing
+    base_fare = Decimal("35.00")
+    per_km = Decimal("10.00")
+
+    calculated_fare = (
+        base_fare
+        + Decimal(str(distance_km)) * per_km
+    )
+
+    fare = Decimal(
+        math.ceil(calculated_fare)
+    ).quantize(
+        Decimal("0.01")
+    )
+
+    nearest_driver, nearest_distance = get_nearest_driver(
+        service_location=customer.location,
+        booking_lat=origin_lat,
+        booking_lng=origin_lng,
+    )
+
+    now = timezone.now()
+
+    booking = Booking.objects.create(
+        customer=customer,
+        customer_name=customer.full_name,
+        contact_number=customer.contact_number,
+        location=customer.location,
+
+        service_type=Booking.ServiceType.PASUGO,
+
+        origin=origin,
+        destination=destination,
+        origin_lat=origin_lat,
+        origin_lng=origin_lng,
+        destination_lat=destination_lat,
+        destination_lng=destination_lng,
+
+        distance_km=distance_km,
+        fare=fare,
+        tip=tip,
+
+        errand_type=errand_type,
+        item_description=item_description,
+        purchase_budget=purchase_budget,
+        recipient_name=recipient_name,
+        recipient_contact_number=(
+            recipient_contact_number
+        ),
+
+        instructions=instructions or None,
+        status="pending",
+
+        priority_driver=nearest_driver,
+        priority_until=now + timedelta(minutes=1),
+    )
+
+    purchase_budget_text = (
+        f"₱{booking.purchase_budget}"
+        if booking.purchase_budget is not None
+        else "Not applicable"
+    )
+
+    message = f"""
+🏃 <b>New Pasugo Alert</b>
+
+📍 <b>Area:</b> {booking.location.name if booking.location else "No Location"}
+
+👤 <b>Customer:</b> {booking.customer_name}
+📞 <b>Contact:</b> {booking.contact_number}
+
+📋 <b>Errand Type:</b> {booking.errand_type}
+🛍️ <b>Request:</b> {booking.item_description}
+💳 <b>Purchase Budget:</b> {purchase_budget_text}
+
+📍 <b>Pickup:</b> {booking.origin}
+🏁 <b>Delivery:</b> {booking.destination}
+
+👤 <b>Recipient:</b> {booking.recipient_name or "Customer"}
+📞 <b>Recipient Contact:</b> {booking.recipient_contact_number or "Same as customer"}
+
+📏 <b>Distance:</b> {booking.distance_km:.2f} KM
+💰 <b>Service Fee:</b> ₱{booking.fare}
+🎁 <b>Tip:</b> ₱{booking.tip}
+💵 <b>Total Rider Fee:</b> ₱{booking.total_amount}
+
+📝 <b>Instructions:</b> {booking.instructions or "None"}
+
+https://www.pickmenow.online/dashboard/
+"""
+
+    if (
+        booking.location
+        and booking.location.telegram_chat_id
+    ):
+        send_telegram_message(
+            booking.location.telegram_chat_id,
+            message
+        )
+
+    if booking.location_id:
+        channel_layer = get_channel_layer()
+
+        async_to_sync(channel_layer.group_send)(
+            (
+                "driver_dashboard_location_"
+                f"{booking.location_id}"
+            ),
+            {
+                "type": "dashboard_refresh",
+                "booking_id": booking.id,
+                "booking_status": booking.status,
+                "service_type": booking.service_type,
+                "reason": "new_pasugo_booking",
+            }
+        )
+
+    return redirect("customer_dashboard")

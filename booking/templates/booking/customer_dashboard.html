@@ -465,6 +465,185 @@
 .call-driver-btn:active {
     transform: scale(0.98);
 }
+
+        /* SERVICE TYPE DISTINCTION */
+        .booking-card.ride-booking {
+            border-left: 7px solid #2563eb;
+            background:
+                linear-gradient(145deg, #eff6ff 0%, #ffffff 44%);
+        }
+
+        .booking-card.pasugo-booking {
+            border: 2px solid #86efac;
+            border-left: 7px solid #16a34a;
+            background:
+                linear-gradient(145deg, #f0fdf4 0%, #ffffff 46%);
+            box-shadow: 0 16px 42px rgba(22, 163, 74, .13);
+        }
+
+        .service-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: -18px -18px 16px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .ride-banner {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            color: #1d4ed8;
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .pasugo-banner {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #ffffff;
+            border-bottom: 1px solid #166534;
+        }
+
+        .service-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .service-type-ride {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .service-type-pasugo {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .pasugo-summary {
+            background: rgba(255, 255, 255, .94);
+            border: 1px solid #bbf7d0;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .pasugo-summary-title {
+            color: #166534;
+            font-size: 13px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 10px;
+        }
+
+        .pasugo-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .pasugo-detail {
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 14px;
+            padding: 11px 12px;
+        }
+
+        .pasugo-detail .label {
+            color: #15803d;
+        }
+
+        .pasugo-detail .value {
+            margin-bottom: 0;
+        }
+
+        .purchase-budget {
+            color: #15803d;
+            font-size: 18px;
+            font-weight: 950;
+        }
+
+        .pasugo-fare-box {
+            border-color: #bbf7d0;
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
+        }
+
+        .pasugo-driver-card {
+            border-color: #86efac;
+            background: linear-gradient(135deg, #ecfdf5, #ffffff);
+        }
+
+        .pasugo-driver-card .driver-card-header {
+            background: linear-gradient(135deg, #16a34a, #166534);
+        }
+
+        .ride-driver-card .driver-card-header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        .ride-driver-card {
+            border-color: #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #ffffff);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, .12);
+        }
+
+        .ride-driver-card .driver-photo {
+            border-color: #2563eb;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .22);
+        }
+
+        .pasugo-notice {
+            background: linear-gradient(135deg, #ecfdf5, #dcfce7);
+            border-left-color: #16a34a;
+            box-shadow: 0 12px 30px rgba(22, 163, 74, .15);
+        }
+
+        .pasugo-notice .notice-icon {
+            background: #16a34a;
+            box-shadow: 0 10px 20px rgba(22, 163, 74, .28);
+        }
+
+        .pasugo-notice .notice-title {
+            color: #166534;
+        }
+
+        .pasugo-notice .notice-text {
+            color: #14532d;
+        }
+
+        .empty-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 576px) {
+            .pasugo-detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .empty-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .service-banner {
+                margin: -22px -22px 18px;
+            }
+        }
+
     </style>
 </head>
 
@@ -477,24 +656,46 @@
 <div class="dashboard-wrapper">
 
     <div class="hero-card">
-        <div class="hero-badge">📋 Customer Ride Center</div>
+        <div class="hero-badge">📋 Customer Service Center</div>
 
         <h2>My Bookings</h2>
 
         <p>
-            Hello, {{ customer.full_name }}. Track your ride status, check your assigned driver, update your tip, or cancel pending bookings.
+            Hello, {{ customer.full_name }}. Track your Ride and Pasugo requests, check your assigned rider, update your tip, or cancel pending bookings.
         </p>
     </div>
-<div class="d-flex justify-content-center mt-3 mb-3">
-    <a href="{% url 'index' %}" class="btn btn-warning btn-lg fw-bold px-4">
-        ➕ Book a New Ride
+<div class="d-flex justify-content-between gap-3 mt-3 mb-3">
+    <a href="{% url 'index' %}" class="btn btn-primary btn-lg fw-bold flex-fill">
+        🛵 Book a New Ride
+    </a>
+
+    <a
+    href="{% url 'pasugo_booking' %}"
+    class="btn btn-success btn-lg fw-bold flex-fill">
+    🏃 Pasugo
     </a>
 </div>
+
+
+
+
     {% if bookings %}
 
         {% for booking in bookings %}
-            <div class="booking-card">
+            <div class="booking-card {% if booking.service_type == "pasugo" %}pasugo-booking{% else %}ride-booking{% endif %}">
                 <div class="booking-card-body">
+
+                    {% if booking.service_type == "pasugo" %}
+                        <div class="service-banner pasugo-banner">
+                            <span>🏃 Pasugo Errand</span>
+                            <span>Service Request</span>
+                        </div>
+                    {% else %}
+                        <div class="service-banner ride-banner">
+                            <span>🛵 Ride Booking</span>
+                            <span>Passenger Ride</span>
+                        </div>
+                    {% endif %}
 
                     <div class="booking-top">
                         <div>
@@ -508,6 +709,18 @@
                             <div class="booking-date">
                                 🕒 {{ booking.created_at }}
                             </div>
+
+                            <div class="mt-2">
+                                {% if booking.service_type == "pasugo" %}
+                                    <span class="service-type-badge service-type-pasugo">
+                                        🏃 Pasugo
+                                    </span>
+                                {% else %}
+                                    <span class="service-type-badge service-type-ride">
+                                        🛵 Ride
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <span class="status-badge status-{{ booking.status }}">
@@ -515,13 +728,73 @@
                         </span>
                     </div>
 
+                    {% if booking.service_type == "pasugo" %}
+
+                        <div class="pasugo-summary">
+                            <div class="pasugo-summary-title">
+                                📋 Errand Information
+                            </div>
+
+                            <div class="pasugo-detail-grid">
+
+                                <div class="pasugo-detail">
+                                    <div class="label">Errand Type</div>
+                                    <div class="value">
+                                        {{ booking.errand_type|default:"General Errand" }}
+                                    </div>
+                                </div>
+
+                                <div class="pasugo-detail">
+                                    <div class="label">Requested Item / Task</div>
+                                    <div class="value">
+                                        {{ booking.item_description|default:"No description provided." }}
+                                    </div>
+                                </div>
+
+                                {% if booking.purchase_budget %}
+                                    <div class="pasugo-detail">
+                                        <div class="label">Purchase Budget</div>
+                                        <div class="purchase-budget">
+                                            ₱{{ booking.purchase_budget }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if booking.recipient_name or booking.recipient_contact_number %}
+                                    <div class="pasugo-detail">
+                                        <div class="label">Recipient</div>
+                                        <div class="value">
+                                            {{ booking.recipient_name|default:"Not specified" }}
+
+                                            {% if booking.recipient_contact_number %}
+                                                <br>
+                                                📞 {{ booking.recipient_contact_number }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                    {% endif %}
+
                     <div class="route-box">
                         <div class="route-item">
                             <div class="route-icon pickup-icon">📍</div>
 
                             <div>
-                                <div class="label">Pickup</div>
-                                <div class="value">{{ booking.origin }}</div>
+                                <div class="label">
+                                    {% if booking.service_type == "pasugo" %}
+                                        Errand Pickup
+                                    {% else %}
+                                        Pickup
+                                    {% endif %}
+                                </div>
+
+                                <div class="value">
+                                    {{ booking.origin }}
+                                </div>
                             </div>
                         </div>
 
@@ -529,17 +802,30 @@
                             <div class="route-icon destination-icon">🏁</div>
 
                             <div>
-                                <div class="label">Destination</div>
-                                <div class="value">{{ booking.destination }}</div>
+                                <div class="label">
+                                    {% if booking.service_type == "pasugo" %}
+                                        Delivery Location
+                                    {% else %}
+                                        Destination
+                                    {% endif %}
+                                </div>
+
+                                <div class="value">
+                                    {{ booking.destination }}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {% if booking.driver %}
 
-                        <div class="driver-card">
+                        <div class="driver-card {% if booking.service_type == "pasugo" %}pasugo-driver-card{% else %}ride-driver-card{% endif %}">
                             <div class="driver-card-header">
-                                ✅ Driver Assigned
+                                {% if booking.service_type == "pasugo" %}
+                                    ✅ Pasugo Rider Assigned
+                                {% else %}
+                                    ✅ Ride Driver Assigned
+                                {% endif %}
                             </div>
 
                             <div class="driver-info">
@@ -556,7 +842,11 @@
                                     </h5>
 
                                     <div class="driver-subtitle">
-                                        Your assigned rider is on the way
+                                        {% if booking.service_type == "pasugo" %}
+                                            Your rider is on the way to handle your errand
+                                        {% else %}
+                                            Your assigned driver is on the way
+                                        {% endif %}
                                     </div>
 
  {% if booking.status == "accepted" %}
@@ -598,16 +888,24 @@
                                 ❌ This booking has been cancelled.
                             </div>
                         {% else %}
-                            <div class="notice-box">
+                            <div class="notice-box {% if booking.service_type == "pasugo" %}pasugo-notice{% endif %}">
                                 <div class="notice-icon">⚠️</div>
 
                                 <div>
                                     <div class="notice-title">
-                                        No Driver Has Accepted Your Booking Yet
+                                        {% if booking.service_type == "pasugo" %}
+                                            No Rider Has Accepted Your Pasugo Yet
+                                        {% else %}
+                                            No Driver Has Accepted Your Ride Yet
+                                        {% endif %}
                                     </div>
 
                                     <div class="notice-text">
-                                        Increase your <strong>🎁 Tip</strong> to make your booking more attractive to nearby riders and get accepted faster.
+                                        {% if booking.service_type == "pasugo" %}
+                                            Increase your <strong>🎁 Tip</strong> to encourage nearby riders to accept your errand faster.
+                                        {% else %}
+                                            Increase your <strong>🎁 Tip</strong> to make your ride more attractive to nearby drivers and get accepted faster.
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -615,10 +913,16 @@
 
                     {% endif %}
 
-                    <div class="fare-box">
+                    <div class="fare-box {% if booking.service_type == "pasugo" %}pasugo-fare-box{% endif %}">
                         <div class="row g-2 text-center">
                             <div class="col-4">
-                                <div class="label">💰 Fare</div>
+                                <div class="label">
+                                    {% if booking.service_type == "pasugo" %}
+                                        💰 Service Fee
+                                    {% else %}
+                                        💰 Fare
+                                    {% endif %}
+                                </div>
                                 <div class="fare-value">₱{{ booking.fare }}</div>
                             </div>
 
@@ -660,7 +964,11 @@
                                 </div>
 
                                 <div class="text-muted small mt-2">
-                                    A higher tip may help your booking get accepted faster.
+                                    {% if booking.service_type == "pasugo" %}
+                                        A higher tip may help your Pasugo request get accepted faster.
+                                    {% else %}
+                                        A higher tip may help your ride get accepted faster.
+                                    {% endif %}
                                 </div>
                             </form>
                         </div>
@@ -674,7 +982,11 @@
                             {% csrf_token %}
 
                             <button type="submit" class="btn btn-outline-danger w-100">
-                                ❌ Cancel Booking
+                                {% if booking.service_type == "pasugo" %}
+                                    ❌ Cancel Pasugo
+                                {% else %}
+                                    ❌ Cancel Ride
+                                {% endif %}
                             </button>
                         </form>
 
@@ -682,7 +994,11 @@
 
                         <div class="disabled-note">
                            {% if booking.status == "accepted" %}
-    🚫 Tip editing and cancellation are disabled because a driver has already accepted your booking.
+    {% if booking.service_type == "pasugo" %}
+        🚫 Tip editing and cancellation are disabled because a rider has already accepted your Pasugo request.
+    {% else %}
+        🚫 Tip editing and cancellation are disabled because a driver has already accepted your ride.
+    {% endif %}
 {% elif booking.status == "completed" %}
     ✅ This booking has already been completed.
 {% elif booking.status == "cancelled" %}
@@ -706,12 +1022,18 @@
             <h5 class="fw-bold mb-2">No bookings yet</h5>
 
             <p class="text-muted mb-3">
-                Your ride bookings will appear here after you book a ride.
+                Your Ride and Pasugo bookings will appear here after you create a request.
             </p>
 
-            <a href="{% url 'index' %}" class="btn btn-primary w-100">
-                🚀 Book a Ride
-            </a>
+            <div class="empty-actions">
+                <a href="{% url 'index' %}" class="btn btn-primary">
+                    🛵 Book a Ride
+                </a>
+
+                <a href="{% url 'pasugo_booking' %}" class="btn btn-success">
+                    🏃 Request Pasugo
+                </a>
+            </div>
         </div>
 
     {% endif %}

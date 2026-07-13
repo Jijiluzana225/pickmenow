@@ -45,8 +45,8 @@ urlpatterns = [
     path("customer/location/", views.choose_customer_location, name="choose_customer_location"),
     path("driver/location/", views.choose_driver_location, name="choose_driver_location"),
 
-
-
+    path("pasugo/",views.pasugo_booking,name="pasugo_booking"),
+    path("pasugo/create/",views.create_pasugo_booking,name="create_pasugo_booking"),
 
     
 ]
