@@ -385,7 +385,63 @@ def customer_register(request):
     })
 
 
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+
+from .models import SiteSettings
+
+
 def customer_login(request):
+    """
+    Customer login is allowed only when SiteSettings.site_status is "active".
+    """
+
+    # Get the current site settings.
+    site_settings = SiteSettings.objects.first()
+
+    # Never default to Active when no settings record exists.
+    current_site_status = (
+        site_settings.site_status
+        if site_settings
+        else "under_repair"
+    )
+
+    status_messages = {
+        "no_rider": (
+            "Sorry, there is currently no available rider. "
+            "Please try booking again later."
+        ),
+        "closed": (
+            "The site is closed today and will open again tomorrow."
+        ),
+        "under_repair": (
+            "The site is temporarily unavailable because it is under repair. "
+            "Please try again later."
+        ),
+
+        # These also support models that save the displayed text
+        # instead of short database values.
+        "No Available Rider": (
+            "Sorry, there is currently no available rider. "
+            "Please try booking again later."
+        ),
+        "Site is Closed Today, Opens Tomorrow": (
+            "The site is closed today and will open again tomorrow."
+        ),
+        "Under Repair": (
+            "The site is temporarily unavailable because it is under repair. "
+            "Please try again later."
+        ),
+    }
+
+    # Normalize the status so both "Active" and "active" work.
+    normalized_status = str(current_site_status).strip().lower()
+
+    context = {
+        "site_status": current_site_status,
+    }
+
+    # Existing authenticated-customer handling.
     if request.user.is_authenticated:
         if hasattr(request.user, "customer_profile"):
             if not request.user.customer_profile.location:
@@ -394,8 +450,31 @@ def customer_login(request):
         return redirect("index")
 
     if request.method == "POST":
-        contact_number = request.POST.get("contact_number")
-        password = request.POST.get("password")
+
+        # IMPORTANT:
+        # Block login before authenticate() and login() are called.
+        if normalized_status != "active":
+            context["site_status_message"] = status_messages.get(
+                current_site_status,
+                "Booking is currently unavailable. Please try again later."
+            )
+
+            return render(
+                request,
+                "booking/customer_login.html",
+                context,
+                status=403
+            )
+
+        contact_number = request.POST.get(
+            "contact_number",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
 
         user = authenticate(
             request,
@@ -412,15 +491,35 @@ def customer_login(request):
 
                 return redirect("customer_dashboard")
 
-            return render(request, "booking/customer_login.html", {
-                "error": "This account is not a customer account."
-            })
+            context["error"] = (
+                "This account is not a customer account."
+            )
 
-        return render(request, "booking/customer_login.html", {
-            "error": "Invalid contact number or password."
-        })
+            return render(
+                request,
+                "booking/customer_login.html",
+                context
+            )
 
-    return render(request, "booking/customer_login.html")
+        context["error"] = (
+            "Invalid contact number or password."
+        )
+
+        return render(
+            request,
+            "booking/customer_login.html",
+            context
+        )
+
+    # The site status must also be included during GET requests
+    # so JavaScript can display the correct popup.
+    return render(
+        request,
+        "booking/customer_login.html",
+        context
+    )
+
+
 
 
 def customer_logout(request):

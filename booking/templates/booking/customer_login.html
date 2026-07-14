@@ -93,41 +93,6 @@
             color: #facc15;
         }
 
-        .brand-subtitle {
-            color: #cbd5e1;
-            font-size: 16px;
-            max-width: 420px;
-            margin-bottom: 24px;
-        }
-
-        .feature-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, .10);
-            border: 1px solid rgba(255, 255, 255, .15);
-            color: #e5e7eb;
-            border-radius: 16px;
-            padding: 10px 12px;
-            font-size: 13px;
-            font-weight: 700;
-            margin: 4px;
-        }
-
-        .hero-bike {
-            width: 150px;
-            height: 150px;
-            border-radius: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 74px;
-            background: linear-gradient(135deg, #facc15, #f97316);
-            box-shadow: 0 24px 60px rgba(250, 204, 21, .28);
-            transform: rotate(-6deg);
-            margin-top: 24px;
-        }
-
         .login-card {
             border: none;
             border-radius: 28px;
@@ -213,12 +178,6 @@
             transform: translateY(-1px);
         }
 
-        .btn-login:disabled {
-            opacity: .75;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .btn-download-app {
             background: linear-gradient(135deg, #00e676, #00c853);
             color: #ffffff;
@@ -236,14 +195,9 @@
         }
 
         .btn-download-app:hover {
-            background: linear-gradient(135deg, #16a34a, #15803d);
             color: #ffffff;
             transform: translateY(-3px) scale(1.03);
             box-shadow: 0 0 35px rgba(0, 230, 118, .8);
-        }
-
-        .btn-download-app:active {
-            transform: scale(.98);
         }
 
         .btn-download-app::before {
@@ -306,65 +260,93 @@
             margin-left: 12px;
         }
 
-        .small-link {
-            color: #f97316;
-            font-weight: 900;
-            text-decoration: none;
-        }
-
-        .small-link:hover {
-            text-decoration: underline;
-        }
-
         .status-modal-content {
             border: none;
             border-radius: 26px;
             overflow: hidden;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, .35);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, .4);
         }
 
         .status-modal-header {
-            border: none;
             background: linear-gradient(135deg, #facc15, #f97316);
+            border: none;
             color: #111827;
             padding: 22px;
         }
 
         .status-modal-icon {
-            width: 74px;
-            height: 74px;
-            margin: 0 auto 14px;
+            width: 78px;
+            height: 78px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: #fff7ed;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            background: #fff7ed;
-            font-size: 38px;
+            font-size: 40px;
         }
 
         .status-modal-title {
-            font-weight: 950;
             text-align: center;
-            margin-bottom: 8px;
+            font-weight: 950;
+            margin-bottom: 10px;
         }
 
         .status-modal-message {
-            color: #4b5563;
             text-align: center;
-            font-weight: 600;
+            color: #4b5563;
+            font-weight: 650;
             line-height: 1.6;
             margin-bottom: 0;
         }
 
         .status-modal-button {
             background: linear-gradient(135deg, #f97316, #facc15);
-            border: none;
             color: #111827;
+            border: none;
             font-weight: 900;
         }
 
         .status-modal-button:hover {
             color: #111827;
+        }
+
+        /*
+         * Disabled page styles.
+         */
+        body.site-disabled .login-card {
+            filter: grayscale(.25);
+        }
+
+        body.site-disabled .page-action {
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+            opacity: .45 !important;
+            transform: none !important;
+            animation: none !important;
+            box-shadow: none !important;
+        }
+
+        body.site-disabled input,
+        body.site-disabled select,
+        body.site-disabled textarea {
+            cursor: not-allowed;
+            background-color: #e5e7eb;
+            opacity: .65;
+        }
+
+        body.site-disabled .btn-download-app::before {
+            animation: none;
+            display: none;
+        }
+
+        .disabled-status-notice {
+            border: none;
+            border-radius: 18px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-weight: 800;
+            line-height: 1.5;
         }
 
         @keyframes pulse {
@@ -393,7 +375,6 @@
 
         @media (max-width: 991px) {
             .brand-panel {
-                color: #ffffff;
                 padding: 24px;
                 display: flex;
                 flex-direction: column;
@@ -403,25 +384,6 @@
 
             .brand-title {
                 font-size: 34px;
-            }
-
-            .brand-subtitle {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .hero-bike {
-                width: 150px;
-                height: 150px;
-                border-radius: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 74px;
-                background: linear-gradient(135deg, #facc15, #f97316);
-                box-shadow: 0 24px 60px rgba(250, 204, 21, .28);
-                transform: rotate(-6deg);
-                margin: 30px auto 0;
             }
         }
 
@@ -492,22 +454,24 @@
 
                     <div class="card-body p-4">
 
+                        {% if not site_is_active %}
+                            <div
+                                class="alert disabled-status-notice text-center"
+                                role="alert">
+
+                                ⚠️ {{ site_status_message }}
+
+                            </div>
+                        {% endif %}
+
                         {% if error %}
                             <div
                                 class="alert alert-danger rounded-4"
                                 role="alert">
-                                {{ error }}
-                            </div>
-                        {% endif %}
 
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div
-                                    class="alert alert-{{ message.tags|default:'info' }} rounded-4"
-                                    role="alert">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
+                                {{ error }}
+
+                            </div>
                         {% endif %}
 
                         <form
@@ -521,7 +485,9 @@
                                 <label
                                     for="contactNumber"
                                     class="form-label">
+
                                     Contact Number
+
                                 </label>
 
                                 <div class="input-group">
@@ -549,7 +515,9 @@
                                 <label
                                     for="customerPassword"
                                     class="form-label">
+
                                     Password
+
                                 </label>
 
                                 <div class="input-group">
@@ -573,25 +541,9 @@
 
                             <button
                                 type="submit"
-                                id="loginBookRideButton"
-                                class="btn btn-login w-100">
+                                class="btn btn-login w-100 page-action">
 
-                                <span id="loginButtonText">
-                                    🚀 Login to Book Ride | Pasugo
-                                </span>
-
-                                <span
-                                    id="loginButtonLoading"
-                                    class="d-none">
-
-                                    <span
-                                        class="spinner-border spinner-border-sm me-2"
-                                        aria-hidden="true">
-                                    </span>
-
-                                    Logging in...
-
-                                </span>
+                                🚀 Login to Book Ride | Pasugo
 
                             </button>
 
@@ -607,7 +559,7 @@
 
                                 <a
                                     href="{% url 'customer_register' %}"
-                                    class="btn btn-outline-warning w-100 fw-bold">
+                                    class="btn btn-outline-warning w-100 fw-bold page-action">
 
                                     Create Customer Account
 
@@ -619,7 +571,7 @@
 
                                 <a
                                     href="https://www.pickmenow.online/download-apk/"
-                                    class="btn btn-download-app w-100"
+                                    class="btn btn-download-app w-100 page-action"
                                     target="_blank"
                                     rel="noopener noreferrer">
 
@@ -639,7 +591,7 @@
 
                             <a
                                 href="{% url 'driver_login' %}"
-                                class="btn btn-driver">
+                                class="btn btn-driver page-action">
 
                                 🛵 Login as Driver
 
@@ -647,7 +599,7 @@
 
                             <a
                                 href="{% url 'driver_register' %}"
-                                class="btn btn-rider-apply">
+                                class="btn btn-rider-apply page-action">
 
                                 🪪 Want to Apply as a Rider?
 
@@ -668,13 +620,14 @@
 </div>
 
 
-<!-- SITE STATUS POPUP -->
 <div
     class="modal fade"
     id="siteStatusModal"
     tabindex="-1"
     aria-labelledby="siteStatusModalLabel"
-    aria-hidden="true">
+    aria-hidden="true"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false">
 
     <div class="modal-dialog modal-dialog-centered">
 
@@ -686,16 +639,9 @@
                     class="modal-title fw-bold"
                     id="siteStatusModalLabel">
 
-                    Booking Unavailable
+                    Service Unavailable
 
                 </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close">
-                </button>
 
             </div>
 
@@ -713,7 +659,7 @@
                     class="status-modal-title"
                     id="siteStatusTitle">
 
-                    Booking Unavailable
+                    Service Unavailable
 
                 </h4>
 
@@ -721,7 +667,7 @@
                     class="status-modal-message"
                     id="siteStatusMessage">
 
-                    The booking service is temporarily unavailable.
+                    Booking is currently unavailable.
 
                 </p>
 
@@ -747,21 +693,11 @@
 </div>
 
 
-<!--
-    Django provides the current status here.
-
-    Your view should send a variable named "site_status".
-
-    Supported values:
-
-    Active
-    No Available Rider
-    Site is Closed Today, Opens Tomorrow
-    Under Repair
--->
 <div
     id="siteStatusData"
-    data-site-status="{{ site_status|default:'Active'|escape }}">
+    data-site-status="{{ site_status|default:'under_repair'|escape }}"
+    data-site-active="{{ site_is_active|yesno:'true,false' }}"
+    data-site-message="{{ site_status_message|default:'Booking is currently unavailable.'|escape }}">
 </div>
 
 
@@ -771,155 +707,155 @@
     document.addEventListener("DOMContentLoaded", function () {
         "use strict";
 
-        const loginForm = document.getElementById("customerLoginForm");
-        const loginButton = document.getElementById("loginBookRideButton");
-        const loginButtonText = document.getElementById("loginButtonText");
-        const loginButtonLoading = document.getElementById("loginButtonLoading");
+        const statusData =
+            document.getElementById("siteStatusData");
 
-        const siteStatusData = document.getElementById("siteStatusData");
-        const siteStatusModalElement =
+        const loginForm =
+            document.getElementById("customerLoginForm");
+
+        const modalElement =
             document.getElementById("siteStatusModal");
 
-        const siteStatusTitle =
-            document.getElementById("siteStatusTitle");
-
-        const siteStatusMessage =
-            document.getElementById("siteStatusMessage");
-
-        const siteStatusIcon =
+        const modalIcon =
             document.getElementById("siteStatusIcon");
 
-        const siteStatusModal =
-            new bootstrap.Modal(siteStatusModalElement);
+        const modalTitle =
+            document.getElementById("siteStatusTitle");
 
-        /*
-         * Read the status sent by the Django view.
-         *
-         * This supports either:
-         * 1. The displayed choice value, such as "Active"
-         * 2. The stored database value, such as "active"
-         */
-        const rawSiteStatus =
-            siteStatusData.dataset.siteStatus || "Active";
+        const modalMessage =
+            document.getElementById("siteStatusMessage");
 
-        const normalizedSiteStatus =
-            rawSiteStatus.trim().toLowerCase();
+        const rawStatus =
+            statusData.dataset.siteStatus || "under_repair";
 
-        const activeStatusValues = [
-            "active"
-        ];
+        const currentStatus =
+            rawStatus.trim().toLowerCase();
 
-        const statusMessages = {
-            "no available rider": {
-                icon: "🛵",
-                title: "No Available Rider",
-                message:
-                    "Sorry, there is currently no available rider. " +
-                    "Please try booking again later."
-            },
+        const siteIsActive =
+            statusData.dataset.siteActive === "true";
 
+        const serverMessage =
+            statusData.dataset.siteMessage ||
+            "Booking is currently unavailable.";
+
+        const statusDetails = {
             "no_rider": {
                 icon: "🛵",
-                title: "No Available Rider",
-                message:
-                    "Sorry, there is currently no available rider. " +
-                    "Please try booking again later."
+                title: "No Available Rider"
             },
 
-            "site is closed today, opens tomorrow": {
-                icon: "🌙",
-                title: "Site Is Closed Today",
-                message:
-                    "PickMeNow is closed today. " +
-                    "Our booking service will open again tomorrow."
+            "no available rider": {
+                icon: "🛵",
+                title: "No Available Rider"
             },
 
             "closed": {
                 icon: "🌙",
-                title: "Site Is Closed Today",
-                message:
-                    "PickMeNow is closed today. " +
-                    "Our booking service will open again tomorrow."
+                title: "Site Is Closed Today"
             },
 
-            "under repair": {
-                icon: "🛠️",
-                title: "Site Under Repair",
-                message:
-                    "PickMeNow is temporarily unavailable because the " +
-                    "site is undergoing maintenance. Please try again later."
+            "site is closed today, opens tomorrow": {
+                icon: "🌙",
+                title: "Site Is Closed Today"
             },
 
             "under_repair": {
                 icon: "🛠️",
-                title: "Site Under Repair",
-                message:
-                    "PickMeNow is temporarily unavailable because the " +
-                    "site is undergoing maintenance. Please try again later."
+                title: "Site Under Repair"
+            },
+
+            "under repair": {
+                icon: "🛠️",
+                title: "Site Under Repair"
             }
         };
 
-        function showSiteStatusPopup(status) {
-            const popupDetails =
-                statusMessages[status] || {
+        function disableEntirePage() {
+            document.body.classList.add("site-disabled");
+
+            document
+                .querySelectorAll(
+                    "button, input, select, textarea"
+                )
+                .forEach(function (element) {
+
+                    /*
+                     * Keep the modal close button enabled.
+                     */
+                    if (
+                        element.hasAttribute("data-bs-dismiss")
+                    ) {
+                        return;
+                    }
+
+                    element.disabled = true;
+                    element.setAttribute(
+                        "aria-disabled",
+                        "true"
+                    );
+                });
+
+            document
+                .querySelectorAll("a")
+                .forEach(function (link) {
+                    link.setAttribute(
+                        "aria-disabled",
+                        "true"
+                    );
+
+                    link.setAttribute(
+                        "tabindex",
+                        "-1"
+                    );
+
+                    link.addEventListener(
+                        "click",
+                        function (event) {
+                            event.preventDefault();
+                            event.stopImmediatePropagation();
+                        }
+                    );
+                });
+        }
+
+        function showSiteStatusMessage() {
+            const details =
+                statusDetails[currentStatus] || {
                     icon: "⚠️",
-                    title: "Booking Temporarily Unavailable",
-                    message:
-                        "The booking service is currently unavailable. " +
-                        "Please try again later."
+                    title: "Service Unavailable"
                 };
 
-            siteStatusIcon.textContent = popupDetails.icon;
-            siteStatusTitle.textContent = popupDetails.title;
-            siteStatusMessage.textContent = popupDetails.message;
+            modalIcon.textContent = details.icon;
+            modalTitle.textContent = details.title;
+            modalMessage.textContent = serverMessage;
 
-            siteStatusModal.show();
+            const statusModal =
+                new bootstrap.Modal(modalElement);
+
+            statusModal.show();
         }
 
-        function setLoginButtonLoading(isLoading) {
-            loginButton.disabled = isLoading;
-
-            if (isLoading) {
-                loginButtonText.classList.add("d-none");
-                loginButtonLoading.classList.remove("d-none");
-            } else {
-                loginButtonText.classList.remove("d-none");
-                loginButtonLoading.classList.add("d-none");
-            }
+        if (!siteIsActive) {
+            disableEntirePage();
+            showSiteStatusMessage();
         }
 
-        loginForm.addEventListener("submit", function (event) {
-            const siteIsActive =
-                activeStatusValues.includes(normalizedSiteStatus);
+        loginForm.addEventListener(
+            "submit",
+            function (event) {
 
-            /*
-             * Stop the form when the status is not Active.
-             */
-            if (!siteIsActive) {
-                event.preventDefault();
-                event.stopPropagation();
+                if (!siteIsActive) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
 
-                setLoginButtonLoading(false);
-                showSiteStatusPopup(normalizedSiteStatus);
+                    showSiteStatusMessage();
 
-                return false;
+                    return false;
+                }
+
+                return true;
             }
-
-            /*
-             * When Active, allow the normal Django POST login.
-             */
-            setLoginButtonLoading(true);
-
-            return true;
-        });
-
-        /*
-         * Restore the button when the browser returns to this page
-         * using its back/forward cache.
-         */
-        window.addEventListener("pageshow", function () {
-            setLoginButtonLoading(false);
-        });
+        );
     });
 </script>
 
