@@ -235,3 +235,29 @@ class Booking(models.Model):
             f"{self.customer_name}: "
             f"{self.origin} to {self.destination}"
         )
+    
+
+
+    # models.py
+from django.db import models
+
+
+class SiteSettings(models.Model):
+    class SiteStatus(models.TextChoices):
+        ACTIVE = "active", "Active"
+        NO_RIDER = "no_rider", "No Available Rider"
+        CLOSED = "closed", "Site is Closed Today, Opens Tomorrow"
+        UNDER_REPAIR = "under_repair", "Under Repair"
+
+    site_status = models.CharField(
+        max_length=30,
+        choices=SiteStatus.choices,
+        default=SiteStatus.ACTIVE,
+    )
+
+    def __str__(self):
+        return self.get_site_status_display()
+
+    class Meta:
+        verbose_name = "Site Setting"
+        verbose_name_plural = "Site Settings"
