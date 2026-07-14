@@ -385,6 +385,7 @@ def customer_register(request):
     })
 
 
+
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 
@@ -393,55 +394,63 @@ from .models import SiteSettings
 
 def customer_login(request):
     """
-    Customer login is allowed only when SiteSettings.site_status is "active".
+    Allow normal customer login only when the site status is active.
     """
 
-    # Get the current site settings.
     site_settings = SiteSettings.objects.first()
 
-    # Never default to Active when no settings record exists.
+    # Treat a missing settings record as unavailable.
     current_site_status = (
         site_settings.site_status
         if site_settings
         else "under_repair"
     )
 
+    # This supports values such as:
+    # "active", "Active", " ACTIVE "
+    normalized_status = str(current_site_status).strip().lower()
+
+    site_is_active = normalized_status == "active"
+
     status_messages = {
         "no_rider": (
+            "Sorry, there is currently no available rider. "
+            "Please try booking again later."
+        ),
+        "no available rider": (
             "Sorry, there is currently no available rider. "
             "Please try booking again later."
         ),
         "closed": (
             "The site is closed today and will open again tomorrow."
         ),
+        "site is closed today, opens tomorrow": (
+            "The site is closed today and will open again tomorrow."
+        ),
         "under_repair": (
             "The site is temporarily unavailable because it is under repair. "
             "Please try again later."
         ),
-
-        # These also support models that save the displayed text
-        # instead of short database values.
-        "No Available Rider": (
-            "Sorry, there is currently no available rider. "
-            "Please try booking again later."
-        ),
-        "Site is Closed Today, Opens Tomorrow": (
-            "The site is closed today and will open again tomorrow."
-        ),
-        "Under Repair": (
+        "under repair": (
             "The site is temporarily unavailable because it is under repair. "
             "Please try again later."
         ),
     }
 
-    # Normalize the status so both "Active" and "active" work.
-    normalized_status = str(current_site_status).strip().lower()
-
+    # These values must always be passed to the HTML.
     context = {
-        "site_status": current_site_status,
+        "site_status": normalized_status,
+        "site_is_active": site_is_active,
+        "site_status_message": (
+            ""
+            if site_is_active
+            else status_messages.get(
+                normalized_status,
+                "Booking is currently unavailable. Please try again later."
+            )
+        ),
     }
 
-    # Existing authenticated-customer handling.
     if request.user.is_authenticated:
         if hasattr(request.user, "customer_profile"):
             if not request.user.customer_profile.location:
@@ -451,14 +460,8 @@ def customer_login(request):
 
     if request.method == "POST":
 
-        # IMPORTANT:
-        # Block login before authenticate() and login() are called.
-        if normalized_status != "active":
-            context["site_status_message"] = status_messages.get(
-                current_site_status,
-                "Booking is currently unavailable. Please try again later."
-            )
-
+        # Block the POST request only when the site is not active.
+        if not site_is_active:
             return render(
                 request,
                 "booking/customer_login.html",
@@ -511,13 +514,12 @@ def customer_login(request):
             context
         )
 
-    # The site status must also be included during GET requests
-    # so JavaScript can display the correct popup.
     return render(
         request,
         "booking/customer_login.html",
         context
     )
+
 
 
 
