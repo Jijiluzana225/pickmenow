@@ -723,7 +723,22 @@ function calculateRoute() {
 
             const leg = response.routes[0].legs[0];
             const kilometers = leg.distance.value / 1000;
-            const estimatedFee = Math.ceil(35 + (kilometers * 10));
+
+            // Pasugo fare:
+            // ₱25 covers the first 3 KM.
+            // Add ₱8 per KM only for the distance beyond 3 KM.
+            const baseFare = 25;
+            const includedDistanceKm = 3;
+            const perKmAfterIncludedDistance = 8;
+            const extraDistanceKm = Math.max(
+                kilometers - includedDistanceKm,
+                0
+            );
+
+            const estimatedFee = Math.ceil(
+                baseFare
+                + (extraDistanceKm * perKmAfterIncludedDistance)
+            );
 
             document.getElementById("distance_km").value = kilometers.toFixed(3);
             document.getElementById("distance_text").textContent = leg.distance.text;
