@@ -1,3 +1,5 @@
+from turtle import distance
+
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.conf import settings
@@ -1524,21 +1526,29 @@ def create_pasugo_booking(request):
 
     # Example Pasugo pricing
     base_fare = Decimal("25.00")
+    included_distance = Decimal("3.00")
     per_km = Decimal("8.00")
 
     distance = Decimal(str(distance_km))
 
-    if distance <= Decimal("3.00"):
-        calculated_fare = base_fare
-    else:
-        calculated_fare = (
-        base_fare
-        + (distance - Decimal("3.00")) * per_km
+    extra_distance = max(
+        distance - included_distance,
+        Decimal("0.00"),
     )
+
+    calculated_fare = (
+        base_fare
+        + extra_distance * per_km
+)
 
     fare = Decimal(
         math.ceil(calculated_fare)
     ).quantize(Decimal("0.01"))
+
+    print("PASUGO DISTANCE:", distance)
+    print("PASUGO EXTRA DISTANCE:", extra_distance)
+    print("PASUGO RAW FARE:", calculated_fare)
+    print("PASUGO FINAL FARE:", fare)
 
     nearest_driver, nearest_distance = get_nearest_driver(
         service_location=customer.location,
