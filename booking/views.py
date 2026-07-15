@@ -1523,19 +1523,22 @@ def create_pasugo_booking(request):
         purchase_budget = None
 
     # Example Pasugo pricing
-    base_fare = Decimal("35.00")
-    per_km = Decimal("10.00")
+    base_fare = Decimal("25.00")
+    per_km = Decimal("8.00")
 
-    calculated_fare = (
+    distance = Decimal(str(distance_km))
+
+    if distance <= Decimal("3.00"):
+        calculated_fare = base_fare
+    else:
+        calculated_fare = (
         base_fare
-        + Decimal(str(distance_km)) * per_km
+        + (distance - Decimal("3.00")) * per_km
     )
 
     fare = Decimal(
         math.ceil(calculated_fare)
-    ).quantize(
-        Decimal("0.01")
-    )
+    ).quantize(Decimal("0.01"))
 
     nearest_driver, nearest_distance = get_nearest_driver(
         service_location=customer.location,
