@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <title>
+        Active Drivers by Location | PickMeNow Admin
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --dark-one: #07111f;
+            --dark-two: #0f172a;
+            --dark-three: #111827;
+            --yellow: #facc15;
+            --orange: #f97316;
+            --green: #16a34a;
+            --light-green: #dcfce7;
+            --white: #ffffff;
+            --gray: #6b7280;
+            --light-gray: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(250, 204, 21, .24),
+                    transparent 32%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(13, 110, 253, .20),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--dark-one) 0%,
+                    var(--dark-two) 48%,
+                    var(--dark-three) 100%
+                );
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            color: #111827;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            padding: 30px 15px 55px;
+        }
+
+        .page-header {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+            border-radius: 26px;
+            padding: 26px;
+            box-shadow:
+                0 22px 55px rgba(0, 0, 0, .27);
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: clamp(1.7rem, 4vw, 2.7rem);
+            font-weight: 950;
+            color: #111827;
+        }
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #374151;
+            font-weight: 700;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(17, 24, 39, .12);
+            border: 1px solid rgba(17, 24, 39, .18);
+            border-radius: 999px;
+            padding: 8px 13px;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background: #111827;
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 11px 17px;
+            text-decoration: none;
+            font-weight: 900;
+            transition: .2s ease;
+        }
+
+        .back-button:hover {
+            background: #020617;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .summary-card {
+            height: 100%;
+            border: none;
+            border-radius: 22px;
+            padding: 21px;
+            background: rgba(255, 255, 255, .97);
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, .20);
+        }
+
+        .summary-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 28px;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+        }
+
+        .summary-label {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .summary-value {
+            color: #111827;
+            font-size: 28px;
+            line-height: 1.1;
+            font-weight: 950;
+        }
+
+        .filter-card {
+            background: rgba(255, 255, 255, .97);
+            border-radius: 22px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, .20);
+        }
+
+        .filter-label {
+            color: #374151;
+            font-weight: 850;
+            margin-bottom: 7px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 14px;
+            border: 1px solid #d1d5db;
+            padding: 12px 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--orange);
+            box-shadow:
+                0 0 0 .2rem rgba(249, 115, 22, .16);
+        }
+
+        .location-section {
+            background: rgba(255, 255, 255, .98);
+            border-radius: 25px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, .23);
+        }
+
+        .location-header {
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #1f2937
+                );
+            color: #ffffff;
+            padding: 19px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .location-title {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 950;
+        }
+
+        .driver-count {
+            background: var(--yellow);
+            color: #111827;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .driver-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .driver-table {
+            margin: 0;
+            min-width: 1000px;
+        }
+
+        .driver-table thead th {
+            background: #f8fafc;
+            color: #4b5563;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 14px 16px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .driver-table tbody td {
+            border-color: var(--light-gray);
+            padding: 15px 16px;
+            vertical-align: middle;
+        }
+
+        .driver-table tbody tr:hover {
+            background: #fff7ed;
+        }
+
+        .driver-profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 2px solid var(--yellow);
+            box-shadow:
+                0 5px 14px rgba(0, 0, 0, .14);
+            flex-shrink: 0;
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #111827;
+            font-size: 20px;
+            font-weight: 950;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+        }
+
+        .driver-name {
+            color: #111827;
+            font-weight: 900;
+        }
+
+        .driver-username {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .contact-value {
+            color: #374151;
+            font-weight: 750;
+        }
+
+        .plate-value {
+            display: inline-block;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            padding: 5px 9px;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .04em;
+        }
+
+        .active-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--light-green);
+            color: #166534;
+            border: 1px solid #86efac;
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .active-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow:
+                0 0 0 4px rgba(22, 163, 74, .13);
+        }
+
+        .date-value {
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            background: rgba(255, 255, 255, .98);
+            border-radius: 25px;
+            padding: 50px 24px;
+            text-align: center;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, .23);
+        }
+
+        .empty-icon {
+            font-size: 65px;
+            margin-bottom: 14px;
+        }
+
+        .empty-title {
+            color: #111827;
+            font-weight: 950;
+        }
+
+        .empty-text {
+            margin: 0;
+            color: var(--gray);
+            font-weight: 650;
+        }
+
+        .no-search-result {
+            display: none;
+            background: rgba(255, 255, 255, .98);
+            border-radius: 22px;
+            padding: 32px;
+            text-align: center;
+            color: var(--gray);
+            font-weight: 850;
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, .20);
+        }
+
+        @media (max-width: 767px) {
+            .page-wrapper {
+                padding-top: 15px;
+            }
+
+            .page-header {
+                padding: 20px;
+                border-radius: 21px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .back-button {
+                width: 100%;
+            }
+
+            .location-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    <div class="container">
+
+        <header class="page-header">
+
+            <div
+                class="d-flex flex-column flex-md-row
+                align-items-md-center justify-content-between gap-3">
+
+                <div>
+
+                    <div class="admin-badge">
+                        🔐 Admin Access Only
+                    </div>
+
+                    <h1 class="page-title">
+                        🛵 Active Drivers
+                    </h1>
+
+                    <p class="page-subtitle">
+                        Approved and available drivers grouped by service location
+                    </p>
+
+                </div>
+
+                <div class="header-actions">
+
+                    <a
+                        href="{% url 'index' %}"
+                        class="back-button">
+
+                        ← Back to Dashboard
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="row g-3">
+
+            <div class="col-md-6">
+
+                <div class="summary-card">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="summary-icon">
+                            🛵
+                        </div>
+
+                        <div>
+
+                            <div class="summary-label">
+                                Total Active Drivers
+                            </div>
+
+                            <div class="summary-value">
+                                {{ total_active_drivers }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="summary-card">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="summary-icon">
+                            📍
+                        </div>
+
+                        <div>
+
+                            <div class="summary-label">
+                                Active Service Locations
+                            </div>
+
+                            <div class="summary-value">
+                                {{ total_locations }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        {% if drivers_by_location %}
+
+            <section class="filter-card">
+
+                <div class="row g-3">
+
+                    <div class="col-md-7">
+
+                        <label
+                            for="driverSearch"
+                            class="filter-label">
+
+                            Search Driver
+
+                        </label>
+
+                        <input
+                            type="search"
+                            id="driverSearch"
+                            class="form-control"
+                            placeholder="Search name, contact number, motorcycle or plate">
+
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <label
+                            for="locationFilter"
+                            class="filter-label">
+
+                            Filter Service Location
+
+                        </label>
+
+                        <select
+                            id="locationFilter"
+                            class="form-select">
+
+                            <option value="">
+                                All Service Locations
+                            </option>
+
+                            {% for location_name, drivers in drivers_by_location.items %}
+
+                                <option value="{{ location_name|lower }}">
+                                    {{ location_name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <main id="driverLocationContainer">
+
+                {% for location_name, drivers in drivers_by_location.items %}
+
+                    <section
+                        class="location-section"
+                        data-location="{{ location_name|lower }}">
+
+                        <div class="location-header">
+
+                            <h2 class="location-title">
+                                📍 {{ location_name }}
+                            </h2>
+
+                            <span class="driver-count">
+
+                                {{ drivers|length }}
+
+                                Active Driver{{ drivers|length|pluralize }}
+
+                            </span>
+
+                        </div>
+
+                        <div class="driver-table-wrapper">
+
+                            <table class="table driver-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Driver</th>
+                                        <th>Contact Number</th>
+                                        <th>Motorcycle</th>
+                                        <th>Plate Number</th>
+                                        <th>Date Registered</th>
+                                        <th>Status</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for driver in drivers %}
+
+                                        <tr
+                                            class="driver-row"
+                                            data-search="
+                                                {{ driver.full_name|lower }}
+                                                {{ driver.user.username|lower }}
+                                                {{ driver.contact_number|lower }}
+                                                {{ driver.motorcycle_model|lower }}
+                                                {{ driver.plate_number|lower }}
+                                                {{ driver.location.name|lower }}
+                                            ">
+
+                                            <td>
+
+                                                <div
+                                                    class="d-flex
+                                                    align-items-center gap-3">
+
+                                                    {% if driver.profile_picture %}
+
+                                                        <img
+                                                            src="{{ driver.profile_picture.url }}"
+                                                            alt="{{ driver.full_name }}"
+                                                            class="driver-profile-picture">
+
+                                                    {% else %}
+
+                                                        <div class="driver-avatar">
+                                                            {{ driver.full_name|first|upper }}
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                    <div>
+
+                                                        <div class="driver-name">
+                                                            {{ driver.full_name }}
+                                                        </div>
+
+                                                        <div class="driver-username">
+                                                            @{{ driver.user.username }}
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="contact-value">
+                                                    {{ driver.contact_number }}
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                {{ driver.motorcycle_model }}
+                                            </td>
+
+                                            <td>
+
+                                                <span class="plate-value">
+                                                    {{ driver.plate_number }}
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="date-value">
+
+                                                    {{ driver.created_at|date:"M d, Y" }}
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="active-badge">
+
+                                                    <span class="active-dot"></span>
+
+                                                    Active
+
+                                                </span>
+
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                {% endfor %}
+
+            </main>
+
+
+            <div
+                id="noSearchResult"
+                class="no-search-result">
+
+                🔎 No active drivers match your search.
+
+            </div>
+
+        {% else %}
+
+            <section class="empty-state">
+
+                <div class="empty-icon">
+                    🛵
+                </div>
+
+                <h2 class="empty-title">
+                    No Active Drivers
+                </h2>
+
+                <p class="empty-text">
+                    There are currently no approved and available drivers
+                    in any active service location.
+                </p>
+
+            </section>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        "use strict";
+
+        const searchInput =
+            document.getElementById("driverSearch");
+
+        const locationFilter =
+            document.getElementById("locationFilter");
+
+        const locationSections =
+            document.querySelectorAll(".location-section");
+
+        const noSearchResult =
+            document.getElementById("noSearchResult");
+
+        function filterDrivers() {
+            const searchValue =
+                searchInput.value.trim().toLowerCase();
+
+            const selectedLocation =
+                locationFilter.value.trim().toLowerCase();
+
+            let totalVisibleDrivers = 0;
+
+            locationSections.forEach(function (section) {
+                const sectionLocation =
+                    section.dataset.location || "";
+
+                const locationMatches =
+                    selectedLocation === "" ||
+                    sectionLocation === selectedLocation;
+
+                const driverRows =
+                    section.querySelectorAll(".driver-row");
+
+                let visibleDriversInLocation = 0;
+
+                driverRows.forEach(function (row) {
+                    const searchableText =
+                        row.dataset.search || "";
+
+                    const searchMatches =
+                        searchValue === "" ||
+                        searchableText.includes(searchValue);
+
+                    const shouldDisplay =
+                        locationMatches && searchMatches;
+
+                    row.style.display =
+                        shouldDisplay ? "" : "none";
+
+                    if (shouldDisplay) {
+                        visibleDriversInLocation += 1;
+                        totalVisibleDrivers += 1;
+                    }
+                });
+
+                section.style.display =
+                    visibleDriversInLocation > 0
+                        ? ""
+                        : "none";
+            });
+
+            if (noSearchResult) {
+                noSearchResult.style.display =
+                    totalVisibleDrivers === 0
+                        ? "block"
+                        : "none";
+            }
+        }
+
+        if (searchInput && locationFilter) {
+            searchInput.addEventListener(
+                "input",
+                filterDrivers
+            );
+
+            locationFilter.addEventListener(
+                "change",
+                filterDrivers
+            );
+        }
+    });
+</script>
+
+</body>
+</html>

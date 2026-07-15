@@ -1640,3 +1640,63 @@ https://www.pickmenow.online/dashboard/
         )
 
     return redirect("customer_dashboard")
+
+
+
+from collections import OrderedDict
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+
+from .models import DriverProfile
+
+
+@staff_member_required(
+    login_url="/admin/login/"
+)
+def active_drivers_by_location(request):
+    """
+    Admin-only page that displays active drivers grouped
+    by their service location.
+    """
+
+    active_drivers = (
+        DriverProfile.objects
+        .filter(
+            is_available=True,
+            is_approved=True,
+            user__is_active=True,
+            location__is_active=True,
+        )
+        .exclude(location__isnull=True)
+        .select_related(
+            "user",
+            "location",
+        )
+        .order_by(
+            "location__name",
+            "full_name",
+        )
+    )
+
+    drivers_by_location = OrderedDict()
+
+    for driver in active_drivers:
+        location_name = driver.location.name
+
+        if location_name not in drivers_by_location:
+            drivers_by_location[location_name] = []
+
+        drivers_by_location[location_name].append(driver)
+
+    context = {
+        "drivers_by_location": drivers_by_location,
+        "total_active_drivers": active_drivers.count(),
+        "total_locations": len(drivers_by_location),
+    }
+
+    return render(
+        request,
+        "booking/active_drivers_by_location.html",
+        context,
+    )

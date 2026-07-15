@@ -1,8 +1,9 @@
+
 <style>
     .pickme-navbar {
         background: linear-gradient(135deg, #111827, #1e293b);
         box-shadow: 0 10px 24px rgba(15, 23, 42, .18);
-        border-bottom: 1px solid rgba(255,255,255,.08);
+        border-bottom: 1px solid rgba(255, 255, 255, .08);
     }
 
     .pickme-navbar .navbar-brand {
@@ -26,12 +27,12 @@
         justify-content: center;
         color: #111827;
         font-size: 17px;
-        box-shadow: 0 8px 18px rgba(249,115,22,.22);
+        box-shadow: 0 8px 18px rgba(249, 115, 22, .22);
         flex: 0 0 auto;
     }
 
     .pickme-navbar .nav-link {
-        color: rgba(255,255,255,.85) !important;
+        color: rgba(255, 255, 255, .85) !important;
         font-weight: 400;
         font-size: .95rem;
         border-radius: 12px;
@@ -42,7 +43,7 @@
     .pickme-navbar .nav-link:hover,
     .pickme-navbar .nav-link:focus {
         color: #ffffff !important;
-        background: rgba(255,255,255,.10);
+        background: rgba(255, 255, 255, .10);
     }
 
     .nav-pill-link {
@@ -51,9 +52,23 @@
         gap: 7px;
     }
 
+    .staff-drivers-link {
+        background: linear-gradient(135deg, #facc15, #f97316);
+        color: #111827 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 7px 18px rgba(249, 115, 22, .20);
+    }
+
+    .staff-drivers-link:hover,
+    .staff-drivers-link:focus {
+        background: linear-gradient(135deg, #fde047, #fb923c) !important;
+        color: #111827 !important;
+        transform: translateY(-1px);
+    }
+
     .availability-card {
-        background: rgba(255,255,255,.10);
-        border: 1px solid rgba(255,255,255,.14);
+        background: rgba(255, 255, 255, .10);
+        border: 1px solid rgba(255, 255, 255, .14);
         border-radius: 14px;
         padding: 7px 11px;
         color: #ffffff;
@@ -83,8 +98,23 @@
         height: 36px;
         object-fit: cover;
         border-radius: 50%;
-        border: 2px solid rgba(250,204,21,.75);
-        box-shadow: 0 6px 14px rgba(0,0,0,.20);
+        border: 2px solid rgba(250, 204, 21, .75);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, .20);
+    }
+
+    .staff-avatar {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #facc15, #f97316);
+        color: #111827;
+        border: 2px solid rgba(250, 204, 21, .75);
+        font-size: 17px;
+        font-weight: 800;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, .20);
     }
 
     .profile-name {
@@ -100,7 +130,7 @@
         border: none;
         border-radius: 16px;
         padding: 8px;
-        box-shadow: 0 18px 40px rgba(15,23,42,.16);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, .16);
     }
 
     .pickme-navbar .dropdown-item {
@@ -136,8 +166,8 @@
         font-weight: 500;
         font-size: .9rem;
         padding: 9px 14px !important;
-        background: rgba(255,255,255,.10);
-        border: 1px solid rgba(255,255,255,.18);
+        background: rgba(255, 255, 255, .10);
+        border: 1px solid rgba(255, 255, 255, .18);
         margin-top: 4px;
     }
 
@@ -170,12 +200,18 @@
             width: 100%;
             margin-top: 8px;
         }
+
+        .staff-drivers-link {
+            margin-top: 4px;
+        }
     }
 </style>
 
 
 <link rel="manifest" href="/static/manifest.json">
+
 <meta name="theme-color" content="#000000">
+
 
 <nav class="navbar navbar-expand-lg navbar-dark pickme-navbar">
 
@@ -183,27 +219,90 @@
 
         {% if user.is_authenticated %}
 
-            {% if user.driver_profile %}
-                <a class="navbar-brand" href="{% url 'dashboard' %}">
-                    <span class="brand-icon">🛵</span>
-                    <span>www.PickMeNow.Online</span>
+            {% if user.is_staff %}
+
+                <a
+                    class="navbar-brand"
+                    href="{% url 'active_drivers_by_location' %}">
+
+                    <span class="brand-icon">
+                        🛵
+                    </span>
+
+                    <span>
+                        www.PickMeNow.Online
+                    </span>
+
+                </a>
+
+            {% elif user.driver_profile %}
+
+                <a
+                    class="navbar-brand"
+                    href="{% url 'dashboard' %}">
+
+                    <span class="brand-icon">
+                        🛵
+                    </span>
+
+                    <span>
+                        www.PickMeNow.Online
+                    </span>
+
                 </a>
 
             {% elif user.customer_profile %}
-                <a class="navbar-brand" href="{% url 'index' %}">
-                    <span class="brand-icon">🛵</span>
-                    <span>www.PickMeNow.Online</span>
+
+                <a
+                    class="navbar-brand"
+                    href="{% url 'index' %}">
+
+                    <span class="brand-icon">
+                        🛵
+                    </span>
+
+                    <span>
+                        www.PickMeNow.Online
+                    </span>
+
                 </a>
+
+            {% else %}
+
+                <a
+                    class="navbar-brand"
+                    href="{% url 'index' %}">
+
+                    <span class="brand-icon">
+                        🛵
+                    </span>
+
+                    <span>
+                        www.PickMeNow.Online
+                    </span>
+
+                </a>
+
             {% endif %}
 
         {% else %}
 
-            <a class="navbar-brand" href="{% url 'index' %}">
-                <span class="brand-icon">🛵</span>
-                <span>www.PickMeNow.Online</span>
+            <a
+                class="navbar-brand"
+                href="{% url 'index' %}">
+
+                <span class="brand-icon">
+                    🛵
+                </span>
+
+                <span>
+                    www.PickMeNow.Online
+                </span>
+
             </a>
 
         {% endif %}
+
 
         <button
             class="navbar-toggler border-0 shadow-none"
@@ -218,52 +317,110 @@
 
         </button>
 
-        <div class="collapse navbar-collapse" id="navbar">
+
+        <div
+            class="collapse navbar-collapse"
+            id="navbar">
 
             <ul class="navbar-nav me-auto">
 
                 {% if user.is_authenticated %}
 
-                    {% if user.customer_profile %}
+                    <!-- STAFF-ONLY AVAILABLE DRIVERS BUTTON -->
+                    {% if user.is_staff %}
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'index' %}">
-                                🛵 Book Ride
-                            </a>
-                        </li>
+                        <li class="nav-item me-lg-2">
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'create_pasugo_booking' %}">
-                                🏃 Pasugo
-                            </a>
-                        </li>
+                            <a
+                                class="nav-link nav-pill-link staff-drivers-link"
+                                href="{% url 'active_drivers_by_location' %}">
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'customer_dashboard' %}">
-                                📋 My Bookings
+                                🟢 Available Drivers
+
                             </a>
+
                         </li>
 
                     {% endif %}
 
+
+                    {% if user.customer_profile %}
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'index' %}">
+
+                                🛵 Book Ride
+
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'create_pasugo_booking' %}">
+
+                                🏃 Pasugo
+
+                            </a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'customer_dashboard' %}">
+
+                                📋 My Bookings
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+
                     {% if user.driver_profile %}
 
                         <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'dashboard' %}">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'dashboard' %}">
+
                                 🛵 Available Bookings
+
                             </a>
+
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'driver_accepted_bookings' %}">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'driver_accepted_bookings' %}">
+
                                 📋 Accepted
+
                             </a>
+
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link nav-pill-link" href="{% url 'driver_completed_bookings' %}">
+
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'driver_completed_bookings' %}">
+
                                 💰 Completed
+
                             </a>
+
                         </li>
 
                     {% endif %}
@@ -272,6 +429,7 @@
 
             </ul>
 
+
             <ul class="navbar-nav ms-auto align-items-lg-center">
 
                 {% if user.is_authenticated %}
@@ -279,6 +437,7 @@
                     {% if user.driver_profile %}
 
                         <li class="nav-item me-lg-3 mt-2 mt-lg-0">
+
                             <form
                                 method="POST"
                                 action="{% url 'toggle_driver_availability' %}"
@@ -292,6 +451,7 @@
                                 </span>
 
                                 <div class="form-check form-switch m-0">
+
                                     <input
                                         class="form-check-input"
                                         type="checkbox"
@@ -299,12 +459,15 @@
                                         id="driverAvailabilityToggle"
                                         {% if user.driver_profile.is_available %}checked{% endif %}
                                         onchange="document.getElementById('availabilityForm').submit();">
+
                                 </div>
 
                             </form>
+
                         </li>
 
                     {% endif %}
+
 
                     <li class="nav-item dropdown">
 
@@ -315,68 +478,139 @@
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
 
-                            {% if user.customer_profile %}
+                            {% if user.is_staff %}
+
+                                <span class="staff-avatar">
+                                    🔐
+                                </span>
+
+                                <span class="profile-name">
+                                    {{ user.get_full_name|default:user.username }}
+                                </span>
+
+                            {% elif user.customer_profile %}
 
                                 {% if user.customer_profile.profile_picture %}
+
                                     <img
                                         src="{{ user.customer_profile.profile_picture.url }}"
-                                        class="profile-avatar">
+                                        class="profile-avatar"
+                                        alt="{{ user.customer_profile.full_name }}">
+
                                 {% else %}
+
                                     <img
                                         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="profile-avatar">
+                                        class="profile-avatar"
+                                        alt="Customer profile">
+
                                 {% endif %}
 
                                 <span class="profile-name">
                                     {{ user.customer_profile.full_name }}
                                 </span>
 
-                            {% endif %}
-
-                            {% if user.driver_profile %}
+                            {% elif user.driver_profile %}
 
                                 {% if user.driver_profile.profile_picture %}
+
                                     <img
                                         src="{{ user.driver_profile.profile_picture.url }}"
-                                        class="profile-avatar">
+                                        class="profile-avatar"
+                                        alt="{{ user.driver_profile.full_name }}">
+
                                 {% else %}
+
                                     <img
                                         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="profile-avatar">
+                                        class="profile-avatar"
+                                        alt="Driver profile">
+
                                 {% endif %}
 
                                 <span class="profile-name">
                                     {{ user.driver_profile.full_name }}
                                 </span>
 
+                            {% else %}
+
+                                <span class="staff-avatar">
+                                    👤
+                                </span>
+
+                                <span class="profile-name">
+                                    {{ user.username }}
+                                </span>
+
                             {% endif %}
 
                         </a>
 
+
                         <ul class="dropdown-menu dropdown-menu-end">
 
-                            {% if user.customer_profile %}
+                            {% if user.is_staff %}
 
                                 <li>
+
                                     <a
                                         class="dropdown-item"
-                                        href="{% url 'customer_profile_update' %}">
-                                        👤 Update Profile
+                                        href="{% url 'active_drivers_by_location' %}">
+
+                                        🟢 Available Drivers
+
                                     </a>
+
+                                </li>
+
+                                <li>
+
+                                    <a
+                                        class="dropdown-item"
+                                        href="/admin/">
+
+                                        ⚙️ Django Admin
+
+                                    </a>
+
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
                                 </li>
 
                             {% endif %}
 
-                            {% if user.driver_profile %}
 
-                               
+                            {% if user.customer_profile %}
 
                                 <li>
+
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'customer_profile_update' %}">
+
+                                        👤 Update Profile
+
+                                    </a>
+
+                                </li>
+
+                            {% endif %}
+
+
+                            {% if user.driver_profile %}
+
+                                <li>
+
                                     <a
                                         class="dropdown-item"
                                         href="{% url 'driver_profile_update' %}">
+
                                         👤 Update Driver Profile
+
                                     </a>
+
                                 </li>
 
                             {% endif %}
@@ -385,26 +619,47 @@
 
                     </li>
 
+
                     {% if user.customer_profile %}
 
                         <li class="nav-item ms-lg-2">
+
                             <a
                                 class="btn logout-btn"
                                 href="{% url 'customer_logout' %}">
+
                                 🚪 Logout
+
                             </a>
+
                         </li>
 
-                    {% endif %}
-
-                    {% if user.driver_profile %}
+                    {% elif user.driver_profile %}
 
                         <li class="nav-item ms-lg-2">
+
                             <a
                                 class="btn logout-btn"
                                 href="{% url 'driver_logout' %}">
+
                                 🚪 Logout
+
                             </a>
+
+                        </li>
+
+                    {% elif user.is_staff %}
+
+                        <li class="nav-item ms-lg-2">
+
+                            <a
+                                class="btn logout-btn"
+                                href="/admin/logout/">
+
+                                🚪 Logout
+
+                            </a>
+
                         </li>
 
                     {% endif %}
@@ -412,19 +667,27 @@
                 {% else %}
 
                     <li class="nav-item">
+
                         <a
                             class="nav-link login-btn"
                             href="{% url 'customer_login' %}">
+
                             👤 Customer Login
+
                         </a>
+
                     </li>
 
                     <li class="nav-item ms-lg-2">
+
                         <a
                             class="nav-link login-btn driver-login-btn"
                             href="{% url 'driver_login' %}">
+
                             🛵 Driver Login
+
                         </a>
+
                     </li>
 
                 {% endif %}
@@ -436,3 +699,4 @@
     </div>
 
 </nav>
+
