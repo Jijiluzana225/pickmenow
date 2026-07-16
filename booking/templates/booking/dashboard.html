@@ -514,6 +514,8 @@
 
 {% include "includes/navbar.html" %}
 
+<audio id="bookingAcceptedSound" preload="auto" src="{% static 'sounds/booking.mp3' %}"></audio>
+
 <div class="dashboard-wrapper">
 
     <div class="page-header">
@@ -1432,7 +1434,7 @@
             }, delay);
         }
 
-        function refreshDashboard() {
+        function refreshDashboard(playSound = false) {
             if (dashboardReloadStarted) {
                 return;
             }
@@ -1441,8 +1443,22 @@
 
             updateSocketStatus(
                 "connected",
-                "Booking updated. Refreshing..."
+                playSound ? "New booking received..." : "Booking updated. Refreshing..."
             );
+
+            if (playSound) {
+                const audio = document.getElementById("bookingAcceptedSound");
+
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {});
+                }
+
+                window.setTimeout(function () {
+                    window.location.reload();
+                }, 1200);
+                return;
+            }
 
             window.setTimeout(function () {
                 window.location.reload();
@@ -1490,7 +1506,11 @@
                 }
 
                 if (data.type === "dashboard_refresh") {
-                    refreshDashboard();
+                    const isNewBooking =
+                        data.reason === "new_booking" ||
+                        data.reason === "new_pasugo_booking";
+
+                    refreshDashboard(isNewBooking);
                 }
             };
 
