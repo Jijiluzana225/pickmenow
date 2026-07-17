@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1447,23 +1448,36 @@
                 playSound ? "New booking received..." : "Booking updated. Refreshing..."
             );
 
-            if (playSound) {
-                const audio = document.getElementById("bookingAcceptedSound");
+            if (!playSound) {
+                window.setTimeout(function () {
+                    window.location.reload();
+                }, 250);
+                return;
+            }
 
-                if (audio) {
-                    audio.currentTime = 0;
-                    audio.play().catch(() => {});
+            const audio = document.getElementById("bookingAcceptedSound");
+
+            const finishNotification = function () {
+                if (typeof showTelegramNotification === "function") {
+                    showTelegramNotification();
                 }
 
                 window.setTimeout(function () {
                     window.location.reload();
-                }, 1200);
+                }, 500);
+            };
+
+            if (!audio) {
+                finishNotification();
                 return;
             }
 
-            window.setTimeout(function () {
-                window.location.reload();
-            }, 250);
+            audio.currentTime = 0;
+            audio.onended = finishNotification;
+
+            audio.play().catch(function () {
+                finishNotification();
+            });
         }
 
         function connectDashboardSocket() {
