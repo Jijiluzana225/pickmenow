@@ -48,6 +48,6 @@ urlpatterns = [
     path("pasugo/",views.pasugo_booking,name="pasugo_booking"),
     path("pasugo/create/",views.create_pasugo_booking,name="create_pasugo_booking"),
     path("active-drivers/", views.active_drivers_by_location, name="active_drivers_by_location",),
-
+    path("customers-by-location/",views.customers_by_location,name="customers_by_location",),
     
 ]

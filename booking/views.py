@@ -1713,3 +1713,74 @@ def active_drivers_by_location(request):
         "booking/active_drivers_by_location.html",
         context,
     )
+
+
+
+from collections import OrderedDict
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from .models import CustomerProfile
+
+
+@staff_member_required(login_url="login")
+def customers_by_location(request):
+    """
+    Display all registered customers grouped by location.
+
+    Template context:
+        customers_by_location:
+            Dictionary containing customers grouped by location.
+
+        total_customers:
+            Total number of registered customers.
+
+        total_locations:
+            Total number of customer locations.
+    """
+
+    customers = (
+        CustomerProfile.objects
+        .select_related(
+            "user",
+            "location",
+        )
+        .order_by(
+            "location__name",
+            "full_name",
+            "user__username",
+        )
+    )
+
+    grouped_customers = {}
+
+    for customer in customers:
+        if customer.location:
+            location_name = customer.location.name
+        else:
+            location_name = "Location Not Provided"
+
+        if location_name not in grouped_customers:
+            grouped_customers[location_name] = []
+
+        grouped_customers[location_name].append(customer)
+
+    # Sort locations alphabetically.
+    customers_by_location = OrderedDict(
+        sorted(
+            grouped_customers.items(),
+            key=lambda item: item[0].lower(),
+        )
+    )
+
+    context = {
+        "customers_by_location": customers_by_location,
+        "total_customers": customers.count(),
+        "total_locations": len(customers_by_location),
+    }
+
+    return render(
+        request,
+        "booking/customers_by_location.html",
+        context,
+    )

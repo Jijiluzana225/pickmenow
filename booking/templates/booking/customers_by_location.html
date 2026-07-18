@@ -1,0 +1,737 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customers by Location | PickMeNow Admin</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --dark-one: #07111f;
+            --dark-two: #0f172a;
+            --dark-three: #111827;
+            --yellow: #facc15;
+            --orange: #f97316;
+            --green: #16a34a;
+            --light-green: #dcfce7;
+            --white: #ffffff;
+            --gray: #6b7280;
+            --light-gray: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(250, 204, 21, .24),
+                    transparent 32%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(13, 110, 253, .20),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--dark-one) 0%,
+                    var(--dark-two) 48%,
+                    var(--dark-three) 100%
+                );
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            color: #111827;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            padding: 30px 15px 55px;
+        }
+
+        .page-header {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+            border-radius: 26px;
+            padding: 26px;
+            box-shadow: 0 22px 55px rgba(0, 0, 0, .27);
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: clamp(1.7rem, 4vw, 2.7rem);
+            font-weight: 950;
+            color: #111827;
+        }
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #374151;
+            font-weight: 700;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(17, 24, 39, .12);
+            border: 1px solid rgba(17, 24, 39, .18);
+            border-radius: 999px;
+            padding: 8px 13px;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background: #111827;
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 11px 17px;
+            text-decoration: none;
+            font-weight: 900;
+            transition: .2s ease;
+        }
+
+        .back-button:hover {
+            background: #020617;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .summary-card {
+            height: 100%;
+            border: none;
+            border-radius: 22px;
+            padding: 21px;
+            background: rgba(255, 255, 255, .97);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .20);
+        }
+
+        .summary-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 28px;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+        }
+
+        .summary-label {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .summary-value {
+            color: #111827;
+            font-size: 28px;
+            line-height: 1.1;
+            font-weight: 950;
+        }
+
+        .filter-card {
+            background: rgba(255, 255, 255, .97);
+            border-radius: 22px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .20);
+        }
+
+        .filter-label {
+            color: #374151;
+            font-weight: 850;
+            margin-bottom: 7px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 14px;
+            border: 1px solid #d1d5db;
+            padding: 12px 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 .2rem rgba(249, 115, 22, .16);
+        }
+
+        .location-section {
+            background: rgba(255, 255, 255, .98);
+            border-radius: 25px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .23);
+        }
+
+        .location-header {
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #1f2937
+                );
+            color: #ffffff;
+            padding: 19px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .location-title {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 950;
+        }
+
+        .customer-count {
+            background: var(--yellow);
+            color: #111827;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .customer-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .customer-table {
+            margin: 0;
+            min-width: 1000px;
+        }
+
+        .customer-table thead th {
+            background: #f8fafc;
+            color: #4b5563;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 14px 16px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .customer-table tbody td {
+            border-color: var(--light-gray);
+            padding: 15px 16px;
+            vertical-align: middle;
+        }
+
+        .customer-table tbody tr:hover {
+            background: #fff7ed;
+        }
+
+        .customer-profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 2px solid var(--yellow);
+            box-shadow: 0 5px 14px rgba(0, 0, 0, .14);
+            flex-shrink: 0;
+        }
+
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #111827;
+            font-size: 20px;
+            font-weight: 950;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--yellow),
+                    var(--orange)
+                );
+        }
+
+        .customer-name {
+            color: #111827;
+            font-weight: 900;
+        }
+
+        .customer-username {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .contact-value {
+            color: #374151;
+            font-weight: 750;
+        }
+
+        .location-value {
+            display: inline-block;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            padding: 5px 9px;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .registered-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--light-green);
+            color: #166534;
+            border: 1px solid #86efac;
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .registered-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, .13);
+        }
+
+        .date-value {
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .empty-state,
+        .no-search-result {
+            background: rgba(255, 255, 255, .98);
+            border-radius: 25px;
+            padding: 42px 24px;
+            text-align: center;
+            color: var(--gray);
+            font-weight: 750;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .23);
+        }
+
+        .no-search-result {
+            display: none;
+        }
+
+        .empty-icon {
+            font-size: 65px;
+            margin-bottom: 14px;
+        }
+
+        .empty-title {
+            color: #111827;
+            font-weight: 950;
+        }
+
+        @media (max-width: 767px) {
+            .page-wrapper {
+                padding-top: 15px;
+            }
+
+            .page-header {
+                padding: 20px;
+                border-radius: 21px;
+            }
+
+            .back-button {
+                width: 100%;
+            }
+
+            .location-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    
+.preview-modal{
+position:fixed;inset:0;background:rgba(0,0,0,.9);
+display:none;align-items:center;justify-content:center;
+z-index:9999;padding:20px;
+}
+.preview-modal img{
+max-width:95vw;
+max-height:95vh;
+border-radius:12px;
+box-shadow:0 0 30px rgba(0,0,0,.5);
+}
+.preview-modal.show{display:flex;}
+
+</style>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <div class="container">
+
+        <header class="page-header">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <div class="admin-badge">
+                        🔐 Admin Access Only
+                    </div>
+
+                    <h1 class="page-title">
+                        👥 Customers
+                    </h1>
+
+                    <p class="page-subtitle">
+                        Registered customers grouped by location
+                    </p>
+                </div>
+
+                <div>
+                    <a href="{% url 'index' %}" class="back-button">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <section class="row g-3">
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="summary-icon">👥</div>
+                        <div>
+                            <div class="summary-label">
+                                Total Customers
+                            </div>
+                            <div class="summary-value">
+                                {{ total_customers }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="summary-icon">📍</div>
+                        <div>
+                            <div class="summary-label">
+                                Customer Locations
+                            </div>
+                            <div class="summary-value">
+                                {{ total_locations }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if customers_by_location %}
+            <section class="filter-card">
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label for="customerSearch" class="filter-label">
+                            Search Customer
+                        </label>
+
+                        <input
+                            type="search"
+                            id="customerSearch"
+                            class="form-control"
+                            placeholder="Search name, username, email or contact number">
+                    </div>
+
+                    <div class="col-md-5">
+                        <label for="locationFilter" class="filter-label">
+                            Filter Customer Location
+                        </label>
+
+                        <select id="locationFilter" class="form-select">
+                            <option value="">All Customer Locations</option>
+
+                            {% for location_name, customers in customers_by_location.items %}
+                                <option value="{{ location_name|lower }}">
+                                    {{ location_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <main id="customerLocationContainer">
+                {% for location_name, customers in customers_by_location.items %}
+                    <section
+                        class="location-section"
+                        data-location="{{ location_name|lower }}">
+
+                        <div class="location-header">
+                            <h2 class="location-title">
+                                📍 {{ location_name }}
+                            </h2>
+
+                            <span class="customer-count">
+                                {{ customers|length }}
+                                Customer{{ customers|length|pluralize }}
+                            </span>
+                        </div>
+
+                        <div class="customer-table-wrapper">
+                            <table class="table customer-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Email Address</th>
+                                        <th>Contact Number</th>
+                                        <th>Location</th>
+                                        <th>Date Registered</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for customer in customers %}
+                                        <tr
+                                            class="customer-row"
+                                            data-search="
+                                                {{ customer.full_name|default:customer.user.get_full_name|lower }}
+                                                {{ customer.user.username|lower }}
+                                                {{ customer.user.email|lower }}
+                                                {{ customer.contact_number|default:''|lower }}
+                                                {{ location_name|lower }}
+                                            ">
+
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    {% if customer.profile_picture %}
+                                                        <img
+                                                            src="{{ customer.profile_picture.url }}"
+                                                            alt="{{ customer.full_name|default:customer.user.username }}"
+                                                            class="customer-profile-picture preview-image"
+                                                            style="cursor:pointer;">
+                                                    {% else %}
+                                                        <div class="customer-avatar">
+                                                            {{ customer.full_name|default:customer.user.username|first|upper }}
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div>
+                                                        <div class="customer-name">
+                                                            {{ customer.full_name|default:customer.user.get_full_name|default:customer.user.username }}
+                                                        </div>
+
+                                                        <div class="customer-username">
+                                                            @{{ customer.user.username }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <span class="contact-value">
+                                                    {{ customer.user.email|default:"No email" }}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span class="contact-value">
+                                                    {{ customer.contact_number|default:"Not provided" }}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span class="location-value">
+                                                    {{ location_name }}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span class="date-value">
+                                                    {{ customer.created_at|date:"M d, Y" }}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span class="registered-badge">
+                                                    <span class="registered-dot"></span>
+                                                    Registered
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                {% endfor %}
+            </main>
+
+            <div id="noSearchResult" class="no-search-result">
+                🔎 No customers match your search.
+            </div>
+        {% else %}
+            <section class="empty-state">
+                <div class="empty-icon">👥</div>
+
+                <h2 class="empty-title">
+                    No Customers
+                </h2>
+
+                <p class="mb-0">
+                    There are currently no registered customers.
+                </p>
+            </section>
+        {% endif %}
+    </div>
+</div>
+
+
+<div id="imagePreviewModal" class="preview-modal">
+    <img id="previewImage" src="" alt="Preview">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        "use strict";
+
+        const searchInput =
+            document.getElementById("customerSearch");
+
+        const locationFilter =
+            document.getElementById("locationFilter");
+
+        const locationSections =
+            document.querySelectorAll(".location-section");
+
+        const noSearchResult =
+            document.getElementById("noSearchResult");
+
+        function filterCustomers() {
+            const searchValue =
+                searchInput.value.trim().toLowerCase();
+
+            const selectedLocation =
+                locationFilter.value.trim().toLowerCase();
+
+            let totalVisibleCustomers = 0;
+
+            locationSections.forEach(function (section) {
+                const sectionLocation =
+                    section.dataset.location || "";
+
+                const locationMatches =
+                    selectedLocation === "" ||
+                    sectionLocation === selectedLocation;
+
+                const customerRows =
+                    section.querySelectorAll(".customer-row");
+
+                let visibleCustomersInLocation = 0;
+
+                customerRows.forEach(function (row) {
+                    const searchableText =
+                        row.dataset.search || "";
+
+                    const searchMatches =
+                        searchValue === "" ||
+                        searchableText.includes(searchValue);
+
+                    const shouldDisplay =
+                        locationMatches && searchMatches;
+
+                    row.style.display =
+                        shouldDisplay ? "" : "none";
+
+                    if (shouldDisplay) {
+                        visibleCustomersInLocation += 1;
+                        totalVisibleCustomers += 1;
+                    }
+                });
+
+                section.style.display =
+                    visibleCustomersInLocation > 0
+                        ? ""
+                        : "none";
+            });
+
+            if (noSearchResult) {
+                noSearchResult.style.display =
+                    totalVisibleCustomers === 0
+                        ? "block"
+                        : "none";
+            }
+        }
+
+        if (searchInput && locationFilter) {
+            searchInput.addEventListener(
+                "input",
+                filterCustomers
+            );
+
+            locationFilter.addEventListener(
+                "change",
+                filterCustomers
+            );
+        }
+
+
+        document.querySelectorAll(".preview-image").forEach(function(img){
+            img.addEventListener("click",function(){
+                document.getElementById("previewImage").src=this.src;
+                document.getElementById("imagePreviewModal").classList.add("show");
+            });
+        });
+
+        document.getElementById("imagePreviewModal").addEventListener("click",function(){
+            this.classList.remove("show");
+            document.getElementById("previewImage").src="";
+        });
+
+    });
+</script>
+</body>
+</html>
