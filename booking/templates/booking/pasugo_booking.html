@@ -724,21 +724,38 @@ function calculateRoute() {
             const leg = response.routes[0].legs[0];
             const kilometers = leg.distance.value / 1000;
 
-            // Pasugo fare:
-            // ₱25 covers the first 3 KM.
-            // Add ₱8 per KM only for the distance beyond 3 KM.
-            const baseFare = 25;
-            const includedDistanceKm = 3;
-            const perKmAfterIncludedDistance = 8;
-            const extraDistanceKm = Math.max(
-                kilometers - includedDistanceKm,
-                0
-            );
+            // Use the assigned location of the logged-in customer.
+            const customerLocationName =
+                "{{ customer.location.name|default:''|escapejs }}"
+                    .trim()
+                    .toLowerCase();
 
-            const estimatedFee = Math.ceil(
-                baseFare
-                + (extraDistanceKm * perKmAfterIncludedDistance)
-            );
+            const baseFare = 25;
+            const perKm = 8;
+            const pasugoFee = 20;
+
+            let estimatedFee;
+
+            if (customerLocationName === "indahag") {
+                // Indahag:
+                // ₱25 covers the first 3 KM.
+                // Add ₱8 per KM only beyond 3 KM.
+                const includedDistanceKm = 3;
+                const extraDistanceKm = Math.max(
+                    kilometers - includedDistanceKm,
+                    0
+                );
+
+                estimatedFee = Math.ceil(
+                    baseFare + (extraDistanceKm * perKm)
+                );
+            } else {
+                // Other customer locations:
+                // ₱25 + total KM × ₱8 + ₱20 Pasugo fee.
+                estimatedFee = Math.ceil(
+                    baseFare + (kilometers * perKm) + pasugoFee
+                );
+            }
 
             document.getElementById("distance_km").value = kilometers.toFixed(3);
             document.getElementById("distance_text").textContent = leg.distance.text;

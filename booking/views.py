@@ -1382,6 +1382,22 @@ def pasugo_booking(request):
         }
     )
 
+import math
+
+from decimal import Decimal, InvalidOperation
+from datetime import timedelta
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.utils import timezone
+
+from .models import Booking
+from .utils import get_nearest_driver
+
+
 @login_required(login_url="customer_login")
 def create_pasugo_booking(request):
     if request.method != "POST":
@@ -1395,8 +1411,15 @@ def create_pasugo_booking(request):
     if not customer.location:
         return redirect("choose_customer_location")
 
-    origin = request.POST.get("origin", "").strip()
-    destination = request.POST.get("destination", "").strip()
+    origin = request.POST.get(
+        "origin",
+        ""
+    ).strip()
+
+    destination = request.POST.get(
+        "destination",
+        ""
+    ).strip()
 
     errand_type = request.POST.get(
         "errand_type",
@@ -1465,7 +1488,9 @@ def create_pasugo_booking(request):
             "booking/pasugo_booking.html",
             {
                 "customer": customer,
-                "error": "Please enter valid booking information."
+                "error": (
+                    "Please enter valid booking information."
+                ),
             }
         )
 
@@ -1477,7 +1502,7 @@ def create_pasugo_booking(request):
                 "customer": customer,
                 "error": (
                     "Pickup and delivery locations are required."
-                )
+                ),
             }
         )
 
@@ -1487,7 +1512,9 @@ def create_pasugo_booking(request):
             "booking/pasugo_booking.html",
             {
                 "customer": customer,
-                "error": "Please select an errand type."
+                "error": (
+                    "Please select an errand type."
+                ),
             }
         )
 
@@ -1499,7 +1526,7 @@ def create_pasugo_booking(request):
                 "customer": customer,
                 "error": (
                     "Please describe the requested errand."
-                )
+                ),
             }
         )
 
@@ -1511,7 +1538,7 @@ def create_pasugo_booking(request):
                 "customer": customer,
                 "error": (
                     "Please calculate the Pasugo route."
-                )
+                ),
             }
         )
 
@@ -1524,29 +1551,75 @@ def create_pasugo_booking(request):
     ):
         purchase_budget = None
 
-    # Example Pasugo pricing
-    base_fare = Decimal("25.00")
-    included_distance = Decimal("3.00")
-    per_km = Decimal("8.00")
-
+    # Convert the submitted distance to Decimal
+    # before performing currency calculations.
     distance = Decimal(str(distance_km))
 
-    extra_distance = max(
-        distance - included_distance,
-        Decimal("0.00"),
+    base_fare = Decimal("25.00")
+    per_km = Decimal("8.00")
+    pasugo_fee = Decimal("20.00")
+
+    location_name = (
+        customer.location.name.strip().casefold()
+        if customer.location.name
+        else ""
     )
 
-    calculated_fare = (
-        base_fare
-        + extra_distance * per_km
-)
+    if location_name == "indahag":
+        # Indahag Pasugo pricing:
+        #
+        # ₱25 covers the first 3 KM.
+        # Additional distance is ₱8 per KM.
+        included_distance = Decimal("3.00")
 
+        chargeable_distance = max(
+            distance - included_distance,
+            Decimal("0.00"),
+        )
+
+        calculated_fare = (
+            base_fare
+            + chargeable_distance * per_km
+        )
+
+        pricing_type = (
+            "Indahag pricing: first 3 KM included"
+        )
+
+    else:
+        # Other service locations:
+        #
+        # Regular ride pricing:
+        # ₱25 + total distance × ₱8
+        #
+        # Then add the ₱20 Pasugo service fee.
+        chargeable_distance = distance
+
+        calculated_fare = (
+            base_fare
+            + chargeable_distance * per_km
+            + pasugo_fee
+        )
+
+        pricing_type = (
+            "Regular ride pricing plus ₱20 Pasugo fee"
+        )
+
+    # Round the calculated fare upward to the next peso,
+    # then store it with two decimal places.
     fare = Decimal(
         math.ceil(calculated_fare)
-    ).quantize(Decimal("0.01"))
+    ).quantize(
+        Decimal("0.01")
+    )
 
+    print("PASUGO LOCATION:", customer.location.name)
+    print("PASUGO PRICING TYPE:", pricing_type)
     print("PASUGO DISTANCE:", distance)
-    print("PASUGO EXTRA DISTANCE:", extra_distance)
+    print(
+        "PASUGO CHARGEABLE DISTANCE:",
+        chargeable_distance
+    )
     print("PASUGO RAW FARE:", calculated_fare)
     print("PASUGO FINAL FARE:", fare)
 
@@ -1589,7 +1662,9 @@ def create_pasugo_booking(request):
         status="pending",
 
         priority_driver=nearest_driver,
-        priority_until=now + timedelta(minutes=1),
+        priority_until=(
+            now + timedelta(minutes=1)
+        ),
     )
 
     purchase_budget_text = (
@@ -1638,7 +1713,9 @@ https://www.pickmenow.online/dashboard/
     if booking.location_id:
         channel_layer = get_channel_layer()
 
-        async_to_sync(channel_layer.group_send)(
+        async_to_sync(
+            channel_layer.group_send
+        )(
             (
                 "driver_dashboard_location_"
                 f"{booking.location_id}"
@@ -1650,6 +1727,14 @@ https://www.pickmenow.online/dashboard/
                 "service_type": booking.service_type,
                 "reason": "new_pasugo_booking",
             }
+        )
+
+        print(
+            "NEW PASUGO DASHBOARD REFRESH SENT TO:",
+            (
+                "driver_dashboard_location_"
+                f"{booking.location_id}"
+            )
         )
 
     return redirect("customer_dashboard")
