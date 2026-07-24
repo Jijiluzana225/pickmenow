@@ -5,12 +5,24 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
     <style>
         body {
-            background: linear-gradient(180deg, #f8fafc, #eef2f7);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(
+                180deg,
+                #f8fafc,
+                #eef2f7
+            );
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
         }
 
         .register-wrapper {
@@ -22,7 +34,7 @@
         .register-card {
             border: none;
             border-radius: 24px;
-            box-shadow: 0 20px 45px rgba(0,0,0,.08);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, .08);
         }
 
         .page-title {
@@ -34,7 +46,8 @@
             font-size: 14px;
         }
 
-        .form-control {
+        .form-control,
+        .form-select {
             border-radius: 14px;
             padding: 12px 15px;
         }
@@ -70,32 +83,54 @@
             color: #6b7280;
         }
 
+        .location-box {
+            background: linear-gradient(
+                135deg,
+                #f0fdf4,
+                #f8fafc
+            );
+            border: 1px solid #bbf7d0;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+
+        .location-help {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
         .login-section {
-    background: linear-gradient(135deg, #eff6ff, #f8fafc);
-    border: 1px solid #dbeafe;
-    border-radius: 20px;
-    padding: 18px;
-    margin-top: 24px;
-    text-align: center;
-}
+            background: linear-gradient(
+                135deg,
+                #eff6ff,
+                #f8fafc
+            );
+            border: 1px solid #dbeafe;
+            border-radius: 20px;
+            padding: 18px;
+            margin-top: 24px;
+            text-align: center;
+        }
 
-.login-section-title {
-    font-weight: 900;
-    color: #1f2937;
-    margin-bottom: 4px;
-}
+        .login-section-title {
+            font-weight: 900;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
 
-.login-section-text {
-    color: #6b7280;
-    font-size: 14px;
-    margin-bottom: 14px;
-}
+        .login-section-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
 
-.btn-login-existing {
-    border-radius: 14px;
-    padding: 12px;
-    font-weight: 900;
-}
+        .btn-login-existing {
+            border-radius: 14px;
+            padding: 12px;
+            font-weight: 900;
+        }
     </style>
 </head>
 
@@ -106,7 +141,7 @@
     alert("{{ error|escapejs }}");
 </script>
 {% endif %}
-    
+
 <div class="register-wrapper">
 
     <div class="card register-card p-4">
@@ -117,7 +152,8 @@
             </h2>
 
             <div class="page-subtitle">
-                Register your motorcycle and wait for admin approval.
+                Register your motorcycle, select your service location,
+                and wait for admin approval.
             </div>
         </div>
 
@@ -127,7 +163,10 @@
             </div>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form
+            method="POST"
+            enctype="multipart/form-data">
+
             {% csrf_token %}
 
             <div class="upload-box">
@@ -135,7 +174,8 @@
                 <img
                     src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
                     id="preview"
-                    class="profile-preview">
+                    class="profile-preview"
+                    alt="Profile picture preview">
 
                 <label class="btn btn-outline-primary mt-3">
                     Choose Profile Picture
@@ -144,8 +184,9 @@
                         type="file"
                         name="profile_picture"
                         id="profile_picture"
-                        accept="image/*"                        
-                        hidden>
+                        accept="image/*"
+                        hidden
+                        required>
                 </label>
 
                 <div class="camera-text mt-2">
@@ -154,23 +195,67 @@
 
             </div>
 
+            <div class="location-box">
+                <label class="form-label">
+                    📍 Service Location
+                </label>
+
+                <select
+                    name="location"
+                    id="location"
+                    class="form-select"
+                    required>
+
+                    <option value="">
+                        Select your service location
+                    </option>
+
+                    {% for location in service_locations %}
+                        <option
+                            value="{{ location.id }}"
+                            {% if selected_location_id|stringformat:"s" == location.id|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+
+                            {{ location.name }}
+                        </option>
+                    {% empty %}
+                        <option value="" disabled>
+                            No service locations are currently available
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <div class="location-help">
+                    You will receive booking requests assigned to this
+                    service location after your account is approved.
+                </div>
+            </div>
+
             <div class="mb-3">
-                <label class="form-label">Full Name</label>
+                <label class="form-label">
+                    Full Name
+                </label>
 
                 <input
                     type="text"
                     name="full_name"
                     class="form-control"
+                    value="{{ full_name|default:'' }}"
                     required>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Contact Number</label>
+                <label class="form-label">
+                    Contact Number
+                </label>
 
                 <input
                     type="text"
                     name="contact_number"
                     class="form-control"
+                    value="{{ contact_number|default:'' }}"
                     placeholder="09XXXXXXXXX"
                     required>
 
@@ -179,8 +264,12 @@
                 </small>
             </div>
 
+            
+
             <div class="mb-3">
-                <label class="form-label">Password</label>
+                <label class="form-label">
+                    Password
+                </label>
 
                 <input
                     type="password"
@@ -191,7 +280,9 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
+                <label class="form-label">
+                    Confirm Password
+                </label>
 
                 <input
                     type="password"
@@ -200,7 +291,10 @@
                     class="form-control"
                     required>
 
-                <div id="passwordMessage" class="small mt-2"></div>
+                <div
+                    id="passwordMessage"
+                    class="small mt-2">
+                </div>
             </div>
 
             <div class="form-check mb-4">
@@ -209,42 +303,57 @@
                     type="checkbox"
                     id="showPassword">
 
-                <label class="form-check-label" for="showPassword">
+                <label
+                    class="form-check-label"
+                    for="showPassword">
+
                     Show Passwords
                 </label>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Motorcycle Model</label>
+                <label class="form-label">
+                    Motorcycle Model
+                </label>
 
                 <input
                     type="text"
                     name="motorcycle_model"
                     class="form-control"
+                    value="{{ motorcycle_model|default:'' }}"
                     placeholder="Honda Click 125"
                     required>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Plate Number</label>
+                <label class="form-label">
+                    Plate Number
+                </label>
 
                 <input
                     type="text"
                     name="plate_number"
                     class="form-control"
+                    value="{{ plate_number|default:'' }}"
                     required>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Driver's License Number</label>
+                <label class="form-label">
+                    Driver's License Number
+                </label>
 
                 <input
                     type="text"
                     name="license_number"
-                    class="form-control">
+                    class="form-control"
+                    value="{{ license_number|default:'' }}">
             </div>
 
-            <button class="btn btn-primary w-100">
+            <button
+                type="submit"
+                class="btn btn-primary w-100">
+
                 Register Driver
             </button>
 
@@ -252,69 +361,118 @@
 
         <div class="login-section">
 
-    <div class="login-section-title">
-        Already registered?
-    </div>
+            <div class="login-section-title">
+                Already registered?
+            </div>
 
-    <div class="login-section-text">
-        Login to your account and continue using PickMeNow.
-    </div>
+            <div class="login-section-text">
+                Login to your account and continue using PickMeNow.
+            </div>
 
-    <a
-        href="{% url 'customer_login' %}"
-        class="btn btn-outline-primary w-100 btn-login-existing">
-        Login Here
-    </a>
+            <a
+                href="{% url 'customer_login' %}"
+                class="btn btn-outline-primary w-100 btn-login-existing">
 
-</div>
+                Login Here
+            </a>
+
+        </div>
 
     </div>
 
 </div>
 
 <script>
-document.getElementById("profile_picture").addEventListener("change", function () {
-    if (this.files && this.files[0]) {
-        const reader = new FileReader();
+const profilePictureInput =
+    document.getElementById("profile_picture");
 
-        reader.onload = function (e) {
-            document.getElementById("preview").src = e.target.result;
-        };
+const preview =
+    document.getElementById("preview");
 
-        reader.readAsDataURL(this.files[0]);
+profilePictureInput.addEventListener(
+    "change",
+    function () {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+            };
+
+            reader.readAsDataURL(this.files[0]);
+        }
     }
-});
+);
 
-document.getElementById("showPassword").addEventListener("change", function () {
-    const type = this.checked ? "text" : "password";
+const showPassword =
+    document.getElementById("showPassword");
 
-    document.getElementById("password").type = type;
-    document.getElementById("confirm_password").type = type;
-});
+const password =
+    document.getElementById("password");
 
-const password = document.getElementById("password");
-const confirmPassword = document.getElementById("confirm_password");
-const message = document.getElementById("passwordMessage");
+const confirmPassword =
+    document.getElementById("confirm_password");
+
+const passwordMessage =
+    document.getElementById("passwordMessage");
+
+showPassword.addEventListener(
+    "change",
+    function () {
+        const inputType =
+            this.checked ? "text" : "password";
+
+        password.type = inputType;
+        confirmPassword.type = inputType;
+    }
+);
 
 function checkPassword() {
     if (confirmPassword.value.length === 0) {
-        message.innerHTML = "";
+        passwordMessage.innerHTML = "";
+        confirmPassword.setCustomValidity("");
         return;
     }
 
     if (password.value === confirmPassword.value) {
-        message.innerHTML = "✓ Passwords match";
-        message.style.color = "#198754";
+        passwordMessage.innerHTML =
+            "✓ Passwords match";
+
+        passwordMessage.style.color =
+            "#198754";
+
         confirmPassword.setCustomValidity("");
     } else {
-        message.innerHTML = "✗ Passwords do not match";
-        message.style.color = "#dc3545";
-        confirmPassword.setCustomValidity("Passwords do not match");
+        passwordMessage.innerHTML =
+            "✗ Passwords do not match";
+
+        passwordMessage.style.color =
+            "#dc3545";
+
+        confirmPassword.setCustomValidity(
+            "Passwords do not match"
+        );
     }
 }
 
-password.addEventListener("keyup", checkPassword);
-confirmPassword.addEventListener("keyup", checkPassword);
+password.addEventListener(
+    "input",
+    checkPassword
+);
+
+confirmPassword.addEventListener(
+    "input",
+    checkPassword
+);
+
+{% if focus_password %}
+window.addEventListener(
+    "load",
+    function () {
+        password.focus();
+    }
+);
+{% endif %}
 </script>
 
 </body>

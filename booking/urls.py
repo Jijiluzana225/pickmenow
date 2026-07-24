@@ -49,5 +49,7 @@ urlpatterns = [
     path("pasugo/create/",views.create_pasugo_booking,name="create_pasugo_booking"),
     path("active-drivers/", views.active_drivers_by_location, name="active_drivers_by_location",),
     path("customers-by-location/",views.customers_by_location,name="customers_by_location",),
+
+    path("staff/registered-driver-locations/",views.registered_driver_locations,name="registered_driver_locations",),
     
 ]

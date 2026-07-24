@@ -1,709 +1,1363 @@
-
 <style>
+    /*
+     * PickMeNow mobile-first navigation
+     * Base styles target phones first. Tablet and desktop enhancements
+     * are added through min-width media queries.
+     */
+
+    :root {
+        --nav-bg-start: #0f172a;
+        --nav-bg-end: #1e293b;
+        --nav-surface: rgba(255, 255, 255, .08);
+        --nav-surface-hover: rgba(255, 255, 255, .14);
+        --nav-border: rgba(255, 255, 255, .12);
+        --nav-text: #f8fafc;
+        --nav-muted: #cbd5e1;
+        --nav-accent-start: #facc15;
+        --nav-accent-end: #f97316;
+        --nav-success: #22c55e;
+        --nav-danger: #ef4444;
+        --nav-warning: #facc15;
+        --nav-radius: 16px;
+        --nav-shadow: 0 14px 35px rgba(15, 23, 42, .24);
+    }
+
     .pickme-navbar {
-        background: linear-gradient(135deg, #111827, #1e293b);
-        box-shadow: 0 10px 24px rgba(15, 23, 42, .18);
-        border-bottom: 1px solid rgba(255, 255, 255, .08);
+        position: relative;
+        z-index: 1050;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--nav-border);
+        background:
+            linear-gradient(
+                135deg,
+                var(--nav-bg-start),
+                var(--nav-bg-end)
+            );
+        box-shadow: var(--nav-shadow);
+    }
+
+    .pickme-navbar .container {
+        gap: 10px;
     }
 
     .pickme-navbar .navbar-brand {
-        display: flex;
+        min-width: 0;
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        letter-spacing: 0;
+        gap: 9px;
+        margin: 0;
         color: #ffffff !important;
-        white-space: nowrap;
-        font-size: 1rem;
+        font-size: .92rem;
+        font-weight: 800;
+        letter-spacing: -.01em;
+        text-decoration: none;
     }
 
     .brand-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #facc15, #f97316);
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        border-radius: 13px;
+        background:
+            linear-gradient(
+                135deg,
+                var(--nav-accent-start),
+                var(--nav-accent-end)
+            );
         color: #111827;
-        font-size: 17px;
-        box-shadow: 0 8px 18px rgba(249, 115, 22, .22);
-        flex: 0 0 auto;
+        font-size: 19px;
+        box-shadow: 0 8px 18px rgba(249, 115, 22, .25);
+    }
+
+    .brand-text {
+        overflow: hidden;
+        max-width: 185px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .pickme-navbar .navbar-toggler {
+        width: 44px;
+        height: 42px;
+        flex: 0 0 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid var(--nav-border) !important;
+        border-radius: 13px;
+        background: var(--nav-surface);
+    }
+
+    .pickme-navbar .navbar-toggler:focus {
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, .22) !important;
+    }
+
+    .pickme-navbar .navbar-collapse {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid var(--nav-border);
+        border-radius: 18px;
+        background: rgba(15, 23, 42, .82);
+        box-shadow: 0 16px 35px rgba(2, 6, 23, .28);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+
+    .pickme-navbar .navbar-nav {
+        width: 100%;
+        gap: 5px;
+    }
+
+    .pickme-navbar .nav-item {
+        width: 100%;
     }
 
     .pickme-navbar .nav-link {
-        color: rgba(255, 255, 255, .85) !important;
-        font-weight: 400;
-        font-size: .95rem;
-        border-radius: 12px;
-        padding: 9px 12px !important;
-        margin: 2px 0;
+        width: 100%;
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 11px 13px !important;
+        margin: 0;
+        border-radius: 13px;
+        color: rgba(255, 255, 255, .90) !important;
+        font-size: .94rem;
+        font-weight: 650;
+        line-height: 1.2;
+        transition:
+            background .18s ease,
+            color .18s ease,
+            transform .18s ease;
     }
 
     .pickme-navbar .nav-link:hover,
     .pickme-navbar .nav-link:focus {
+        background: var(--nav-surface-hover);
         color: #ffffff !important;
-        background: rgba(255, 255, 255, .10);
+        transform: translateY(-1px);
     }
 
     .nav-pill-link {
-        display: flex;
-        align-items: center;
-        gap: 7px;
+        justify-content: flex-start;
+    }
+
+    .nav-icon {
+        width: 23px;
+        flex: 0 0 23px;
+        text-align: center;
+        font-size: 17px;
     }
 
     .staff-drivers-link {
-        background: linear-gradient(135deg, #facc15, #f97316);
+        background:
+            linear-gradient(
+                135deg,
+                var(--nav-accent-start),
+                var(--nav-accent-end)
+            );
         color: #111827 !important;
-        font-weight: 700 !important;
-        box-shadow: 0 7px 18px rgba(249, 115, 22, .20);
+        font-weight: 850 !important;
+        box-shadow: 0 8px 20px rgba(249, 115, 22, .20);
     }
 
     .staff-drivers-link:hover,
     .staff-drivers-link:focus {
-        background: linear-gradient(135deg, #fde047, #fb923c) !important;
+        background:
+            linear-gradient(
+                135deg,
+                #fde047,
+                #fb923c
+            ) !important;
         color: #111827 !important;
-        transform: translateY(-1px);
     }
 
-    .availability-card {
-        background: rgba(255, 255, 255, .10);
-        border: 1px solid rgba(255, 255, 255, .14);
+    .mobile-control-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin: 8px 0 4px;
+    }
+
+    .availability-card,
+    .gps-status-card {
+        width: 100%;
+        min-height: 47px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 12px;
+        margin: 0;
+        border: 1px solid var(--nav-border);
         border-radius: 14px;
-        padding: 7px 11px;
+        background: var(--nav-surface);
         color: #ffffff;
     }
 
-    .availability-label {
-        font-size: 13px;
-        font-weight: 400;
-        color: #f3f4f6;
-        white-space: nowrap;
+    .control-copy {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 9px;
     }
 
-    .availability-card .form-check-input {
-        width: 40px;
-        height: 21px;
-        cursor: pointer;
-        border: none;
-    }
-
-    .availability-card .form-check-input:checked {
-        background-color: #16a34a;
-        border-color: #16a34a;
-    }
-
-    .profile-avatar {
-        width: 36px;
-        height: 36px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 2px solid rgba(250, 204, 21, .75);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, .20);
-    }
-
-    .staff-avatar {
-        width: 36px;
-        height: 36px;
+    .control-icon {
+        width: 27px;
+        height: 27px;
+        flex: 0 0 27px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #facc15, #f97316);
-        color: #111827;
-        border: 2px solid rgba(250, 204, 21, .75);
-        font-size: 17px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, .10);
+        font-size: 14px;
+    }
+
+    .control-text {
+        min-width: 0;
+    }
+
+    .control-title {
+        display: block;
+        color: #ffffff;
+        font-size: 12px;
         font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .control-subtitle {
+        display: block;
+        margin-top: 2px;
+        color: var(--nav-muted);
+        font-size: 10px;
+        line-height: 1.15;
+    }
+
+    .availability-card .form-check {
+        min-height: auto;
+    }
+
+    .availability-card .form-check-input {
+        width: 44px;
+        height: 23px;
+        margin: 0;
+        cursor: pointer;
+        border: none;
+        background-color: #64748b;
+        box-shadow: none;
+    }
+
+    .availability-card .form-check-input:checked {
+        border-color: #16a34a;
+        background-color: #16a34a;
+    }
+
+    .gps-status-card {
+        justify-content: flex-start;
+    }
+
+    .gps-status-dot {
+        width: 10px;
+        height: 10px;
+        flex: 0 0 10px;
+        border-radius: 50%;
+        background: #94a3b8;
+        box-shadow: 0 0 0 4px rgba(148, 163, 184, .16);
+    }
+
+    .gps-status-card.is-updating .gps-status-dot {
+        background: var(--nav-warning);
+        box-shadow: 0 0 0 4px rgba(250, 204, 21, .18);
+        animation: gpsPulse 1.2s infinite;
+    }
+
+    .gps-status-card.is-current .gps-status-dot {
+        background: var(--nav-success);
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, .18);
+    }
+
+    .gps-status-card.is-error .gps-status-dot {
+        background: var(--nav-danger);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, .18);
+    }
+
+    @keyframes gpsPulse {
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .65;
+            transform: scale(.82);
+        }
+    }
+
+    .account-menu-link {
+        justify-content: flex-start;
+        margin-top: 4px !important;
+        border: 1px solid var(--nav-border);
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .profile-avatar,
+    .staff-avatar {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        border: 2px solid rgba(250, 204, 21, .75);
+        border-radius: 50%;
         box-shadow: 0 6px 14px rgba(0, 0, 0, .20);
     }
 
+    .profile-avatar {
+        object-fit: cover;
+        background: #ffffff;
+    }
+
+    .staff-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            linear-gradient(
+                135deg,
+                var(--nav-accent-start),
+                var(--nav-accent-end)
+            );
+        color: #111827;
+        font-size: 17px;
+        font-weight: 850;
+    }
+
+    .profile-copy {
+        min-width: 0;
+        flex: 1;
+    }
+
     .profile-name {
-        max-width: 150px;
+        display: block;
         overflow: hidden;
+        max-width: 100%;
+        color: #ffffff;
+        font-size: .92rem;
+        font-weight: 750;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-weight: 500;
-        font-size: .95rem;
+    }
+
+    .profile-role {
+        display: block;
+        margin-top: 2px;
+        color: var(--nav-muted);
+        font-size: 10px;
+        font-weight: 600;
     }
 
     .pickme-navbar .dropdown-menu {
-        border: none;
-        border-radius: 16px;
+        width: 100%;
+        margin-top: 7px !important;
         padding: 8px;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, .16);
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 18px 42px rgba(15, 23, 42, .22);
     }
 
     .pickme-navbar .dropdown-item {
-        border-radius: 11px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
         padding: 10px 12px;
-        font-weight: 400;
-        font-size: .95rem;
+        border-radius: 11px;
         color: #1f2937;
+        font-size: .91rem;
+        font-weight: 650;
+        white-space: normal;
     }
 
-    .pickme-navbar .dropdown-item:hover {
+    .pickme-navbar .dropdown-item:hover,
+    .pickme-navbar .dropdown-item:focus {
         background: #fff7ed;
         color: #c2410c;
     }
 
+    .logout-btn,
+    .login-btn {
+        width: 100%;
+        min-height: 46px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 5px;
+        padding: 10px 14px !important;
+        border-radius: 13px;
+        font-size: .92rem;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
     .logout-btn {
-        border-radius: 12px;
-        font-weight: 500;
-        font-size: .9rem;
-        padding: 9px 14px;
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-        border: none;
+        border: 1px solid rgba(254, 202, 202, .18);
+        background:
+            linear-gradient(
+                135deg,
+                #dc2626,
+                #b91c1c
+            );
         color: #ffffff !important;
     }
 
-    .logout-btn:hover {
-        background: linear-gradient(135deg, #b91c1c, #991b1b);
+    .logout-btn:hover,
+    .logout-btn:focus {
+        background:
+            linear-gradient(
+                135deg,
+                #b91c1c,
+                #991b1b
+            );
         color: #ffffff !important;
     }
 
     .login-btn {
-        border-radius: 12px;
-        font-weight: 500;
-        font-size: .9rem;
-        padding: 9px 14px !important;
-        background: rgba(255, 255, 255, .10);
-        border: 1px solid rgba(255, 255, 255, .18);
-        margin-top: 4px;
+        border: 1px solid var(--nav-border);
+        background: var(--nav-surface);
+        color: #ffffff !important;
     }
 
     .driver-login-btn {
-        background: linear-gradient(135deg, #facc15, #f97316);
-        color: #111827 !important;
         border: none;
-    }
-
-    .driver-login-btn:hover {
+        background:
+            linear-gradient(
+                135deg,
+                var(--nav-accent-start),
+                var(--nav-accent-end)
+            );
         color: #111827 !important;
-        opacity: .95;
     }
 
-    @media (max-width: 991px) {
-        .pickme-navbar .navbar-collapse {
-            padding-top: 14px;
+    .driver-login-btn:hover,
+    .driver-login-btn:focus {
+        color: #111827 !important;
+        opacity: .96;
+    }
+
+    .staff-mobile-shortcut {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .staff-mobile-shortcut .btn {
+        width: 100%;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        border: none;
+        border-radius: 13px;
+        background: rgba(250, 204, 21, .13);
+        color: #fde68a;
+        font-size: .88rem;
+        font-weight: 750;
+    }
+
+    /* Small tablets and larger phones */
+    @media (min-width: 576px) {
+        .pickme-navbar .navbar-brand {
+            font-size: 1rem;
         }
 
-        .availability-card {
-            margin-bottom: 10px;
-            justify-content: space-between;
+        .brand-text {
+            max-width: none;
+        }
+
+        .mobile-control-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    /* Desktop navigation */
+    @media (min-width: 992px) {
+        .pickme-navbar {
+            padding: 9px 0;
+        }
+
+        .pickme-navbar .container {
+            flex-wrap: nowrap;
+        }
+
+        .pickme-navbar .navbar-collapse {
+            width: auto;
+            margin-top: 0;
+            margin-left: 18px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .pickme-navbar .navbar-nav {
+            width: auto;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pickme-navbar .nav-item {
+            width: auto;
+        }
+
+        .pickme-navbar .nav-link {
+            width: auto;
+            min-height: 42px;
+            padding: 9px 11px !important;
+            font-size: .89rem;
+            white-space: nowrap;
+        }
+
+        .mobile-control-grid {
+            display: flex;
+            grid-template-columns: none;
+            gap: 7px;
+            margin: 0 8px 0 0;
+        }
+
+        .availability-card,
+        .gps-status-card {
+            width: auto;
+            min-height: 42px;
+            padding: 7px 10px;
+        }
+
+        .control-subtitle {
+            display: none;
+        }
+
+        .gps-status-card {
+            max-width: 145px;
+        }
+
+        .account-menu-link {
+            max-width: 220px;
+            margin-top: 0 !important;
         }
 
         .profile-name {
-            max-width: 220px;
+            max-width: 125px;
         }
 
-        .logout-btn {
-            width: 100%;
-            margin-top: 8px;
+        .pickme-navbar .dropdown-menu {
+            width: 245px;
         }
 
-        .staff-drivers-link {
-            margin-top: 4px;
+        .logout-btn,
+        .login-btn {
+            width: auto;
+            min-height: 42px;
+            margin-top: 0;
+            padding: 9px 13px !important;
+            white-space: nowrap;
+        }
+
+        .staff-mobile-shortcut {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .pickme-navbar .nav-link {
+            font-size: .93rem;
+        }
+
+        .profile-name {
+            max-width: 155px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pickme-navbar *,
+        .pickme-navbar *::before,
+        .pickme-navbar *::after {
+            scroll-behavior: auto !important;
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
         }
     }
 </style>
 
-
 <link rel="manifest" href="/static/manifest.json">
-
-<meta name="theme-color" content="#000000">
-
+<meta name="theme-color" content="#0f172a">
 
 <nav class="navbar navbar-expand-lg navbar-dark pickme-navbar">
-
     <div class="container">
 
         {% if user.is_authenticated %}
 
             {% if user.is_staff %}
-
                 <a
                     class="navbar-brand"
                     href="{% url 'active_drivers_by_location' %}">
 
-                    <span class="brand-icon">
+                    <span class="brand-icon" aria-hidden="true">
                         🛵
                     </span>
 
-                    <span>
-                        www.PickMeNow.Online
+                    <span class="brand-text">
+                        PickMeNow.Online
                     </span>
-
-                </a>
-
-
-                 <a
-                    href="{% url 'customers_by_location' %}"
-                    class="btn btn-warning fw-bold">
-                    👥 View Customers by Location
                 </a>
 
             {% elif user.driver_profile %}
-
                 <a
                     class="navbar-brand"
                     href="{% url 'dashboard' %}">
 
-                    <span class="brand-icon">
+                    <span class="brand-icon" aria-hidden="true">
                         🛵
                     </span>
 
-                    <span>
-                        www.PickMeNow.Online
+                    <span class="brand-text">
+                        PickMeNow.Online
                     </span>
-
                 </a>
 
             {% elif user.customer_profile %}
-
                 <a
                     class="navbar-brand"
                     href="{% url 'index' %}">
 
-                    <span class="brand-icon">
+                    <span class="brand-icon" aria-hidden="true">
                         🛵
                     </span>
 
-                    <span>
-                        www.PickMeNow.Online
+                    <span class="brand-text">
+                        PickMeNow.Online
                     </span>
-
                 </a>
 
             {% else %}
-
                 <a
                     class="navbar-brand"
                     href="{% url 'index' %}">
 
-                    <span class="brand-icon">
+                    <span class="brand-icon" aria-hidden="true">
                         🛵
                     </span>
 
-                    <span>
-                        www.PickMeNow.Online
+                    <span class="brand-text">
+                        PickMeNow.Online
                     </span>
-
                 </a>
-
             {% endif %}
 
         {% else %}
-
             <a
                 class="navbar-brand"
                 href="{% url 'index' %}">
 
-                <span class="brand-icon">
+                <span class="brand-icon" aria-hidden="true">
                     🛵
                 </span>
 
-                <span>
-                    www.PickMeNow.Online
+                <span class="brand-text">
+                    PickMeNow.Online
                 </span>
-
             </a>
-
         {% endif %}
 
-
         <button
-            class="navbar-toggler border-0 shadow-none"
+            class="navbar-toggler shadow-none"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbar"
             aria-controls="navbar"
             aria-expanded="false"
-            aria-label="Toggle navigation">
+            aria-label="Open navigation menu">
 
             <span class="navbar-toggler-icon"></span>
-
         </button>
-
 
         <div
             class="collapse navbar-collapse"
             id="navbar">
 
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-lg-auto">
 
                 {% if user.is_authenticated %}
 
-                    <!-- STAFF-ONLY AVAILABLE DRIVERS BUTTON -->
                     {% if user.is_staff %}
-
-                        <li class="nav-item me-lg-2">
-
+                        <li class="nav-item">
                             <a
                                 class="nav-link nav-pill-link staff-drivers-link"
                                 href="{% url 'active_drivers_by_location' %}">
 
-                                🟢 Available Drivers
-
+                                <span class="nav-icon" aria-hidden="true">🟢</span>
+                                <span>Available Drivers</span>
                             </a>
-
                         </li>
 
+                        <li class="nav-item">
+                            <a
+                                class="nav-link nav-pill-link"
+                                href="{% url 'registered_driver_locations' %}">
+
+                                <span class="nav-icon" aria-hidden="true">📍</span>
+                                <span>Driver Map</span>
+                            </a>
+                        </li>
+
+                        <li class="staff-mobile-shortcut">
+                            <a
+                                href="{% url 'customers_by_location' %}"
+                                class="btn">
+
+                                <span aria-hidden="true">👥</span>
+                                <span>Customers by Location</span>
+                            </a>
+                        </li>
                     {% endif %}
 
-
                     {% if user.customer_profile %}
-
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'index' %}">
 
-                                🛵 Book Ride
-
+                                <span class="nav-icon" aria-hidden="true">🛵</span>
+                                <span>Book Ride</span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'create_pasugo_booking' %}">
 
-                                🏃 Pasugo
-
+                                <span class="nav-icon" aria-hidden="true">🏃</span>
+                                <span>Pasugo</span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'customer_dashboard' %}">
 
-                                📋 My Bookings
-
+                                <span class="nav-icon" aria-hidden="true">📋</span>
+                                <span>My Bookings</span>
                             </a>
-
                         </li>
-
                     {% endif %}
 
-
                     {% if user.driver_profile %}
-
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'dashboard' %}">
 
-                                🛵 Available Bookings
-
+                                <span class="nav-icon" aria-hidden="true">🛵</span>
+                                <span>Available Bookings</span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'driver_accepted_bookings' %}">
 
-                                📋 Accepted
-
+                                <span class="nav-icon" aria-hidden="true">📋</span>
+                                <span>Accepted</span>
                             </a>
-
                         </li>
 
                         <li class="nav-item">
-
                             <a
                                 class="nav-link nav-pill-link"
                                 href="{% url 'driver_completed_bookings' %}">
 
-                                💰 Completed
-
+                                <span class="nav-icon" aria-hidden="true">💰</span>
+                                <span>Completed</span>
                             </a>
-
                         </li>
-
                     {% endif %}
 
                 {% endif %}
-
             </ul>
 
-
-            <ul class="navbar-nav ms-auto align-items-lg-center">
+            <ul class="navbar-nav ms-lg-auto">
 
                 {% if user.is_authenticated %}
 
                     {% if user.driver_profile %}
+                        <li class="nav-item">
+                            <div class="mobile-control-grid">
 
-                        <li class="nav-item me-lg-3 mt-2 mt-lg-0">
+                                <form
+                                    method="POST"
+                                    action="{% url 'toggle_driver_availability' %}"
+                                    id="availabilityForm"
+                                    class="availability-card">
 
-                            <form
-                                method="POST"
-                                action="{% url 'toggle_driver_availability' %}"
-                                id="availabilityForm"
-                                class="availability-card d-flex align-items-center gap-2">
+                                    {% csrf_token %}
 
-                                {% csrf_token %}
+                                    <div class="control-copy">
+                                        <span
+                                            class="control-icon"
+                                            aria-hidden="true">
+                                            🟢
+                                        </span>
 
-                                <span class="availability-label">
-                                    🟢 Available
-                                </span>
+                                        <span class="control-text">
+                                            <span class="control-title">
+                                                Driver availability
+                                            </span>
 
-                                <div class="form-check form-switch m-0">
+                                            <span class="control-subtitle">
+                                                Receive new bookings
+                                            </span>
+                                        </span>
+                                    </div>
 
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        name="is_available"
-                                        id="driverAvailabilityToggle"
-                                        {% if user.driver_profile.is_available %}checked{% endif %}
-                                        onchange="document.getElementById('availabilityForm').submit();">
+                                    <div class="form-check form-switch m-0">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="is_available"
+                                            id="driverAvailabilityToggle"
+                                            aria-label="Toggle driver availability"
+                                            {% if user.driver_profile.is_available %}checked{% endif %}
+                                            onchange="document.getElementById('availabilityForm').submit();">
+                                    </div>
+                                </form>
 
+                                <div
+                                    id="driverGpsStatus"
+                                    class="gps-status-card"
+                                    role="status"
+                                    aria-live="polite">
+
+                                    <span class="gps-status-dot"></span>
+
+                                    <span class="control-text">
+                                        <span
+                                            class="control-title"
+                                            id="driverGpsStatusText">
+                                            GPS waiting
+                                        </span>
+
+                                        <span class="control-subtitle">
+                                            Live location status
+                                        </span>
+                                    </span>
                                 </div>
 
-                            </form>
-
+                            </div>
                         </li>
-
                     {% endif %}
 
-
                     <li class="nav-item dropdown">
-
                         <a
-                            class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                            class="nav-link dropdown-toggle account-menu-link"
                             href="#"
                             role="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
 
                             {% if user.is_staff %}
-
-                                <span class="staff-avatar">
+                                <span class="staff-avatar" aria-hidden="true">
                                     🔐
                                 </span>
 
-                                <span class="profile-name">
-                                    {{ user.get_full_name|default:user.username }}
+                                <span class="profile-copy">
+                                    <span class="profile-name">
+                                        {{ user.get_full_name|default:user.username }}
+                                    </span>
+
+                                    <span class="profile-role">
+                                        Administrator
+                                    </span>
                                 </span>
 
                             {% elif user.customer_profile %}
-
                                 {% if user.customer_profile.profile_picture %}
-
                                     <img
                                         src="{{ user.customer_profile.profile_picture.url }}"
                                         class="profile-avatar"
                                         alt="{{ user.customer_profile.full_name }}">
-
                                 {% else %}
-
-                                    <img
-                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="profile-avatar"
-                                        alt="Customer profile">
-
+                                    <span class="staff-avatar" aria-hidden="true">
+                                        👤
+                                    </span>
                                 {% endif %}
 
-                                <span class="profile-name">
-                                    {{ user.customer_profile.full_name }}
+                                <span class="profile-copy">
+                                    <span class="profile-name">
+                                        {{ user.customer_profile.full_name }}
+                                    </span>
+
+                                    <span class="profile-role">
+                                        Customer account
+                                    </span>
                                 </span>
 
                             {% elif user.driver_profile %}
-
                                 {% if user.driver_profile.profile_picture %}
-
                                     <img
                                         src="{{ user.driver_profile.profile_picture.url }}"
                                         class="profile-avatar"
                                         alt="{{ user.driver_profile.full_name }}">
-
                                 {% else %}
-
-                                    <img
-                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="profile-avatar"
-                                        alt="Driver profile">
-
+                                    <span class="staff-avatar" aria-hidden="true">
+                                        🛵
+                                    </span>
                                 {% endif %}
 
-                                <span class="profile-name">
-                                    {{ user.driver_profile.full_name }}
+                                <span class="profile-copy">
+                                    <span class="profile-name">
+                                        {{ user.driver_profile.full_name }}
+                                    </span>
+
+                                    <span class="profile-role">
+                                        Driver account
+                                    </span>
                                 </span>
 
                             {% else %}
-
-                                <span class="staff-avatar">
+                                <span class="staff-avatar" aria-hidden="true">
                                     👤
                                 </span>
 
-                                <span class="profile-name">
-                                    {{ user.username }}
+                                <span class="profile-copy">
+                                    <span class="profile-name">
+                                        {{ user.username }}
+                                    </span>
+
+                                    <span class="profile-role">
+                                        User account
+                                    </span>
                                 </span>
-
                             {% endif %}
-
                         </a>
-
 
                         <ul class="dropdown-menu dropdown-menu-end">
 
                             {% if user.is_staff %}
-
                                 <li>
-
                                     <a
                                         class="dropdown-item"
                                         href="{% url 'active_drivers_by_location' %}">
 
-                                        🟢 Available Drivers
-
+                                        <span aria-hidden="true">🟢</span>
+                                        <span>Available Drivers</span>
                                     </a>
-
                                 </li>
 
                                 <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'registered_driver_locations' %}">
 
+                                        <span aria-hidden="true">📍</span>
+                                        <span>Driver Map</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{% url 'customers_by_location' %}">
+
+                                        <span aria-hidden="true">👥</span>
+                                        <span>Customers by Location</span>
+                                    </a>
+                                </li>
+
+                                <li>
                                     <a
                                         class="dropdown-item"
                                         href="/admin/">
 
-                                        ⚙️ Django Admin
-
+                                        <span aria-hidden="true">⚙️</span>
+                                        <span>Django Admin</span>
                                     </a>
-
                                 </li>
 
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-
                             {% endif %}
 
-
                             {% if user.customer_profile %}
-
                                 <li>
-
                                     <a
                                         class="dropdown-item"
                                         href="{% url 'customer_profile_update' %}">
 
-                                        👤 Update Profile
-
+                                        <span aria-hidden="true">👤</span>
+                                        <span>Update Profile</span>
                                     </a>
-
                                 </li>
-
                             {% endif %}
 
-
                             {% if user.driver_profile %}
-
                                 <li>
-
                                     <a
                                         class="dropdown-item"
                                         href="{% url 'driver_profile_update' %}">
 
-                                        👤 Update Driver Profile
-
+                                        <span aria-hidden="true">👤</span>
+                                        <span>Update Driver Profile</span>
                                     </a>
-
                                 </li>
-
                             {% endif %}
-
                         </ul>
-
                     </li>
 
-
                     {% if user.customer_profile %}
-
-                        <li class="nav-item ms-lg-2">
-
+                        <li class="nav-item">
                             <a
                                 class="btn logout-btn"
                                 href="{% url 'customer_logout' %}">
 
-                                🚪 Logout
-
+                                <span aria-hidden="true">🚪</span>
+                                <span>Logout</span>
                             </a>
-
                         </li>
 
                     {% elif user.driver_profile %}
-
-                        <li class="nav-item ms-lg-2">
-
+                        <li class="nav-item">
                             <a
                                 class="btn logout-btn"
                                 href="{% url 'driver_logout' %}">
 
-                                🚪 Logout
-
+                                <span aria-hidden="true">🚪</span>
+                                <span>Logout</span>
                             </a>
-
                         </li>
 
                     {% elif user.is_staff %}
-
-                        <li class="nav-item ms-lg-2">
-
+                        <li class="nav-item">
                             <a
                                 class="btn logout-btn"
                                 href="/admin/logout/">
 
-                                🚪 Logout
-
+                                <span aria-hidden="true">🚪</span>
+                                <span>Logout</span>
                             </a>
-
                         </li>
-
                     {% endif %}
 
                 {% else %}
-
                     <li class="nav-item">
-
                         <a
                             class="nav-link login-btn"
                             href="{% url 'customer_login' %}">
 
-                            👤 Customer Login
-
+                            <span aria-hidden="true">👤</span>
+                            <span>Customer Login</span>
                         </a>
-
                     </li>
 
-                    <li class="nav-item ms-lg-2">
-
+                    <li class="nav-item">
                         <a
                             class="nav-link login-btn driver-login-btn"
                             href="{% url 'driver_login' %}">
 
-                            🛵 Driver Login
-
+                            <span aria-hidden="true">🛵</span>
+                            <span>Driver Login</span>
                         </a>
-
                     </li>
-
                 {% endif %}
-
             </ul>
-
         </div>
-
     </div>
-
 </nav>
 
+{% if user.is_authenticated and user.driver_profile %}
+
+<script>
+    (function () {
+        "use strict";
+
+        const LOCATION_UPDATE_URL =
+            "{% url 'update_driver_location' %}";
+
+        const MINIMUM_SEND_INTERVAL_MS = 15000;
+
+        let gpsWatchId = null;
+        let lastSentAt = 0;
+        let requestInProgress = false;
+
+        function getCookie(name) {
+            const cookieValue =
+                document.cookie
+                    .split(";")
+                    .map(function (item) {
+                        return item.trim();
+                    })
+                    .find(function (item) {
+                        return item.startsWith(
+                            name + "="
+                        );
+                    });
+
+            if (!cookieValue) {
+                return "";
+            }
+
+            return decodeURIComponent(
+                cookieValue.substring(
+                    name.length + 1
+                )
+            );
+        }
+
+        function setGpsStatus(
+            message,
+            stateClass
+        ) {
+            const statusCard =
+                document.getElementById(
+                    "driverGpsStatus"
+                );
+
+            const statusText =
+                document.getElementById(
+                    "driverGpsStatusText"
+                );
+
+            if (!statusCard || !statusText) {
+                return;
+            }
+
+            statusCard.classList.remove(
+                "is-updating",
+                "is-current",
+                "is-error"
+            );
+
+            if (stateClass) {
+                statusCard.classList.add(
+                    stateClass
+                );
+            }
+
+            statusText.textContent =
+                message;
+        }
+
+        async function sendDriverLocation(
+            latitude,
+            longitude,
+            accuracy
+        ) {
+            if (requestInProgress) {
+                return;
+            }
+
+            requestInProgress = true;
+
+            setGpsStatus(
+                "Updating GPS...",
+                "is-updating"
+            );
+
+            try {
+                const response =
+                    await fetch(
+                        LOCATION_UPDATE_URL,
+                        {
+                            method: "POST",
+                            credentials: "same-origin",
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+                                "X-CSRFToken":
+                                    getCookie("csrftoken"),
+                                "X-Requested-With":
+                                    "XMLHttpRequest"
+                            },
+                            body: JSON.stringify({
+                                latitude: latitude,
+                                longitude: longitude,
+                                accuracy: accuracy
+                            })
+                        }
+                    );
+
+                const result =
+                    await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.message
+                        || "Unable to save GPS."
+                    );
+                }
+
+                lastSentAt = Date.now();
+
+                setGpsStatus(
+                    "GPS current",
+                    "is-current"
+                );
+
+            } catch (error) {
+                console.error(
+                    "Driver GPS update failed:",
+                    error
+                );
+
+                setGpsStatus(
+                    "GPS update failed",
+                    "is-error"
+                );
+
+            } finally {
+                requestInProgress = false;
+            }
+        }
+
+        function handleDriverPosition(
+            position
+        ) {
+            const now = Date.now();
+
+            if (
+                now - lastSentAt
+                < MINIMUM_SEND_INTERVAL_MS
+            ) {
+                return;
+            }
+
+            sendDriverLocation(
+                position.coords.latitude,
+                position.coords.longitude,
+                position.coords.accuracy
+            );
+        }
+
+        function handleGpsError(error) {
+            let message =
+                "GPS unavailable";
+
+            if (
+                error.code
+                === error.PERMISSION_DENIED
+            ) {
+                message =
+                    "Allow GPS permission";
+            } else if (
+                error.code
+                === error.POSITION_UNAVAILABLE
+            ) {
+                message =
+                    "GPS position unavailable";
+            } else if (
+                error.code
+                === error.TIMEOUT
+            ) {
+                message =
+                    "GPS request timed out";
+            }
+
+            setGpsStatus(
+                message,
+                "is-error"
+            );
+
+            console.warn(
+                "Driver GPS error:",
+                error.message
+            );
+        }
+
+        function startDriverGpsTracking() {
+            if (!navigator.geolocation) {
+                setGpsStatus(
+                    "GPS not supported",
+                    "is-error"
+                );
+
+                return;
+            }
+
+            if (gpsWatchId !== null) {
+                return;
+            }
+
+            setGpsStatus(
+                "Checking GPS...",
+                "is-updating"
+            );
+
+            gpsWatchId =
+                navigator.geolocation.watchPosition(
+                    handleDriverPosition,
+                    handleGpsError,
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 5000,
+                        timeout: 15000
+                    }
+                );
+        }
+
+        function stopDriverGpsTracking() {
+            if (
+                gpsWatchId !== null
+                && navigator.geolocation
+            ) {
+                navigator.geolocation.clearWatch(
+                    gpsWatchId
+                );
+            }
+
+            gpsWatchId = null;
+        }
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+                const availabilityToggle =
+                    document.getElementById(
+                        "driverAvailabilityToggle"
+                    );
+
+                if (
+                    availabilityToggle
+                    && !availabilityToggle.checked
+                ) {
+                    setGpsStatus(
+                        "GPS paused",
+                        ""
+                    );
+
+                    return;
+                }
+
+                startDriverGpsTracking();
+            }
+        );
+
+        window.addEventListener(
+            "beforeunload",
+            stopDriverGpsTracking
+        );
+    })();
+</script>
+
+{% endif %}

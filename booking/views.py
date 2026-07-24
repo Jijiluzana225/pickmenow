@@ -19,6 +19,9 @@ import requests
 
 
 
+
+
+
 def refresh_booking_dashboards(booking, reason):
     """
     Refresh both the driver dashboards in the booking's location
@@ -596,74 +599,217 @@ https://www.pickmenow.online/dashboard/
     return redirect("customer_dashboard")
 
 
+
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.urls import reverse
+
+from .models import DriverProfile, ServiceLocation
+
+
 def driver_register(request):
+    service_locations = ServiceLocation.objects.filter(
+        is_active=True
+    ).order_by("name")
+
     if request.method == "POST":
-        full_name = request.POST.get("full_name")
-        contact_number = request.POST.get("contact_number")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
-        motorcycle_model = request.POST.get("motorcycle_model")
-        plate_number = request.POST.get("plate_number")
-        license_number = request.POST.get("license_number")
-        profile_picture = request.FILES.get("profile_picture")
+        full_name = request.POST.get(
+            "full_name",
+            ""
+        ).strip()
+
+        contact_number = request.POST.get(
+            "contact_number",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
+
+        confirm_password = request.POST.get(
+            "confirm_password",
+            ""
+        )
+
+        motorcycle_model = request.POST.get(
+            "motorcycle_model",
+            ""
+        ).strip()
+
+        plate_number = request.POST.get(
+            "plate_number",
+            ""
+        ).strip()
+
+        license_number = request.POST.get(
+            "license_number",
+            ""
+        ).strip()
+
+        location_id = request.POST.get(
+            "location",
+            ""
+        ).strip()
+
+        profile_picture = request.FILES.get(
+            "profile_picture"
+        )
+
+        form_data = {
+            "full_name": full_name,
+            "contact_number": contact_number,
+            "motorcycle_model": motorcycle_model,
+            "plate_number": plate_number,
+            "license_number": license_number,
+            "selected_location_id": location_id,
+            "service_locations": service_locations,
+        }
+
+        if not full_name:
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": "Please enter your full name.",
+                }
+            )
+
+        if not contact_number:
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": "Please enter your contact number.",
+                }
+            )
+
+        if not location_id:
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": "Please select your service location.",
+                }
+            )
+
+        try:
+            selected_location = ServiceLocation.objects.get(
+                id=location_id,
+                is_active=True,
+            )
+        except (
+            ServiceLocation.DoesNotExist,
+            ValueError,
+            TypeError,
+        ):
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": (
+                        "The selected service location is invalid "
+                        "or currently unavailable."
+                    ),
+                }
+            )
 
         if not profile_picture:
-            return render(request, "booking/driver_register.html", {
-                "error": "Please upload your profile picture.",
-                "full_name": full_name,
-                "contact_number": contact_number,
-                "motorcycle_model": motorcycle_model,
-                "plate_number": plate_number,
-                "license_number": license_number,
-            })
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": "Please upload your profile picture.",
+                }
+            )
 
         if password != confirm_password:
-            return render(request, "booking/driver_register.html", {
-                "error": "Passwords do not match.",
-                "full_name": full_name,
-                "contact_number": contact_number,
-                "motorcycle_model": motorcycle_model,
-                "plate_number": plate_number,
-                "license_number": license_number,
-                "focus_password": True,
-            })
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": "Passwords do not match.",
+                    "focus_password": True,
+                }
+            )
 
-        if User.objects.filter(username=contact_number).exists():
-            return render(request, "booking/driver_register.html", {
-                "error": "Contact number is already registered.",
-                "full_name": full_name,
-                "contact_number": contact_number,
-                "motorcycle_model": motorcycle_model,
-                "plate_number": plate_number,
-                "license_number": license_number,
-            })
+        if User.objects.filter(
+            username=contact_number
+        ).exists():
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": (
+                        "Contact number is already registered."
+                    ),
+                }
+            )
+
+        if DriverProfile.objects.filter(
+            contact_number=contact_number
+        ).exists():
+            return render(
+                request,
+                "booking/driver_register.html",
+                {
+                    **form_data,
+                    "error": (
+                        "Contact number is already registered."
+                    ),
+                }
+            )
 
         user = User.objects.create_user(
             username=contact_number,
             password=password,
-            first_name=full_name
+            first_name=full_name,
         )
 
         DriverProfile.objects.create(
             user=user,
             full_name=full_name,
             contact_number=contact_number,
+            location=selected_location,
             profile_picture=profile_picture,
             motorcycle_model=motorcycle_model,
             plate_number=plate_number,
-            license_number=license_number,
+            license_number=license_number or None,
             is_available=True,
-            is_approved=False
+            is_approved=False,
         )
 
-        return HttpResponse(f"""
+        return HttpResponse(
+            f"""
             <script>
-            alert("Registration successful!\\n\\nWait for the call of the Admin to activate your account.");
-            window.location.href = "{reverse('customer_login')}";
-            </script>
-        """)
+                alert(
+                    "Registration successful!\\n\\n"
+                    + "Selected location: {selected_location.name}\\n\\n"
+                    + "Wait for the call of the Admin "
+                    + "to activate your account."
+                );
 
-    return render(request, "booking/driver_register.html")
+                window.location.href = "{reverse('customer_login')}";
+            </script>
+            """
+        )
+
+    return render(
+        request,
+        "booking/driver_register.html",
+        {
+            "service_locations": service_locations,
+        }
+    )
 
 
 def driver_login(request):
@@ -1867,5 +2013,198 @@ def customers_by_location(request):
     return render(
         request,
         "booking/customers_by_location.html",
+        context,
+    )
+
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from django.utils import timezone
+
+from .models import DriverProfile, ServiceLocation
+from .utils import (
+    DRIVER_GPS_ACTIVE_MINUTES,
+    get_driver_gps_status,
+)
+
+
+@staff_member_required(login_url="/admin/login/")
+def registered_driver_locations(request):
+    service_locations = (
+        ServiceLocation.objects
+        .filter(is_active=True)
+        .order_by("name")
+    )
+
+    selected_location_id = request.GET.get(
+        "location",
+        "",
+    ).strip()
+
+    drivers = (
+        DriverProfile.objects
+        .select_related(
+            "user",
+            "location",
+        )
+        .filter(
+            user__is_active=True,
+        )
+        .order_by(
+            "location__name",
+            "full_name",
+        )
+    )
+
+    if selected_location_id:
+        try:
+            selected_location_id_int = int(
+                selected_location_id
+            )
+
+            drivers = drivers.filter(
+                location_id=selected_location_id_int,
+            )
+
+        except (TypeError, ValueError):
+            selected_location_id = ""
+
+    driver_map_data = []
+
+    current_gps_count = 0
+    stale_gps_count = 0
+    no_gps_count = 0
+
+    for driver in drivers:
+        gps_status = get_driver_gps_status(
+            driver,
+            active_minutes=DRIVER_GPS_ACTIVE_MINUTES,
+        )
+
+        if (
+            driver.current_lat is None
+            or driver.current_lng is None
+        ):
+            no_gps_count += 1
+            continue
+
+        if gps_status["is_current"]:
+            current_gps_count += 1
+        else:
+            stale_gps_count += 1
+
+        # Pin every driver that has coordinates.
+        # Old GPS locations remain visible but are marked as stale.
+        driver_map_data.append({
+            "id": driver.id,
+            "full_name": driver.full_name,
+            "contact_number": driver.contact_number,
+
+            "location_name": (
+                driver.location.name
+                if driver.location
+                else "No service location"
+            ),
+
+            "motorcycle_model": (
+                driver.motorcycle_model
+            ),
+
+            "plate_number": (
+                driver.plate_number
+            ),
+
+            "license_number": (
+                driver.license_number or ""
+            ),
+
+            "latitude": float(
+                driver.current_lat
+            ),
+
+            "longitude": float(
+                driver.current_lng
+            ),
+
+            "is_available": (
+                driver.is_available
+            ),
+
+            "is_approved": (
+                driver.is_approved
+            ),
+
+            "gps_is_current": (
+                gps_status["is_current"]
+            ),
+
+            "gps_status": (
+                gps_status["status"]
+            ),
+
+            "gps_label": (
+                gps_status["label"]
+            ),
+
+            "gps_age_minutes": (
+                round(
+                    gps_status["age_minutes"],
+                    1,
+                )
+                if gps_status["age_minutes"] is not None
+                else None
+            ),
+
+            "last_location_update": (
+                timezone.localtime(
+                    driver.last_location_update
+                ).strftime(
+                    "%b %d, %Y %I:%M %p"
+                )
+                if driver.last_location_update
+                else "Never updated"
+            ),
+
+            "profile_picture": (
+                driver.profile_picture.url
+                if driver.profile_picture
+                else ""
+            ),
+        })
+
+    context = {
+        "drivers": drivers,
+        "service_locations": service_locations,
+        "selected_location_id": selected_location_id,
+        "driver_map_data": driver_map_data,
+
+        "total_registered_drivers": (
+            drivers.count()
+        ),
+
+        "total_pinned_drivers": (
+            len(driver_map_data)
+        ),
+
+        "current_gps_count": (
+            current_gps_count
+        ),
+
+        "stale_gps_count": (
+            stale_gps_count
+        ),
+
+        "no_gps_count": (
+            no_gps_count
+        ),
+
+        "gps_active_minutes": (
+            DRIVER_GPS_ACTIVE_MINUTES
+        ),
+    }
+
+    return render(
+        request,
+        "booking/registered_driver_locations.html",
         context,
     )

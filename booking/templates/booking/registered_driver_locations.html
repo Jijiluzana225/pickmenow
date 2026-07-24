@@ -1,0 +1,1109 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <title>
+        Registered Driver Locations | PickMeNow.Online
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-dark: #111827;
+            --primary-blue: #1d4ed8;
+            --light-blue: #dbeafe;
+            --page-background: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-dark: #1f2937;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--page-background);
+            color: var(--text-dark);
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 24px 15px 45px;
+        }
+
+        .page-header {
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 24px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #1e3a8a,
+                    #1d4ed8
+                );
+            color: #ffffff;
+            box-shadow:
+                0 20px 45px rgba(15, 23, 42, .20);
+        }
+
+        .page-title {
+            margin: 0 0 7px;
+            font-size: clamp(25px, 4vw, 38px);
+            font-weight: 950;
+        }
+
+        .page-description {
+            max-width: 800px;
+            margin: 0;
+            color: #dbeafe;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .summary-card,
+        .filter-card,
+        .map-card,
+        .drivers-card {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            box-shadow:
+                0 14px 35px rgba(15, 23, 42, .08);
+        }
+
+        .summary-card {
+            height: 100%;
+            padding: 18px;
+            border-radius: 20px;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            margin: 4px 0 0;
+            font-size: 29px;
+            font-weight: 950;
+        }
+
+        .filter-card {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 22px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .form-select {
+            min-height: 49px;
+            border-radius: 14px;
+        }
+
+        .clear-filter-button {
+            min-height: 49px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .map-card {
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-radius: 25px;
+        }
+
+        .map-card-header,
+        .drivers-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .map-title,
+        .drivers-title {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 950;
+        }
+
+        .map-description,
+        .drivers-description {
+            margin: 3px 0 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .count-badge {
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: var(--light-blue);
+            color: #1e40af;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        #driverMap {
+            width: 100%;
+            height: 610px;
+            background: #dfe7f1;
+        }
+
+        .map-message {
+            display: none;
+            padding: 65px 20px;
+            text-align: center;
+        }
+
+        .drivers-card {
+            overflow: hidden;
+            border-radius: 24px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            padding: 14px 15px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 14px 15px;
+            vertical-align: middle;
+        }
+
+        .driver-profile {
+            display: flex;
+            min-width: 210px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .driver-avatar,
+        .driver-avatar-placeholder {
+            width: 45px;
+            height: 45px;
+            flex: 0 0 auto;
+            border: 2px solid var(--light-blue);
+            border-radius: 50%;
+            background: #f1f5f9;
+        }
+
+        .driver-avatar {
+            object-fit: cover;
+        }
+
+        .driver-avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .driver-name {
+            font-size: 14px;
+            font-weight: 950;
+        }
+
+        .driver-contact {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .location-badge,
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .location-badge {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .status-available,
+        .status-pinned {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-approved {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-no-gps {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .map-info-window {
+            min-width: 245px;
+            padding: 4px;
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        .map-info-title {
+            margin: 0 0 7px;
+            color: #111827;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .map-info-line {
+            margin: 4px 0;
+            color: #475569;
+            font-size: 12px;
+        }
+
+        .map-info-status {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 767px) {
+            .page-container {
+                padding: 15px 10px 30px;
+            }
+
+            .map-card-header,
+            .drivers-card-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            #driverMap {
+                height: 470px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include "includes/navbar.html" %}
+
+    <main class="page-container">
+
+        <section class="page-header">
+            <h1 class="page-title">
+                📍 Registered Driver Locations
+            </h1>
+
+            <p class="page-description">
+                Select a service location to show all registered drivers
+                assigned to that location. Drivers with saved GPS coordinates
+                are pinned automatically on the Google Map.
+            </p>
+        </section>
+
+        <section class="row g-3">
+
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <div class="summary-label">
+                        Registered Drivers
+                    </div>
+
+                    <p class="summary-value">
+                        {{ total_registered_drivers|default:0 }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <div class="summary-label">
+                        Drivers Pinned
+                    </div>
+
+                    <p class="summary-value">
+                        {{ total_pinned_drivers|default:0 }}
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="filter-card">
+
+            <form
+                method="GET"
+                action="{% url 'registered_driver_locations' %}"
+                id="serviceLocationFilterForm">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-9">
+
+                        <label
+                            for="locationServices"
+                            class="form-label">
+
+                            Service Location
+                        </label>
+
+                        <select
+                            name="location"
+                            id="locationServices"
+                            class="form-select"
+                            onchange="this.form.submit();">
+
+                            <option value="">
+                                All service locations
+                            </option>
+
+                            {% for service_location in service_locations %}
+
+                                <option
+                                    value="{{ service_location.id }}"
+                                    {% if selected_location_id|stringformat:"s" == service_location.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ service_location.name }}
+
+                                </option>
+
+                            {% empty %}
+
+                                <option value="" disabled>
+                                    No active service locations
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <a
+                            href="{% url 'registered_driver_locations' %}"
+                            class="clear-filter-button">
+
+                            Clear Filter
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="map-card">
+
+            <div class="map-card-header">
+
+                <div>
+                    <h2 class="map-title">
+                        Driver Location Map
+                    </h2>
+
+                    <p class="map-description">
+                        Blue pin: your current browser location. Green pin:
+                        available driver with current GPS. Red pin:
+                        unavailable driver with current GPS. Yellow pin:
+                        driver with an older saved GPS location.
+                    </p>
+                </div>
+
+                <div class="count-badge">
+                    📍 {{ total_pinned_drivers|default:0 }} pinned
+                </div>
+
+            </div>
+
+            <div id="driverMap"></div>
+
+            <div
+                id="noMapDrivers"
+                class="map-message">
+
+                <h3>No driver coordinates found</h3>
+
+                <p class="text-muted mb-0">
+                    None of the drivers assigned to this service location
+                    currently have both current_lat and current_lng values.
+                </p>
+
+            </div>
+
+            <div
+                id="mapLoadError"
+                class="map-message">
+
+                <h3>Unable to load Google Maps</h3>
+
+                <p class="text-muted mb-0">
+                    Check the API key restrictions and make sure the Maps
+                    JavaScript API is enabled.
+                </p>
+
+            </div>
+
+        </section>
+
+        <section class="drivers-card">
+
+            <div class="drivers-card-header">
+
+                <div>
+                    <h2 class="drivers-title">
+                        Registered Drivers
+                    </h2>
+
+                    <p class="drivers-description">
+                        Drivers assigned to the selected service location.
+                    </p>
+                </div>
+
+                <div class="count-badge">
+                    🛵 {{ total_registered_drivers|default:0 }} drivers
+                </div>
+
+            </div>
+
+            {% if drivers %}
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Driver</th>
+                                <th>Service Location</th>
+                                <th>Motorcycle</th>
+                                <th>Availability</th>
+                                <th>Approval</th>
+                                <th>GPS Status</th>
+                                <th>Last Location Update</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for driver in drivers %}
+
+                                <tr
+                                    data-driver-id="{{ driver.id }}"
+                                    data-driver-name="{{ driver.full_name|escape }}"
+                                    data-driver-picture="{% if driver.profile_picture %}{{ driver.profile_picture.url }}{% endif %}">
+
+                                    <td>
+
+                                        <div class="driver-profile">
+
+                                            {% if driver.profile_picture %}
+
+                                                <img
+                                                    src="{{ driver.profile_picture.url }}"
+                                                    class="driver-avatar"
+                                                    alt="{{ driver.full_name }}">
+
+                                            {% else %}
+
+                                                <div class="driver-avatar-placeholder">
+                                                    🛵
+                                                </div>
+
+                                            {% endif %}
+
+                                            <div>
+                                                <div class="driver-name">
+                                                    {{ driver.full_name }}
+                                                </div>
+
+                                                <div class="driver-contact">
+                                                    {{ driver.contact_number }}
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="location-badge">
+
+                                            {% if driver.location %}
+                                                📍 {{ driver.location.name }}
+                                            {% else %}
+                                                No location
+                                            {% endif %}
+
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ driver.motorcycle_model|default:"Not provided" }}
+                                        </strong>
+
+                                        <div class="driver-contact">
+                                            Plate:
+                                            {{ driver.plate_number|default:"Not provided" }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+
+                                        {% if driver.is_available %}
+
+                                            <span class="status-badge status-available">
+                                                🟢 Available
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status-badge status-unavailable">
+                                                🔴 Unavailable
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if driver.is_approved %}
+
+                                            <span class="status-badge status-approved">
+                                                ✓ Approved
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status-badge status-pending">
+                                                Pending
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if driver.current_lat == None or driver.current_lng == None %}
+
+                                            <span class="status-badge status-no-gps">
+                                                No GPS
+                                            </span>
+
+                                        {% elif driver.last_location_update %}
+
+                                            <span class="status-badge status-pinned">
+                                                📍 Pinned
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status-badge status-no-gps">
+                                                Missing update time
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if driver.last_location_update %}
+
+                                            {{ driver.last_location_update|date:"M d, Y" }}
+                                            <br>
+                                            {{ driver.last_location_update|date:"h:i A" }}
+
+                                        {% else %}
+
+                                            Never updated
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="p-5 text-center">
+                    <h3>No registered drivers found</h3>
+
+                    <p class="text-muted mb-0">
+                        No drivers are assigned to the selected service
+                        location.
+                    </p>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    {{ driver_map_data|json_script:"driver-map-data" }}
+
+    <script>
+        let map;
+        let activeInfoWindow;
+
+        function initMap() {
+            const mapElement =
+                document.getElementById("driverMap");
+
+            const noDriversElement =
+                document.getElementById("noMapDrivers");
+
+            const dataElement =
+                document.getElementById("driver-map-data");
+
+            const defaultCenter = {
+                lat: 8.4542,
+                lng: 124.6319
+            };
+
+            map = new google.maps.Map(
+                mapElement,
+                {
+                    center: defaultCenter,
+                    zoom: 12,
+                    mapTypeId:
+                        google.maps.MapTypeId.ROADMAP,
+                    streetViewControl: false,
+                    fullscreenControl: true,
+                    mapTypeControl: true,
+                    zoomControl: true
+                }
+            );
+
+            let drivers = [];
+
+            try {
+                drivers =
+                    JSON.parse(dataElement.textContent);
+            } catch (error) {
+                console.error(
+                    "Invalid driver map data:",
+                    error
+                );
+            }
+
+
+            const pictureLookup = {};
+            document.querySelectorAll("tr[data-driver-id]").forEach(function(row){
+                pictureLookup[String(row.dataset.driverId)] = {
+                    url: row.dataset.driverPicture || "",
+                    name: row.dataset.driverName || ""
+                };
+            });
+
+            drivers.forEach(function(driver){
+                const p = pictureLookup[String(driver.id)];
+                if(p){
+                    driver.profile_picture_url = p.url;
+                    if(!driver.full_name){driver.full_name=p.name;}
+                }
+            });
+
+            const validDrivers =
+                Array.isArray(drivers)
+                    ? drivers.filter(
+                        function (driver) {
+                            const latitude =
+                                Number(driver.latitude);
+
+                            const longitude =
+                                Number(driver.longitude);
+
+                            return (
+                                Number.isFinite(latitude)
+                                && Number.isFinite(longitude)
+                                && latitude >= -90
+                                && latitude <= 90
+                                && longitude >= -180
+                                && longitude <= 180
+                            );
+                        }
+                    )
+                    : [];
+
+            const bounds =
+                new google.maps.LatLngBounds();
+
+            validDrivers.forEach(
+                function (driver) {
+                    const driverLocation = {
+                        lat: Number(driver.latitude),
+                        lng: Number(driver.longitude)
+                    };
+
+                    let markerIcon;
+
+                    if (!driver.gps_is_current) {
+                        markerIcon =
+                            "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+                    } else if (driver.is_available) {
+                        markerIcon =
+                            "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+                    } else {
+                        markerIcon =
+                            "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+                    }
+
+                    const marker =
+                        new google.maps.Marker({
+                            position: driverLocation,
+                            map: map,
+                            title:
+                                driver.full_name
+                                || "Registered Driver",
+                            icon: {
+                                url: driver.profile_picture_url || markerIcon,
+                                scaledSize: new google.maps.Size(46,46),
+                                anchor: new google.maps.Point(23,23)
+                            }
+                        });
+
+                    bounds.extend(driverLocation);
+
+                    marker.addListener(
+                        "click",
+                        function () {
+                            showDriverInformation(
+                                marker,
+                                driver
+                            );
+                        }
+                    );
+                }
+            );
+
+            if (validDrivers.length === 0) {
+                noDriversElement.style.display =
+                    "block";
+            } else if (validDrivers.length === 1) {
+                map.setCenter({
+                    lat: Number(validDrivers[0].latitude),
+                    lng: Number(validDrivers[0].longitude)
+                });
+
+                map.setZoom(16);
+            } else {
+                map.fitBounds(bounds);
+
+                google.maps.event.addListenerOnce(
+                    map,
+                    "bounds_changed",
+                    function () {
+                        if (map.getZoom() > 16) {
+                            map.setZoom(16);
+                        }
+                    }
+                );
+            }
+
+            showBrowserLocation();
+        }
+
+        function showBrowserLocation() {
+            if (!navigator.geolocation) {
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const browserLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    new google.maps.Marker({
+                        position: browserLocation,
+                        map: map,
+                        title: "Your Location",
+                        icon:
+                            "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    });
+                },
+                function (error) {
+                    console.warn(
+                        "GPS error:",
+                        error.message
+                    );
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 30000
+                }
+            );
+        }
+
+        function showDriverInformation(
+            marker,
+            driver
+        ) {
+            if (activeInfoWindow) {
+                activeInfoWindow.close();
+            }
+
+            const availability =
+                driver.is_available
+                    ? "🟢 Available"
+                    : "🔴 Unavailable";
+
+            const gpsStatus =
+                driver.gps_is_current
+                    ? "Current GPS"
+                    : "Older saved GPS";
+
+            const approval =
+                driver.is_approved
+                    ? "✓ Approved"
+                    : "Pending approval";
+
+            const content = `
+                <div class="map-info-window">
+
+                    <h3 class="map-info-title">
+                        ${escapeHtml(
+                            driver.full_name
+                            || "Registered Driver"
+                        )}
+                    </h3>
+
+                    <div class="map-info-line">
+                        📍
+                        ${escapeHtml(
+                            driver.location_name
+                            || "No service location"
+                        )}
+                    </div>
+
+                    <div class="map-info-line">
+                        📱
+                        ${escapeHtml(
+                            driver.contact_number
+                            || "Not provided"
+                        )}
+                    </div>
+
+                    <div class="map-info-line">
+                        🛵
+                        ${escapeHtml(
+                            driver.motorcycle_model
+                            || "Not provided"
+                        )}
+                    </div>
+
+                    <div class="map-info-line">
+                        Plate:
+                        ${escapeHtml(
+                            driver.plate_number
+                            || "Not provided"
+                        )}
+                    </div>
+
+                    <div class="map-info-line">
+                        Last update:
+                        ${escapeHtml(
+                            driver.last_location_update
+                            || "Never updated"
+                        )}
+                    </div>
+
+                    <div class="map-info-line">
+                        GPS status:
+                        ${escapeHtml(gpsStatus)}
+                    </div>
+
+                    <span
+                        class="map-info-status ${
+                            driver.is_available
+                                ? "status-available"
+                                : "status-unavailable"
+                        }">
+
+                        ${availability}
+
+                    </span>
+
+                    <span
+                        class="map-info-status ${
+                            driver.is_approved
+                                ? "status-approved"
+                                : "status-pending"
+                        }">
+
+                        ${approval}
+
+                    </span>
+
+                </div>
+            `;
+
+            activeInfoWindow =
+                new google.maps.InfoWindow({
+                    content: content
+                });
+
+            activeInfoWindow.open({
+                map: map,
+                anchor: marker
+            });
+        }
+
+        function escapeHtml(value) {
+            const element =
+                document.createElement("div");
+
+            element.textContent =
+                value === null || value === undefined
+                    ? ""
+                    : String(value);
+
+            return element.innerHTML;
+        }
+
+        window.gm_authFailure =
+            function () {
+                const mapElement =
+                    document.getElementById("driverMap");
+
+                const errorElement =
+                    document.getElementById("mapLoadError");
+
+                mapElement.style.display =
+                    "none";
+
+                errorElement.style.display =
+                    "block";
+            };
+    </script>
+
+    <script
+        async
+        defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAp38ahRHi7YSU7iDITGyvJSHT6uo8-RFE&libraries=places&callback=initMap">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    driver_map_data.append({
+    "id": driver.id,
+    "full_name": driver.full_name,
+    "contact_number": driver.contact_number,
+    "location_name": (
+        driver.location.name
+        if driver.location
+        else ""
+    ),
+    "motorcycle_model": driver.motorcycle_model,
+    "plate_number": driver.plate_number,
+    "latitude": float(driver.current_lat),
+    "longitude": float(driver.current_lng),
+    "is_available": driver.is_available,
+    "is_approved": driver.is_approved,
+    "gps_is_current": gps_status["is_current"],
+    "last_location_update": (
+        driver.last_location_update.strftime(
+            "%b %d, %Y %I:%M %p"
+        )
+        if driver.last_location_update
+        else ""
+    ),
+    "profile_picture_url": (
+        driver.profile_picture.url
+        if driver.profile_picture
+        else ""
+    ),
+})
+
+</body>
+</html>
