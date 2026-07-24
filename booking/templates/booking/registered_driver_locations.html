@@ -298,8 +298,10 @@
         }
 
         .map-info-window {
-            min-width: 245px;
-            padding: 4px;
+            width: min(290px, 78vw);
+            overflow: hidden;
+            padding: 2px;
+            color: #1f2937;
             font-family:
                 system-ui,
                 -apple-system,
@@ -308,23 +310,109 @@
                 sans-serif;
         }
 
+        .map-info-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            margin-bottom: 11px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .map-info-avatar,
+        .map-info-avatar-placeholder {
+            width: 66px;
+            height: 66px;
+            flex: 0 0 66px;
+            border: 4px solid #22c55e;
+            border-radius: 50%;
+            background: #f1f5f9;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, .20);
+        }
+
+        .map-info-avatar {
+            display: block;
+            object-fit: cover;
+        }
+
+        .map-info-avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .map-info-heading {
+            min-width: 0;
+        }
+
         .map-info-title {
-            margin: 0 0 7px;
+            overflow: hidden;
+            margin: 0;
             color: #111827;
             font-size: 16px;
             font-weight: 900;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .map-info-location {
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .map-info-details {
+            display: grid;
+            gap: 8px;
         }
 
         .map-info-line {
-            margin: 4px 0;
+            display: grid;
+            grid-template-columns: 22px minmax(0, 1fr);
+            align-items: start;
+            gap: 7px;
+            margin: 0;
             color: #475569;
             font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .map-info-icon {
+            text-align: center;
+        }
+
+        .map-info-label {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .map-info-value {
+            display: block;
+            margin-top: 1px;
+            color: #334155;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .map-info-statuses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
         }
 
         .map-info-status {
-            display: inline-block;
-            margin-top: 7px;
-            padding: 5px 8px;
+            display: inline-flex;
+            align-items: center;
+            min-height: 27px;
+            padding: 5px 9px;
             border-radius: 999px;
             font-size: 10px;
             font-weight: 900;
@@ -741,6 +829,17 @@
             const dataElement =
                 document.getElementById("driver-map-data");
 
+            if (
+                !mapElement
+                || !noDriversElement
+                || !dataElement
+            ) {
+                console.error(
+                    "Required map elements are missing."
+                );
+                return;
+            }
+
             const defaultCenter = {
                 lat: 8.4542,
                 lng: 124.6319
@@ -841,11 +940,15 @@
                             title:
                                 driver.full_name
                                 || "Registered Driver",
-                            icon: {
-                                url: driver.profile_picture_url || markerIcon,
-                                scaledSize: new google.maps.Size(46,46),
-                                anchor: new google.maps.Point(23,23)
-                            }
+                            icon: driver.profile_picture_url
+                                ? {
+                                    url: driver.profile_picture_url,
+                                    scaledSize:
+                                        new google.maps.Size(46, 46),
+                                    anchor:
+                                        new google.maps.Point(23, 23)
+                                }
+                                : markerIcon
                         });
 
                     bounds.extend(driverLocation);
@@ -946,83 +1049,158 @@
                     ? "✓ Approved"
                     : "Pending approval";
 
+            const profilePicture =
+                driver.profile_picture_url
+                    ? `
+                        <img
+                            src="${escapeAttribute(driver.profile_picture_url)}"
+                            class="map-info-avatar"
+                            alt="${escapeAttribute(
+                                driver.full_name
+                                || "Registered Driver"
+                            )}">
+                    `
+                    : `
+                        <div
+                            class="map-info-avatar-placeholder"
+                            aria-hidden="true">
+                            🛵
+                        </div>
+                    `;
+
             const content = `
                 <div class="map-info-window">
 
-                    <h3 class="map-info-title">
-                        ${escapeHtml(
-                            driver.full_name
-                            || "Registered Driver"
-                        )}
-                    </h3>
+                    <div class="map-info-profile">
+                        ${profilePicture}
 
-                    <div class="map-info-line">
-                        📍
-                        ${escapeHtml(
-                            driver.location_name
-                            || "No service location"
-                        )}
+                        <div class="map-info-heading">
+                            <h3 class="map-info-title">
+                                ${escapeHtml(
+                                    driver.full_name
+                                    || "Registered Driver"
+                                )}
+                            </h3>
+
+                            <div class="map-info-location">
+                                📍
+                                ${escapeHtml(
+                                    driver.location_name
+                                    || "No service location"
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="map-info-line">
-                        📱
-                        ${escapeHtml(
-                            driver.contact_number
-                            || "Not provided"
-                        )}
+                    <div class="map-info-details">
+
+                        <div class="map-info-line">
+                            <span class="map-info-icon">📱</span>
+
+                            <span>
+                                <span class="map-info-label">
+                                    Contact
+                                </span>
+
+                                <span class="map-info-value">
+                                    ${escapeHtml(
+                                        driver.contact_number
+                                        || "Not provided"
+                                    )}
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="map-info-line">
+                            <span class="map-info-icon">🛵</span>
+
+                            <span>
+                                <span class="map-info-label">
+                                    Motorcycle
+                                </span>
+
+                                <span class="map-info-value">
+                                    ${escapeHtml(
+                                        driver.motorcycle_model
+                                        || "Not provided"
+                                    )}
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="map-info-line">
+                            <span class="map-info-icon">🔖</span>
+
+                            <span>
+                                <span class="map-info-label">
+                                    Plate number
+                                </span>
+
+                                <span class="map-info-value">
+                                    ${escapeHtml(
+                                        driver.plate_number
+                                        || "Not provided"
+                                    )}
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="map-info-line">
+                            <span class="map-info-icon">🕒</span>
+
+                            <span>
+                                <span class="map-info-label">
+                                    Last location update
+                                </span>
+
+                                <span class="map-info-value">
+                                    ${escapeHtml(
+                                        driver.last_location_update
+                                        || "Never updated"
+                                    )}
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="map-info-line">
+                            <span class="map-info-icon">🛰️</span>
+
+                            <span>
+                                <span class="map-info-label">
+                                    GPS status
+                                </span>
+
+                                <span class="map-info-value">
+                                    ${escapeHtml(gpsStatus)}
+                                </span>
+                            </span>
+                        </div>
+
                     </div>
 
-                    <div class="map-info-line">
-                        🛵
-                        ${escapeHtml(
-                            driver.motorcycle_model
-                            || "Not provided"
-                        )}
+                    <div class="map-info-statuses">
+
+                        <span
+                            class="map-info-status ${
+                                driver.is_available
+                                    ? "status-available"
+                                    : "status-unavailable"
+                            }">
+
+                            ${availability}
+                        </span>
+
+                        <span
+                            class="map-info-status ${
+                                driver.is_approved
+                                    ? "status-approved"
+                                    : "status-pending"
+                            }">
+
+                            ${approval}
+                        </span>
+
                     </div>
-
-                    <div class="map-info-line">
-                        Plate:
-                        ${escapeHtml(
-                            driver.plate_number
-                            || "Not provided"
-                        )}
-                    </div>
-
-                    <div class="map-info-line">
-                        Last update:
-                        ${escapeHtml(
-                            driver.last_location_update
-                            || "Never updated"
-                        )}
-                    </div>
-
-                    <div class="map-info-line">
-                        GPS status:
-                        ${escapeHtml(gpsStatus)}
-                    </div>
-
-                    <span
-                        class="map-info-status ${
-                            driver.is_available
-                                ? "status-available"
-                                : "status-unavailable"
-                        }">
-
-                        ${availability}
-
-                    </span>
-
-                    <span
-                        class="map-info-status ${
-                            driver.is_approved
-                                ? "status-approved"
-                                : "status-pending"
-                        }">
-
-                        ${approval}
-
-                    </span>
-
                 </div>
             `;
 
@@ -1047,6 +1225,11 @@
                     : String(value);
 
             return element.innerHTML;
+        }
+
+        function escapeAttribute(value) {
+            return escapeHtml(value)
+                .replaceAll("`", "&#96;");
         }
 
         window.gm_authFailure =
@@ -1074,36 +1257,5 @@
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
     </script>
-
-    driver_map_data.append({
-    "id": driver.id,
-    "full_name": driver.full_name,
-    "contact_number": driver.contact_number,
-    "location_name": (
-        driver.location.name
-        if driver.location
-        else ""
-    ),
-    "motorcycle_model": driver.motorcycle_model,
-    "plate_number": driver.plate_number,
-    "latitude": float(driver.current_lat),
-    "longitude": float(driver.current_lng),
-    "is_available": driver.is_available,
-    "is_approved": driver.is_approved,
-    "gps_is_current": gps_status["is_current"],
-    "last_location_update": (
-        driver.last_location_update.strftime(
-            "%b %d, %Y %I:%M %p"
-        )
-        if driver.last_location_update
-        else ""
-    ),
-    "profile_picture_url": (
-        driver.profile_picture.url
-        if driver.profile_picture
-        else ""
-    ),
-})
-
 </body>
 </html>
