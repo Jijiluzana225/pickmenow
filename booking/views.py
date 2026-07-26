@@ -1054,14 +1054,14 @@ def accept_booking(request, booking_id):
         booking.driver = driver
         booking.status = "accepted"
         booking.assigned_at = now
-        booking.accepted_at = now
+        booking.updated_at = now
 
         booking.save(
             update_fields=[
                 "driver",
                 "status",
                 "assigned_at",
-                "accepted_at",
+                "updated_at",
             ]
         )
 
@@ -1179,6 +1179,7 @@ def cancel_booking(request, booking_id):
     if request.method == "POST":
         if booking.status in ["pending", "assigned"]:
             booking.status = "cancelled"
+            booking.updated_at = timezone.now()
 
             booking.save(
                 update_fields=[
@@ -1204,13 +1205,13 @@ def driver_accepted_bookings(request):
     bookings = Booking.objects.filter(
         driver=driver,
         status="accepted"
-    ).order_by("-accepted_at", "-assigned_at", "-created_at")
+    ).order_by("-updated_at", "-assigned_at", "-created_at")
 
     for booking in bookings:
         booking.can_no_show = (
             booking.status == "accepted"
-            and booking.accepted_at
-            and timezone.now() >= booking.accepted_at + timedelta(minutes=2)
+            and booking.updated_at
+            and timezone.now() >= booking.updated_at + timedelta(minutes=2)
         )
 
     return render(request, "booking/driver_accepted_bookings.html", {
@@ -1255,6 +1256,7 @@ def complete_booking(request, booking_id):
 
     with transaction.atomic():
         booking.status = "completed"
+        booking.updated_at = timezone.now()
 
         booking.save(
             update_fields=[
@@ -1441,7 +1443,7 @@ def no_show_booking(request, booking_id):
     with transaction.atomic():
         booking.status = "no_show"
         booking.instructions = "No Show"
-
+        booking.updated_at = timezone.now()
         booking.save(
             update_fields=[
                 "status",

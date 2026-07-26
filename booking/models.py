@@ -198,9 +198,17 @@ class Booking(models.Model):
         auto_now_add=True
     )
 
+
     accepted_at = models.DateTimeField(
-        blank=True,
-        null=True
+    blank=True,
+    null=True,
+    db_index=True
+    )
+
+    updated_at = models.DateTimeField(
+    blank=True,
+    null=True,
+    db_index=True
     )
 
     priority_driver = models.ForeignKey(

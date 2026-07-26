@@ -710,8 +710,16 @@
                                     </div>
 
                                     <div class="text-muted small">
-                                        {{ booking.created_at }}
-                                    </div>
+    Created:
+    {{ booking.created_at|date:"M d, Y h:i A" }}
+</div>
+
+{% if booking.updated_at %}
+<div class="text-muted small">
+    {{ booking.get_status_display }}:
+    {{ booking.updated_at|date:"M d, Y h:i A" }}
+</div>
+{% endif %}
 
                                     <div class="text-muted small">
                                         {{ booking.distance_km }} KM

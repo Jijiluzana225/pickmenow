@@ -386,8 +386,8 @@
 
                                 <small class="text-muted">
                                     Accepted:
-                                    {% if booking.accepted_at %}
-                                        {{ booking.accepted_at }}
+                                    {% if booking.updated_at %}
+                                        {{ booking.updated_at }}
                                     {% else %}
                                         {{ booking.assigned_at }}
                                     {% endif %}
