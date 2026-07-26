@@ -431,6 +431,54 @@
             box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
         }
 
+        .booking-card.cancelled-booking {
+            opacity: 1;
+            border: 2px solid #ef4444;
+            border-left: 7px solid #b91c1c;
+            background: linear-gradient(145deg, #fef2f2 0%, #ffffff 68%);
+            box-shadow: 0 14px 34px rgba(185, 28, 28, 0.16);
+        }
+
+        .booking-card.cancelled-booking .service-banner {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #ffffff;
+            border-bottom-color: #7f1d1d;
+        }
+
+        .booking-card.cancelled-booking .fare-box {
+            background: #fff1f2;
+            border-color: #fecaca;
+        }
+
+        .booking-card.cancelled-booking .fare-total {
+            color: #b91c1c;
+        }
+
+        .status-cancelled,
+        .status-Cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .cancelled-row > * {
+            background: #fef2f2 !important;
+            color: #7f1d1d;
+        }
+
+        .cancelled-row:hover > * {
+            background: #fee2e2 !important;
+        }
+
+        .cancelled-row .fw-bold.text-success {
+            color: #b91c1c !important;
+        }
+
+        .plain-location {
+            color: #4b5563;
+            font-weight: 600;
+        }
+
         .inactive-booking .route-btn,
         .inactive-booking .accept-btn {
             pointer-events: none;
@@ -556,7 +604,7 @@
             <h2>Driver Dashboard</h2>
 
             <p>
-                View customer bookings, routes, fares, tips,
+                View today's customer bookings, routes, fares, tips,
                 and accept available bookings.
             </p>
 
@@ -599,6 +647,9 @@
                         {% endif %}
                         {% if booking.status != "pending" %}
                             inactive-booking
+                        {% endif %}
+                        {% if booking.status|lower == "cancelled" %}
+                            cancelled-booking
                         {% endif %}
                     "
                 >
@@ -762,13 +813,19 @@
                             </div>
 
                             <div class="value">
-                                <a
-                                    href="{% url 'navigate_to_origin' booking.id %}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {{ booking.origin }}
-                                </a>
+                                {% if booking.status|lower == "pending" %}
+                                    <a
+                                        href="{% url 'navigate_to_origin' booking.id %}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {{ booking.origin }}
+                                    </a>
+                                {% else %}
+                                    <span class="plain-location">
+                                        {{ booking.origin }}
+                                    </span>
+                                {% endif %}
                             </div>
 
                             <div class="label">
@@ -786,13 +843,19 @@
                             </div>
 
                             <div class="value">
-                                <a
-                                    href="{% url 'navigate_to_origin' booking.id %}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {{ booking.origin }}
-                                </a>
+                                {% if booking.status|lower == "pending" %}
+                                    <a
+                                        href="{% url 'navigate_to_origin' booking.id %}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {{ booking.origin }}
+                                    </a>
+                                {% else %}
+                                    <span class="plain-location">
+                                        {{ booking.origin }}
+                                    </span>
+                                {% endif %}
                             </div>
 
                             <div class="label">
@@ -1096,6 +1159,9 @@
                                     {% if booking.status != "pending" %}
                                         inactive-row
                                     {% endif %}
+                                    {% if booking.status|lower == "cancelled" %}
+                                        cancelled-row
+                                    {% endif %}
                                 "
                             >
                                 <td>
@@ -1180,13 +1246,19 @@
                                 </td>
 
                                 <td>
-                                    <a
-                                        href="{% url 'navigate_to_origin' booking.id %}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        {{ booking.origin }}
-                                    </a>
+                                    {% if booking.status|lower == "pending" %}
+                                        <a
+                                            href="{% url 'navigate_to_origin' booking.id %}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {{ booking.origin }}
+                                        </a>
+                                    {% else %}
+                                        <span class="plain-location">
+                                            {{ booking.origin }}
+                                        </span>
+                                    {% endif %}
                                 </td>
 
                                 <td>
@@ -1421,7 +1493,7 @@
             </h5>
 
             <p class="mb-0">
-                New customer bookings will appear here.
+                New customer bookings for today will appear here.
             </p>
         </div>
 

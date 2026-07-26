@@ -72,6 +72,7 @@ def index(request):
         return redirect("dashboard")
 
     return redirect("customer_login")
+
 @login_required(login_url="driver_login")
 def dashboard(request):
     if not hasattr(request.user, "driver_profile"):
@@ -91,32 +92,35 @@ def dashboard(request):
             },
         )
 
+    now = timezone.localtime()
+    today = now.date()
+
     has_active_booking = Booking.objects.filter(
         driver=driver,
-        status="accepted",
+        status__iexact="accepted",
     ).exists()
 
-    now = timezone.now()
-
-    # Show all bookings in the driver's location.
-    bookings = Booking.objects.filter(
-        location=driver.location,
-    ).select_related(
-        "priority_driver",
-        "customer",
-        "driver",
-    ).order_by("-created_at")
+    bookings = (
+        Booking.objects.filter(
+            location=driver.location,
+            created_at__date=today,
+        )
+        .select_related(
+            "priority_driver",
+            "customer",
+            "driver",
+        )
+        .order_by("-created_at")
+    )
 
     for booking in bookings:
         booking.can_accept = False
         booking.wait_seconds = 0
         booking.is_priority_driver = False
 
-        # Only pending bookings can be accepted.
-        if booking.status != "pending":
+        if booking.status.lower() != "pending":
             continue
 
-        # Do not allow accepting a booking already assigned to a driver.
         if booking.driver_id is not None:
             continue
 
@@ -157,8 +161,10 @@ def dashboard(request):
             "driver": driver,
             "has_active_booking": has_active_booking,
             "server_time": now,
+            "today": today,
         },
     )
+
 
 from decimal import Decimal, InvalidOperation
 from datetime import timedelta
