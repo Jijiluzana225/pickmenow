@@ -98,18 +98,22 @@ def dashboard(request):
     ).exists()
 
     now = timezone.now()
-
     bookings = Booking.objects.filter(
-        status="pending",
-        driver__isnull=True,
-        location=driver.location
+    location=driver.location
     ).select_related(
-        "priority_driver",
-        "customer",
+    "priority_driver",
+    "customer",
+    "driver",
     ).order_by("-created_at")
 
     for booking in bookings:
-        # Active whenever the one-minute deadline has not expired.
+        booking.can_accept = False
+        booking.wait_seconds = 0
+        booking.is_priority_driver = False
+
+        if booking.status != "pending":
+            continue
+
         priority_window_active = (
             booking.priority_until is not None
             and booking.priority_until > now
@@ -120,11 +124,6 @@ def dashboard(request):
             and booking.priority_driver_id == driver.id
         )
 
-        # During the first minute:
-        # - only the nearest driver can accept;
-        # - if no nearest driver was found, nobody can accept.
-        #
-        # After one minute, all eligible drivers can accept.
         booking.can_accept = (
             not has_active_booking
             and driver.is_available
@@ -143,10 +142,7 @@ def dashboard(request):
                     ).total_seconds()
                 )
             )
-        else:
-            booking.wait_seconds = 0
-
-    return render(
+        return render(
         request,
         "booking/dashboard.html",
         {

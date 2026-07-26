@@ -426,6 +426,37 @@
             background: #f0fdf4;
         }
 
+        .booking-card.inactive-booking {
+            opacity: 0.78;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .inactive-booking .route-btn,
+        .inactive-booking .accept-btn {
+            pointer-events: none;
+        }
+
+        .inactive-row {
+            opacity: 0.72;
+        }
+
+        .inactive-row .route-btn,
+        .inactive-row .accept-btn,
+        .inactive-row a {
+            pointer-events: none;
+        }
+
+        .booking-disabled-note {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #4b5563;
+            border-radius: 12px;
+            padding: 9px 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
         .empty-state {
             background: #ffffff;
             border-radius: 22px;
@@ -565,6 +596,9 @@
                         {% endif %}
                         {% if booking.is_priority_driver %}
                             priority-booking
+                        {% endif %}
+                        {% if booking.status != "pending" %}
+                            inactive-booking
                         {% endif %}
                     "
                 >
@@ -828,31 +862,67 @@
                             </div>
                         </div>
 
-                        <button
-                            type="button"
-                            class="
-                                btn
-                                btn-primary
-                                route-btn
-                                w-100
-                                mb-2
-                            "
-                            data-bs-toggle="modal"
-                            data-bs-target="#bookingRouteModal"
-                            onclick="showBookingRoute(
-                                {{ booking.origin_lat }},
-                                {{ booking.origin_lng }},
-                                {{ booking.destination_lat }},
-                                {{ booking.destination_lng }},
-                                '{{ booking.customer_name|escapejs }}',
-                                '{{ booking.distance_km|escapejs }}',
-                                '{{ booking.service_type|escapejs }}'
-                            )"
-                        >
-                            View Booking Route
-                        </button>
+                        {% if booking.status == "pending" %}
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    btn-primary
+                                    route-btn
+                                    w-100
+                                    mb-2
+                                "
+                                data-bs-toggle="modal"
+                                data-bs-target="#bookingRouteModal"
+                                onclick="showBookingRoute(
+                                    {{ booking.origin_lat }},
+                                    {{ booking.origin_lng }},
+                                    {{ booking.destination_lat }},
+                                    {{ booking.destination_lng }},
+                                    '{{ booking.customer_name|escapejs }}',
+                                    '{{ booking.distance_km|escapejs }}',
+                                    '{{ booking.service_type|escapejs }}'
+                                )"
+                            >
+                                View Booking Route
+                            </button>
+                        {% else %}
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    btn-secondary
+                                    route-btn
+                                    w-100
+                                    mb-2
+                                "
+                                disabled
+                            >
+                                Route unavailable — {{ booking.status|title }}
+                            </button>
+                        {% endif %}
 
-                        {% if has_active_booking %}
+                        {% if booking.status != "pending" %}
+
+                            <div class="booking-disabled-note">
+                                This booking is {{ booking.status|title }} and is not active.
+                            </div>
+
+                            <button
+                                type="button"
+                                class="
+                                    btn
+                                    btn-secondary
+                                    accept-btn
+                                    w-100
+                                    mb-3
+                                "
+                                disabled
+                            >
+                                {{ booking.status|title }}
+                            </button>
+
+                        {% elif has_active_booking %}
 
                             <button
                                 type="button"
@@ -868,7 +938,7 @@
                                 You already have an accepted booking
                             </button>
 
-                        {% elif booking.status != "pending" or booking.driver %}
+                        {% elif booking.driver %}
 
                             <div
                                 class="
@@ -1023,6 +1093,9 @@
                                     {% if booking.is_priority_driver %}
                                         priority-row
                                     {% endif %}
+                                    {% if booking.status != "pending" %}
+                                        inactive-row
+                                    {% endif %}
                                 "
                             >
                                 <td>
@@ -1131,22 +1204,33 @@
                                 </td>
 
                                 <td>
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary route-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#bookingRouteModal"
-                                        onclick="showBookingRoute(
-                                            {{ booking.origin_lat }},
-                                            {{ booking.origin_lng }},
-                                            {{ booking.destination_lat }},
-                                            {{ booking.destination_lng }},
-                                            '{{ booking.customer_name|escapejs }}',
-                                            '{{ booking.distance_km|escapejs }}'
-                                        )"
-                                    >
-                                        View Route
-                                    </button>
+                                    {% if booking.status == "pending" %}
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary route-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#bookingRouteModal"
+                                            onclick="showBookingRoute(
+                                                {{ booking.origin_lat }},
+                                                {{ booking.origin_lng }},
+                                                {{ booking.destination_lat }},
+                                                {{ booking.destination_lng }},
+                                                '{{ booking.customer_name|escapejs }}',
+                                                '{{ booking.distance_km|escapejs }}',
+                                                '{{ booking.service_type|escapejs }}'
+                                            )"
+                                        >
+                                            View Route
+                                        </button>
+                                    {% else %}
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary route-btn"
+                                            disabled
+                                        >
+                                            Disabled
+                                        </button>
+                                    {% endif %}
                                 </td>
 
                                 <td>
@@ -1177,7 +1261,11 @@
                                 </td>
 
                                 <td>
-                                    {% if booking.is_priority_driver and booking.wait_seconds > 0 %}
+                                    {% if booking.status != "pending" %}
+                                        <span class="text-muted small">
+                                            Not active
+                                        </span>
+                                    {% elif booking.is_priority_driver and booking.wait_seconds > 0 %}
                                         <span class="priority-badge">
                                             ⭐ Nearest
                                         </span>
@@ -1200,7 +1288,22 @@
                                 </td>
 
                                 <td>
-                                    {% if has_active_booking %}
+                                    {% if booking.status != "pending" %}
+
+                                        <button
+                                            type="button"
+                                            class="
+                                                btn
+                                                btn-secondary
+                                                btn-sm
+                                                accept-btn
+                                            "
+                                            disabled
+                                        >
+                                            {{ booking.status|title }}
+                                        </button>
+
+                                    {% elif has_active_booking %}
 
                                         <button
                                             type="button"
@@ -1215,7 +1318,7 @@
                                             Already Accepted One
                                         </button>
 
-                                    {% elif booking.status != "pending" or booking.driver %}
+                                    {% elif booking.driver %}
 
                                         <span class="text-muted small">
                                             Taken
@@ -2100,7 +2203,8 @@
                     routeData.destinationLat,
                     routeData.destinationLng,
                     routeData.customerName,
-                    routeData.distanceKm
+                    routeData.distanceKm,
+                    routeData.serviceType
                 );
             }
         }
